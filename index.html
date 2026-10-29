@@ -743,6 +743,29 @@ html{touch-action:manipulation}
 .auPriv{margin:0;font-size:12px;color:var(--muted);line-height:1.4}
 #authOv .card{display:grid;gap:12px;grid-template-columns:minmax(0,1fr)}
 .whoCloud{font-size:11px;margin-left:4px;vertical-align:middle}
+#netOv .card{grid-template-columns:minmax(0,1fr)}#netOv .card>*{min-width:0}.frRow .frBtns{flex:none}
+.frBox{display:grid;min-width:0;grid-template-columns:minmax(0,1fr);gap:10px;background:var(--panel-2);border:1px solid var(--edge);border-radius:12px;padding:12px}
+.frMe{margin:0;color:var(--muted);font-size:14px}.frMe b{color:var(--text)}
+.frAdd{display:flex;gap:8px}.frAdd input{flex:1;min-width:0;background:var(--panel);color:var(--text);border:1px solid var(--edge);border-radius:8px;padding:10px;font:600 16px var(--f-ui)}
+.frList{display:grid;gap:6px;grid-template-columns:minmax(0,1fr)}.frAdd input{width:0}
+.frRow{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:8px 8px 8px 10px}
+.frRow .dot{width:10px;height:10px;border-radius:50%;background:#55657e}.frRow .dot.on{background:#35d07f;box-shadow:0 0 0 3px rgba(53,208,127,.2)}.frRow .dot.game{background:var(--lamp)}
+.frRow .nm{display:grid;min-width:0}.frRow .nm b{font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.frRow .nm span{font-size:12px;color:var(--muted)}
+.frBtns{display:flex;gap:6px}.frBtns button{padding:8px 10px;font-size:14px}
+.frCh{border:0;border-radius:8px;background:linear-gradient(#ff5a67,#c8202f);color:#fff;font:700 14px var(--f-ui);letter-spacing:.06em;cursor:pointer;box-shadow:inset 0 -2px 0 #8b1520}
+.frCh:disabled{opacity:.45;cursor:default}
+.frX{background:none;border:1px solid var(--edge);color:var(--muted);border-radius:8px;cursor:pointer;font:600 13px var(--f-ui)}
+.frOk{border:0;border-radius:8px;background:#2fa96a;color:#fff;font:700 14px var(--f-ui);cursor:pointer}
+.frHead{font-size:12px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;font-weight:700}
+.frEmpty{margin:0;color:var(--muted);font-size:14px;line-height:1.4}
+.frMsg{margin:0;font-size:14px;color:var(--lamp);min-height:0}
+#chOv{z-index:60;background:rgba(7,10,15,.86)}
+.chCard{text-align:center;justify-items:center;border-color:#c8202f;box-shadow:0 0 0 3px rgba(229,57,74,.25),0 20px 60px rgba(0,0,0,.6)}
+.chCard .go,.chCard .ghost{width:100%}
+.chIcon{font-size:56px;line-height:1;animation:chPulse 1s ease-in-out infinite}
+@keyframes chPulse{50%{transform:scale(1.12) rotate(-6deg)}}
+@media (prefers-reduced-motion:reduce){.chIcon{animation:none}}
+.chWho{margin:0;font-size:18px}.chSub{margin:0;color:var(--muted);font-size:14px}
 </style>
 
 <div id="app">
@@ -829,7 +852,7 @@ html{touch-action:manipulation}
           <div class="rail">
             <button class="tab" id="passBtn" data-tab="passOv"><span class="ti pass"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4zm6 0v10h2V7z"/></svg></span><span>Pass</span><i class="bdg" id="passBdg" hidden></i></button>
             <button class="tab" id="roadBtn" data-tab="roadOv"><span class="ti road"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h10v2h3v3a4 4 0 0 1-4 4h-.3A5 5 0 0 1 13 14.9V18h3v3H8v-3h3v-3.1A5 5 0 0 1 8.3 12H8a4 4 0 0 1-4-4V5h3V3zm0 4H6v1a2 2 0 0 0 1 1.7V7zm10 0v2.7A2 2 0 0 0 18 8V7h-1z"/></svg></span><span>Road</span><i class="bdg" id="roadBdg" hidden></i></button>
-            <button class="tab" id="friendBtn"><span class="ti fr"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm8 1a3 3 0 1 1 0-6 3 3 0 0 1 0 6zM1 20c0-4 4-6 8-6s8 2 8 6zm16-6c3 0 6 1.5 6 5h-5c0-2-.4-3.6-1-5z"/></svg></span><span id="friendLbl">Friends</span></button>
+            <button class="tab" id="friendBtn"><span class="ti fr"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm8 1a3 3 0 1 1 0-6 3 3 0 0 1 0 6zM1 20c0-4 4-6 8-6s8 2 8 6zm16-6c3 0 6 1.5 6 5h-5c0-2-.4-3.6-1-5z"/></svg></span><span id="friendLbl">Friends</span><i class="bdg" id="frBdg" hidden></i></button>
             <button class="tab" id="statsBtn" data-tab="statsOv"><span class="ti stats"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10h4v10zm6 0V4h4v16zm6 0v-7h4v7z"/></svg></span><span>Stats</span></button>
           </div>
         </div>
@@ -909,6 +932,17 @@ html{touch-action:manipulation}
       </div>
     </div>
 
+    <div class="ov" id="chOv" hidden>
+      <div class="card chCard">
+        <div class="chIcon">⚔️</div>
+        <div class="result" style="font-size:44px">CHALLENGE!</div>
+        <p class="chWho"><b id="chName">-</b> wants to play you 1v1</p>
+        <p class="chSub" id="chSub"></p>
+        <button class="go" id="chYes">ACCEPT</button>
+        <button class="ghost" id="chNo">Decline</button>
+      </div>
+    </div>
+
     <div class="ov" id="authOv" hidden>
       <div class="card">
         <div class="result" style="font-size:40px" id="auTitle">SIGN IN</div>
@@ -957,7 +991,9 @@ html{touch-action:manipulation}
 
     <div class="ov" id="netOv" hidden>
       <div class="card">
-        <div class="result" style="font-size:44px">PLAY A FRIEND</div>
+        <div class="result" style="font-size:44px">FRIENDS</div>
+        <div class="frBox" id="frBox" hidden></div>
+        <div class="bxSec" id="codeHead">Play with a code</div>
         <p>1v1 online. One of you hosts and shares the code, the other joins with it. You each bring your own deck, upgrades and unlocked moves. Friend games don't give trophies, pucks or quest progress.</p>
         <button class="go" id="hostBtn" style="font-size:24px">HOST A GAME</button>
         <div class="codeBox" id="codeBox" hidden><span class="eyebrow">Your game code</span><b id="myCode">-----</b><span id="hostMsg">Waiting for your friend to join...</span>
@@ -3204,7 +3240,7 @@ async function cloudPush(now){
   cloudBusy=false;paintAcct();
 }
 async function onAuth(u){
-  if(!u){acct=null;paintAcct();paintWho();return}
+  if(!u){acct=null;stopSocial();paintAcct();paintWho();renderFriends();return}
   acct={uid:u.uid,email:u.email||''};cloudState='sync';paintAcct();
   let doc=null;try{const d=await fbDb.collection('users').doc(u.uid).get();doc=d.exists?d.data():null}catch(e){cloudState='err';paintAcct();auMsg('Signed in, but couldn\'t reach your online save. Check your connection.');return}
   const list=profileList();
@@ -3232,6 +3268,8 @@ async function onAuth(u){
   if(pull){pullInto(name,doc)}
   switchUser(name);
   if(push)await cloudPush(true);else{cloudState='ok';cloudAt=Date.now()}
+  try{const fin=await claimName(acctName()||name);void fin}catch(_){}
+  profileUp().then(()=>{try{startSocial()}catch(e){console.warn('social',e)}});
   paintAcct();paintWho();renderProfiles();
   if(!$('authOv').hidden){$('authOv').hidden=true;openProfiles();toast('\u2601\uFE0F SIGNED IN \u00b7 '+name.toUpperCase(),'small',1800)}
 }
@@ -3266,6 +3304,7 @@ async function auSubmit(e){
   try{
     if(auMode==='up'){
       const nm=cleanName($('auName').value);if(!nm){auMsg('Pick a username (letters or numbers).');$('auGo').disabled=false;return}
+      try{const t=await fbDb.collection('usernames').doc(lowerName(nm)).get();if(t.exists){auMsg('The username '+nm+' is taken. Pick another one.');$('auGo').disabled=false;return}}catch(_){}
       pendingName=nm;if(curUser&&!acctOf(curUser)&&nm!==curUser){renameUser(curUser,nm)}
       const r=await fbAuth.createUserWithEmailAndPassword(email,pass);try{await r.user.sendEmailVerification()}catch(_){}
     }else await fbAuth.signInWithEmailAndPassword(email,pass);
@@ -3282,12 +3321,13 @@ function renameUser(from,to){
   for(const key of[...SAVE_KEYS,'uid']){const v=ls.get(PKEY(from,key));if(v!==null){ls.set(PKEY(to,key),v);ls.del(PKEY(from,key))}}
   ls.set('slapshot-profiles',JSON.stringify(list.map(n=>n===from?to:n)));if(curUser===from){curUser=to;ls.set('slapshot-current',to);$('whoName').textContent=to}
 }
-async function signOut(){try{await cloudPush(true)}catch(_){}try{await fbAuth.signOut()}catch(_){}acct=null;paintAcct();paintWho();renderProfiles();toast('SIGNED OUT','small',1200)}
+async function signOut(){try{await cloudPush(true)}catch(_){}try{await profileUp({seen:0})}catch(_){}stopSocial();try{await fbAuth.signOut()}catch(_){}acct=null;paintAcct();paintWho();renderProfiles();toast('SIGNED OUT','small',1200)}
 var delAcctArm=false;
 async function deleteAccount(){
   if(!delAcctArm){delAcctArm=true;paintAcct();return}delAcctArm=false;
   const u=fbAuth&&fbAuth.currentUser;if(!u)return;
   try{await fbDb.collection('users').doc(u.uid).delete()}catch(_){}
+  try{await fbDb.collection('profiles').doc(u.uid).delete()}catch(_){}try{const nm=acctName();const d=await fbDb.collection('usernames').doc(lowerName(nm)).get();if(d.exists&&d.data().uid===u.uid)await fbDb.collection('usernames').doc(lowerName(nm)).delete()}catch(_){}stopSocial();
   try{await u.delete()}catch(e){if(e&&e.code==='auth/requires-recent-login'){profMsg('For safety, sign out and sign back in, then delete the account right away.');paintAcct();return}profMsg(fbErr(e));paintAcct();return}
   for(const n of profileList())if(acctOf(n)===acct.uid)ls.del(PKEY(n,'uid'));
   acct=null;profMsg('Account deleted. Your progress is still on this device as a local player.');paintAcct();paintWho();renderProfiles();
@@ -3304,8 +3344,146 @@ function paintAcct(){
   const bs=box.querySelectorAll('p b');bs[0].textContent=acct.email;if(bs[1])bs[1].textContent=linked||'-';
   $('acOut').onclick=signOut;$('acDel').onclick=deleteAccount;
 }
+/* ---------- FRIENDS + CHALLENGES ----------
+   Firestore: usernames/{lowercase name} -> {uid} (so friends can find you; each name belongs to one account),
+   profiles/{uid} -> {name, tr, tr5, seen, st, friends:[uid]} (public to signed-in players),
+   requests/{id} -> {type:'fr'|'ch', from, to, fromName, code?, at, status} (only the two players can see it).
+   Nobody writes anyone else's documents: accepting a friend adds them to YOUR list and marks the request;
+   the sender sees that and adds you to theirs. A challenge hosts a game (the usual code) and sends the
+   code in a request; the friend gets a pop-up and joins it with one tap. */
+var frUnsub=[],frIn=[],frOut=[],myProf=null,frProfs={},pendingCh=null,chShownId='',chToastId='',frHb=0,frPoll=0,frDelArm='',frMsgT='',chOut=null;
+const FV=()=>window.firebase.firestore.FieldValue;
+const lowerName=n=>String(n||'').trim().toLowerCase();
+const CH_TTL=120000,ONLINE_MS=150000;
+function acctName(){return acct?profileList().find(n=>acctOf(n)===acct.uid)||'':''}
+function acctTrophies(){const n=acctName();if(n&&n===curUser)return[trophies,trophies5];let t=+ls.get(PKEY(n,'trophies'))||0,t5=0;try{t5=+(JSON.parse(ls.get(PKEY(n,'cards'))||'{}').trophies5)||0}catch(_){}return[t,t5]}
+function inMatch(){return !!netRole||($('menuOv').hidden&&$('endOv').hidden&&['play','faceoff','goal','replay','so','stop','inter'].includes(phase))}
+async function profileUp(extra){
+  if(!acct||!fbDb)return;const n=acctName();if(!n)return;const[t,t5]=acctTrophies();
+  try{await fbDb.collection('profiles').doc(acct.uid).set(Object.assign({name:n,lower:lowerName(n),tr:t,tr5:t5,seen:Date.now(),st:inMatch()?'game':'on'},extra||{}),{merge:true})}catch(e){console.warn('profile',e)}
+}
+async function claimName(name){
+  for(let i=0;i<40;i++){const n=i?cleanName(name.slice(0,13)+' '+(i+1)):name,ref=fbDb.collection('usernames').doc(lowerName(n));
+    try{const d=await ref.get();if(d.exists){if(d.data().uid===acct.uid)return n;continue}
+      await ref.set({uid:acct.uid,name:n});if(n!==name){renameUser(name,n);toast('YOUR USERNAME IS NOW '+n.toUpperCase(),'small',2400)}return n}catch(e){console.warn('name',e);return name}}
+  return name}
+function stopSocial(){frUnsub.forEach(f=>{try{f()}catch(_){}});frUnsub=[];clearInterval(frHb);clearInterval(frPoll);frIn=[];frOut=[];myProf=null;frProfs={};pendingCh=null;paintFrBdg()}
+function startSocial(){
+  stopSocial();if(!acct||!fbDb)return;const c=fbDb.collection('requests'),me=acct.uid;
+  const docs=q=>q.docs.map(d=>Object.assign({id:d.id},d.data()));
+  frUnsub.push(c.where('to','==',me).onSnapshot(q=>{frIn=docs(q);onIncoming()},e=>console.warn('in',e)));
+  frUnsub.push(c.where('from','==',me).onSnapshot(q=>{frOut=docs(q);onOutgoing()},e=>console.warn('out',e)));
+  frUnsub.push(fbDb.collection('profiles').doc(me).onSnapshot(d=>{myProf=d.exists?d.data():null;refreshFriends()},e=>console.warn('me',e)));
+  frHb=setInterval(()=>{if(document.visibilityState!=='hidden')profileUp()},60000);
+  frPoll=setInterval(()=>{if(!$('netOv').hidden)refreshFriends()},20000);
+}
+const reqDel=id=>fbDb.collection('requests').doc(id).delete().catch(()=>{});
+function onIncoming(){
+  const now=Date.now();pendingCh=null;
+  for(const r of frIn){
+    if(r.type==='ch'){if(now-(+r.at||0)>CH_TTL||r.status!=='new'){if(now-(+r.at||0)>CH_TTL)reqDel(r.id);continue}
+      if(!pendingCh||r.at>pendingCh.at)pendingCh=r}}
+  if(!pendingCh&&!$('chOv').hidden)$('chOv').hidden=true;
+  paintFrBdg();renderFriends();checkCh();
+}
+async function onOutgoing(){
+  const now=Date.now();
+  for(const r of frOut){
+    if(r.type==='fr'&&r.status==='acc'){try{await fbDb.collection('profiles').doc(acct.uid).set({friends:FV().arrayUnion(r.to)},{merge:true})}catch(_){}reqDel(r.id);toast('\u{1F91D} '+String(r.toName||'FRIEND').toUpperCase()+' ACCEPTED','small',2000)}
+    else if(r.type==='ch'){
+      if(r.status==='dec'){reqDel(r.id);toast(String(r.toName||'Your friend').toUpperCase()+' DECLINED','small',2000);if(chOut&&chOut.to===r.to){chOut=null;if(hostingNow()&&!netRole)$('hostMsg').textContent='They said no this time. You\'re still hosting: share the code or challenge someone else.'}}
+      else if(r.status==='acc'){if(chOut&&chOut.to===r.to&&!netRole)$('hostMsg').textContent=(r.toName||'Your friend')+' accepted! Linking...';setTimeout(()=>reqDel(r.id),15000)}
+      else if(now-(+r.at||0)>CH_TTL){reqDel(r.id);if(chOut&&chOut.to===r.to){chOut=null;if(!netRole&&hostingNow())$('hostMsg').textContent='No answer. You\'re still hosting.'}}}
+  }
+  renderFriends();
+}
+async function refreshFriends(){
+  const ids=(myProf&&myProf.friends)||[];
+  await Promise.all(ids.map(async id=>{try{const d=await fbDb.collection('profiles').doc(id).get();frProfs[id]=d.exists?d.data():{name:'?',gone:true}}catch(_){}}));
+  for(const k in frProfs)if(!ids.includes(k))delete frProfs[k];
+  renderFriends();
+}
+function paintFrBdg(){const n=frIn.filter(r=>r.type==='fr'&&r.status==='new').length+(pendingCh?1:0),b=$('frBdg');if(!b)return;b.hidden=!n;b.textContent=n}
+function frStatus(p){if(!p||p.gone)return['','Account deleted'];const ago=Date.now()-(+p.seen||0);
+  if(ago<ONLINE_MS)return p.st==='game'?['game','In a game']:['on','Online'];
+  const m=Math.round(ago/60000);return['',m<60?`Seen ${m} min ago`:m<1440?`Seen ${Math.round(m/60)} h ago`:`Seen ${Math.round(m/1440)} d ago`]}
+function renderFriends(){
+  const box=$('frBox');if(!box)return;
+  if(!cloudOn()){box.hidden=true;$('codeHead').hidden=true;return}box.hidden=false;$('codeHead').hidden=false;
+  if(!acct){box.innerHTML='<p class="frEmpty"><b style="color:var(--text)">Add friends and challenge them.</b> Sign in (or make an account) first so your friends can find you.</p><button class="cloudBtn" id="frSign">\u2601\uFE0F SIGN IN</button>';$('frSign').onclick=()=>openAuth('in');return}
+  const me=acct.uid,mine=(myProf&&myProf.friends)||[];
+  const inFr=frIn.filter(r=>r.type==='fr'&&r.status==='new'),outFr=frOut.filter(r=>r.type==='fr'&&r.status==='new');
+  let h=`<p class="frMe">Your username: <b></b> \u00b7 friends add you with it</p>
+    <div class="frAdd"><input id="frIn" maxlength="16" placeholder="Friend's username" autocomplete="off" spellcheck="false" aria-label="Friend's username"><button class="ghost" id="frAddBtn">Add</button></div>
+    <p class="frMsg" id="frMsg">${esc(frMsgT)}</p>`;
+  if(inFr.length)h+=`<div class="frHead">Friend requests</div><div class="frList">${inFr.map(r=>`<div class="frRow"><i class="dot on"></i><div class="nm"><b>${esc(r.fromName||'?')}</b><span>wants to be friends</span></div><div class="frBtns"><button class="frOk" data-acc="${esc(r.id)}">Accept</button><button class="frX" data-dec="${esc(r.id)}">\u2715</button></div></div>`).join('')}</div>`;
+  const rows=mine.map(id=>{const p=frProfs[id],[cls,txt]=frStatus(p),mutual=p&&Array.isArray(p.friends)&&p.friends.includes(me);
+    const busy=chOut&&chOut.to===id;
+    return`<div class="frRow"><i class="dot ${cls}"></i><div class="nm"><b>${esc(p?p.name:'...')}</b><span>${mutual?txt+' \u00b7 \u{1F3C6} '+(p.tr||0):'Request pending'}</span></div>
+      <div class="frBtns"><button class="frCh" data-ch="${esc(id)}" ${mutual&&!p.gone&&!netRole?'':'disabled'}>${busy?'SENT':'\u2694\uFE0F PLAY'}</button><button class="frX" data-rm="${esc(id)}" aria-label="Remove friend">${frDelArm===id?'Remove?':'\u2715'}</button></div></div>`});
+  h+=`<div class="frHead">Friends (${mine.length})</div>`+(rows.length?`<div class="frList">${rows.join('')}</div>`:'<p class="frEmpty">No friends yet. Type a friend\'s username above. They need an account too.</p>');
+  if(outFr.length)h+=`<p class="frEmpty">Waiting for: ${outFr.map(r=>esc(r.toName||'?')).join(', ')}</p>`;
+  const keep=$('frIn')?$('frIn').value:'',focused=document.activeElement&&document.activeElement.id==='frIn';
+  box.innerHTML=h;box.querySelector('.frMe b').textContent=acctName()||'-';$('frIn').value=keep;if(focused)$('frIn').focus();
+  $('frAddBtn').onclick=addFriend;$('frIn').onkeydown=e=>{if(e.key==='Enter')addFriend()};
+  box.querySelectorAll('[data-acc]').forEach(b=>b.onclick=()=>acceptFr(b.dataset.acc));
+  box.querySelectorAll('[data-dec]').forEach(b=>b.onclick=()=>reqDel(b.dataset.dec));
+  box.querySelectorAll('[data-ch]').forEach(b=>b.onclick=()=>challenge(b.dataset.ch));
+  box.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>removeFriend(b.dataset.rm));
+}
+const frSay=t=>{frMsgT=t;const m=$('frMsg');if(m)m.textContent=t};
+async function addFriend(){
+  const raw=cleanName($('frIn').value);if(!raw){frSay('Type your friend\'s username.');return}
+  frSay('Looking...');
+  try{
+    const d=await fbDb.collection('usernames').doc(lowerName(raw)).get();
+    if(!d.exists){frSay('No player called '+raw+'. Check the spelling (they need an account).');return}
+    const uid=d.data().uid,nm=d.data().name||raw;
+    if(uid===acct.uid){frSay('That\'s you!');return}
+    if(((myProf&&myProf.friends)||[]).includes(uid)){frSay(nm+' is already on your list.');return}
+    const back=frIn.find(r=>r.type==='fr'&&r.from===uid&&r.status==='new');if(back){await acceptFr(back.id);return}
+    await fbDb.collection('requests').doc('fr_'+acct.uid+'_'+uid).set({type:'fr',from:acct.uid,to:uid,fromName:acctName(),toName:nm,at:Date.now(),status:'new'});
+    $('frIn').value='';frSay('Friend request sent to '+nm+'.');
+  }catch(e){console.warn(e);frSay('Couldn\'t send that. Check your connection.')}
+}
+async function acceptFr(id){
+  const r=frIn.find(x=>x.id===id);if(!r)return;
+  try{await fbDb.collection('profiles').doc(acct.uid).set({friends:FV().arrayUnion(r.from)},{merge:true});await fbDb.collection('requests').doc(id).update({status:'acc'});frSay('You and '+(r.fromName||'them')+' are friends now.');tone(880,.1,'sine',.05,1320)}
+  catch(e){frSay('Couldn\'t accept. Check your connection.')}
+}
+async function removeFriend(uid){
+  if(frDelArm!==uid){frDelArm=uid;renderFriends();setTimeout(()=>{if(frDelArm===uid){frDelArm='';renderFriends()}},3000);return}
+  frDelArm='';try{await fbDb.collection('profiles').doc(acct.uid).set({friends:FV().arrayRemove(uid)},{merge:true})}catch(_){}
+}
+async function challenge(uid){
+  const p=frProfs[uid];if(!p||netRole)return;audio();
+  chOut={to:uid,name:p.name};renderFriends();
+  if(!hostingNow())hostGame();
+  for(let i=0;i<60&&!hostingNow();i++)await new Promise(r=>setTimeout(r,250));
+  if(!hostingNow()){chOut=null;frSay('Couldn\'t start a game to send. Try again.');renderFriends();return}
+  try{await fbDb.collection('requests').doc('ch_'+acct.uid+'_'+uid).set({type:'ch',from:acct.uid,to:uid,fromName:acctName(),toName:p.name,code:hostCode,tr:acctTrophies()[0],at:Date.now(),status:'new'});
+    $('hostMsg').textContent='Challenge sent to '+p.name+'. Waiting for them to accept...';frSay('');tone(660,.08,'square',.04,990)}
+  catch(e){chOut=null;frSay('Couldn\'t send the challenge. Check your connection.')}
+  renderFriends();
+}
+function cancelChallenges(){for(const r of frOut)if(r.type==='ch')reqDel(r.id);chOut=null}
+function checkCh(){
+  const r=pendingCh;
+  if(!r){if(!$('chOv').hidden)$('chOv').hidden=true;return}
+  if(Date.now()-(+r.at||0)>CH_TTL){pendingCh=null;$('chOv').hidden=true;return}
+  if(inMatch()){if(chToastId!==r.id){chToastId=r.id;toast('\u2694\uFE0F '+String(r.fromName||'A friend').toUpperCase()+' CHALLENGED YOU','small',2600)}return}
+  if($('chOv').hidden||chShownId!==r.id){chShownId=r.id;$('chName').textContent=r.fromName||'A friend';$('chOv').hidden=false;try{tone(660,.12,'square',.05,990);setTimeout(()=>tone(880,.14,'square',.05,1320),150)}catch(_){}}
+  const left=Math.max(0,Math.ceil((CH_TTL-(Date.now()-r.at))/1000));$('chSub').textContent=(r.tr!=null?'\u{1F3C6} '+r.tr+' trophies \u00b7 ':'')+'expires in '+left+'s';
+}
+if(typeof setInterval==='function')setInterval(()=>{if(pendingCh)checkCh()},1000);
+async function answerCh(yes){
+  const r=pendingCh;$('chOv').hidden=true;if(!r)return;pendingCh=null;paintFrBdg();
+  try{await fbDb.collection('requests').doc(r.id).update({status:yes?'acc':'dec'})}catch(_){}
+  if(!yes)return;audio();
+  hideAllOv();$('netOv').hidden=false;renderFriends();$('joinCode').value=r.code;joinGame();
+}
 function paintWho(){const w=$('whoName');if(!w)return;w.textContent=curUser||'-';if(acct&&curUser&&acctOf(curUser)===acct.uid){const c=document.createElement('span');c.className='whoCloud';c.textContent='\u2601\uFE0F';w.appendChild(c)}}
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')cloudPush(true)});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')cloudPush(true);else if(acct)profileUp()});
 window.addEventListener('pagehide',()=>cloudPush(true));
 /* ---------- MOVE A SAVE TO ANOTHER DEVICE ----------
    Live: this device opens a PeerJS peer under a 6-letter code; the other device connects to it and the
@@ -4975,13 +5153,13 @@ function leaveNet(msg){
   $('menuOv').hidden=false;if(msg)toast(msg,'small',2200);
   $('codeBox').hidden=true;$('hostBtn').disabled=false;$('joinBtn').disabled=false;netMsg('');paintHosting();
 }
-$('friendBtn').addEventListener('click',()=>{$('menuOv').hidden=true;$('netOv').hidden=false;
+$('friendBtn').addEventListener('click',()=>{$('menuOv').hidden=true;$('netOv').hidden=false;frSay('');renderFriends();if(acct)refreshFriends();
   const h=hostingNow();$('codeBox').hidden=!h;$('hostBtn').disabled=h;if(!h)netMsg('');$('joinBtn').disabled=false;paintHosting()});
 $('hostBtn').addEventListener('click',()=>{audio();hostGame()});
 $('joinBtn').addEventListener('click',joinGame);
 $('joinCode').addEventListener('keydown',e=>{if(e.key==='Enter')joinGame()});
 $('netCancel').addEventListener('click',()=>{if(!netRole&&!hostingNow())closeNet();$('netOv').hidden=true;$('menuOv').hidden=false;paintHosting()});
-$('stopHost').addEventListener('click',()=>{closeNet();hostCode='';rememberCode('');$('codeBox').hidden=true;$('hostBtn').disabled=false;netMsg('Stopped hosting.');paintHosting()});
+$('stopHost').addEventListener('click',()=>{cancelChallenges();closeNet();hostCode='';rememberCode('');$('codeBox').hidden=true;$('hostBtn').disabled=false;netMsg('Stopped hosting.');paintHosting()});
 $('copyCode').addEventListener('click',()=>{const c=hostCode;if(!c)return;
   const done=()=>{$('copyCode').textContent='Copied';setTimeout(()=>$('copyCode').textContent='Copy code',1500)};
   try{navigator.clipboard.writeText(c).then(done,()=>{})}catch(_){}});
@@ -4995,6 +5173,7 @@ $('whoBtn').addEventListener('click',openProfiles);
 $('profClose').addEventListener('click',closeProfiles);
 $('xferBtn').addEventListener('click',()=>{audio();openXfer()});
 $('authClose').addEventListener('click',closeAuth);
+$('chYes').addEventListener('click',()=>answerCh(true));$('chNo').addEventListener('click',()=>answerCh(false));
 $('auTog').addEventListener('click',e=>{const b=e.target.closest('button');if(b)auTab(b.dataset.a)});
 $('auForm').addEventListener('submit',auSubmit);
 $('auForgot').addEventListener('click',auForgot);
