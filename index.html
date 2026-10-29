@@ -3351,7 +3351,7 @@ function paintAcct(){
    Nobody writes anyone else's documents: accepting a friend adds them to YOUR list and marks the request;
    the sender sees that and adds you to theirs. A challenge hosts a game (the usual code) and sends the
    code in a request; the friend gets a pop-up and joins it with one tap. */
-var frUnsub=[],frIn=[],frOut=[],myProf=null,frProfs={},pendingCh=null,chShownId='',chToastId='',frHb=0,frPoll=0,frDelArm='',frMsgT='',chOut=null;
+var nameOk=null,nameErr='',profErr='',frUnsub=[],frIn=[],frOut=[],myProf=null,frProfs={},pendingCh=null,chShownId='',chToastId='',frHb=0,frPoll=0,frDelArm='',frMsgT='',chOut=null;
 const FV=()=>window.firebase.firestore.FieldValue;
 const lowerName=n=>String(n||'').trim().toLowerCase();
 const CH_TTL=120000,ONLINE_MS=150000;
@@ -3360,18 +3360,23 @@ function acctTrophies(){const n=acctName();if(n&&n===curUser)return[trophies,tro
 function inMatch(){return !!netRole||($('menuOv').hidden&&$('endOv').hidden&&['play','faceoff','goal','replay','so','stop','inter'].includes(phase))}
 async function profileUp(extra){
   if(!acct||!fbDb)return;const n=acctName();if(!n)return;const[t,t5]=acctTrophies();
-  try{await fbDb.collection('profiles').doc(acct.uid).set(Object.assign({name:n,lower:lowerName(n),tr:t,tr5:t5,seen:Date.now(),st:inMatch()?'game':'on'},extra||{}),{merge:true})}catch(e){console.warn('profile',e)}
+  try{await fbDb.collection('profiles').doc(acct.uid).set(Object.assign({name:n,lower:lowerName(n),tr:t,tr5:t5,seen:Date.now(),st:inMatch()?'game':'on'},extra||{}),{merge:true});profErr=''}catch(e){console.warn('profile',e);profErr=(e&&e.code)||'error';renderFriends()}
 }
 async function claimName(name){
   for(let i=0;i<40;i++){const n=i?cleanName(name.slice(0,13)+' '+(i+1)):name,ref=fbDb.collection('usernames').doc(lowerName(n));
     try{const d=await ref.get();if(d.exists){if(d.data().uid===acct.uid)return n;continue}
-      await ref.set({uid:acct.uid,name:n});if(n!==name){renameUser(name,n);toast('YOUR USERNAME IS NOW '+n.toUpperCase(),'small',2400)}return n}catch(e){console.warn('name',e);return name}}
+      await ref.set({uid:acct.uid,name:n});nameOk=true;nameErr='';if(n!==name){renameUser(name,n);toast('YOUR USERNAME IS NOW '+n.toUpperCase(),'small',2400)}renderFriends();return n}catch(e){console.warn('name',e);nameOk=false;nameErr=(e&&e.code)||'error';renderFriends();return name}}
   return name}
+function fsErr(e){const c=(e&&e.code)||'';
+  if(/permission/.test(c))return'The game\'s database rules are out of date. (Game owner: Firebase \u2192 Firestore \u2192 Rules, paste the new rules, Publish.)';
+  if(/unavailable|network|deadline/.test(c))return'No connection. Check your internet and try again.';
+  if(/unauthenticated/.test(c))return'You\'re signed out. Sign in again.';
+  return'Something went wrong'+(c?' ('+c+')':'')+'. Try again.'}
 function stopSocial(){frUnsub.forEach(f=>{try{f()}catch(_){}});frUnsub=[];clearInterval(frHb);clearInterval(frPoll);frIn=[];frOut=[];myProf=null;frProfs={};pendingCh=null;paintFrBdg()}
 function startSocial(){
   stopSocial();if(!acct||!fbDb)return;const c=fbDb.collection('requests'),me=acct.uid;
   const docs=q=>q.docs.map(d=>Object.assign({id:d.id},d.data()));
-  frUnsub.push(c.where('to','==',me).onSnapshot(q=>{frIn=docs(q);onIncoming()},e=>console.warn('in',e)));
+  frUnsub.push(c.where('to','==',me).onSnapshot(q=>{frIn=docs(q);onIncoming()},e=>{console.warn('in',e);profErr=(e&&e.code)||'error';renderFriends()}));
   frUnsub.push(c.where('from','==',me).onSnapshot(q=>{frOut=docs(q);onOutgoing()},e=>console.warn('out',e)));
   frUnsub.push(fbDb.collection('profiles').doc(me).onSnapshot(d=>{myProf=d.exists?d.data():null;refreshFriends()},e=>console.warn('me',e)));
   frHb=setInterval(()=>{if(document.visibilityState!=='hidden')profileUp()},60000);
@@ -3413,7 +3418,8 @@ function renderFriends(){
   if(!acct){box.innerHTML='<p class="frEmpty"><b style="color:var(--text)">Add friends and challenge them.</b> Sign in (or make an account) first so your friends can find you.</p><button class="cloudBtn" id="frSign">\u2601\uFE0F SIGN IN</button>';$('frSign').onclick=()=>openAuth('in');return}
   const me=acct.uid,mine=(myProf&&myProf.friends)||[];
   const inFr=frIn.filter(r=>r.type==='fr'&&r.status==='new'),outFr=frOut.filter(r=>r.type==='fr'&&r.status==='new');
-  let h=`<p class="frMe">Your username: <b></b> \u00b7 friends add you with it</p>
+  const warn=(nameOk===false||profErr)?`<p class="frMsg">\u26A0\uFE0F ${esc(fsErr({code:nameErr||profErr}))}</p>`:'';
+  let h=`<p class="frMe">Your username: <b></b> ${nameOk?'<span style="color:#7ff0b4">\u2713</span>':''} \u00b7 friends add you with it</p>${warn}
     <div class="frAdd"><input id="frIn" maxlength="16" placeholder="Friend's username" autocomplete="off" spellcheck="false" aria-label="Friend's username"><button class="ghost" id="frAddBtn">Add</button></div>
     <p class="frMsg" id="frMsg">${esc(frMsgT)}</p>`;
   if(inFr.length)h+=`<div class="frHead">Friend requests</div><div class="frList">${inFr.map(r=>`<div class="frRow"><i class="dot on"></i><div class="nm"><b>${esc(r.fromName||'?')}</b><span>wants to be friends</span></div><div class="frBtns"><button class="frOk" data-acc="${esc(r.id)}">Accept</button><button class="frX" data-dec="${esc(r.id)}">\u2715</button></div></div>`).join('')}</div>`;
@@ -3437,19 +3443,19 @@ async function addFriend(){
   frSay('Looking...');
   try{
     const d=await fbDb.collection('usernames').doc(lowerName(raw)).get();
-    if(!d.exists){frSay('No player called '+raw+'. Check the spelling (they need an account).');return}
+    if(!d.exists){frSay('No player called '+raw+' yet. Check the spelling. They need an account, and need to open the newest version of the game once while signed in.');return}
     const uid=d.data().uid,nm=d.data().name||raw;
     if(uid===acct.uid){frSay('That\'s you!');return}
     if(((myProf&&myProf.friends)||[]).includes(uid)){frSay(nm+' is already on your list.');return}
     const back=frIn.find(r=>r.type==='fr'&&r.from===uid&&r.status==='new');if(back){await acceptFr(back.id);return}
     await fbDb.collection('requests').doc('fr_'+acct.uid+'_'+uid).set({type:'fr',from:acct.uid,to:uid,fromName:acctName(),toName:nm,at:Date.now(),status:'new'});
     $('frIn').value='';frSay('Friend request sent to '+nm+'.');
-  }catch(e){console.warn(e);frSay('Couldn\'t send that. Check your connection.')}
+  }catch(e){console.warn(e);frSay(fsErr(e))}
 }
 async function acceptFr(id){
   const r=frIn.find(x=>x.id===id);if(!r)return;
   try{await fbDb.collection('profiles').doc(acct.uid).set({friends:FV().arrayUnion(r.from)},{merge:true});await fbDb.collection('requests').doc(id).update({status:'acc'});frSay('You and '+(r.fromName||'them')+' are friends now.');tone(880,.1,'sine',.05,1320)}
-  catch(e){frSay('Couldn\'t accept. Check your connection.')}
+  catch(e){frSay(fsErr(e))}
 }
 async function removeFriend(uid){
   if(frDelArm!==uid){frDelArm=uid;renderFriends();setTimeout(()=>{if(frDelArm===uid){frDelArm='';renderFriends()}},3000);return}
@@ -3463,7 +3469,7 @@ async function challenge(uid){
   if(!hostingNow()){chOut=null;frSay('Couldn\'t start a game to send. Try again.');renderFriends();return}
   try{await fbDb.collection('requests').doc('ch_'+acct.uid+'_'+uid).set({type:'ch',from:acct.uid,to:uid,fromName:acctName(),toName:p.name,code:hostCode,tr:acctTrophies()[0],at:Date.now(),status:'new'});
     $('hostMsg').textContent='Challenge sent to '+p.name+'. Waiting for them to accept...';frSay('');tone(660,.08,'square',.04,990)}
-  catch(e){chOut=null;frSay('Couldn\'t send the challenge. Check your connection.')}
+  catch(e){chOut=null;frSay(fsErr(e))}
   renderFriends();
 }
 function cancelChallenges(){for(const r of frOut)if(r.type==='ch')reqDel(r.id);chOut=null}
@@ -5153,7 +5159,7 @@ function leaveNet(msg){
   $('menuOv').hidden=false;if(msg)toast(msg,'small',2200);
   $('codeBox').hidden=true;$('hostBtn').disabled=false;$('joinBtn').disabled=false;netMsg('');paintHosting();
 }
-$('friendBtn').addEventListener('click',()=>{$('menuOv').hidden=true;$('netOv').hidden=false;frSay('');renderFriends();if(acct)refreshFriends();
+$('friendBtn').addEventListener('click',()=>{$('menuOv').hidden=true;$('netOv').hidden=false;frSay('');renderFriends();if(acct){refreshFriends();if(!nameOk&&fbDb)claimName(acctName()).then(()=>profileUp())}
   const h=hostingNow();$('codeBox').hidden=!h;$('hostBtn').disabled=h;if(!h)netMsg('');$('joinBtn').disabled=false;paintHosting()});
 $('hostBtn').addEventListener('click',()=>{audio();hostGame()});
 $('joinBtn').addEventListener('click',joinGame);
