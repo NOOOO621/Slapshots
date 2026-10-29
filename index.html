@@ -2594,6 +2594,15 @@ function ironHit(kind,team){ // ding!
     pbp(pick1(kind==='bar'?['Off the crossbar!','Clangs it off the bar!']:['Off the post!','Ping! Hits iron.','Rings it off the post!','DINGER! Off the post.']),2);if(puck.lastSk&&!puck.lastSk.goalie)story('post',puck.lastSk);else reactTalk('post');
     if(team===0&&!netOn())questEvent('post')}
 }
+// push the puck out of a net it got into the wrong way (through the side/back mesh, or a stick behind the net)
+function netEject(n,front){
+  const sg=n.fs,fr=n.front;
+  if(front){puck.y=fr+sg*(PR+.25);if(puck.vy*sg<0)puck.vy=-puck.vy*.3}
+  else{const ax=Math.abs(puck.x-50),side=NH+PR+.3-ax,back=sg>0?puck.y-(n.y0-PR-.3):(n.y1+PR+.3)-puck.y;
+    if(side<back){const sx=Math.sign(puck.x-50)||1;puck.x=50+sx*(NH+PR+.3);if(puck.vx*sx<0)puck.vx=-puck.vx*.3}
+    else{puck.y=sg>0?n.y0-PR-.3:n.y1+PR+.3;if(puck.vy*sg>0)puck.vy=-puck.vy*.3}}
+  puck.inNet=-1;puck.stuckT=0;
+}
 function netPuck(px,py){
   for(let i=0;i<NETS.length;i++){
     const n=NETS[i],sg=n.fs,fr=n.front,loose=puck.owner===null;
@@ -2605,9 +2614,18 @@ function netPuck(px,py){
     // stale "inside" flag (faceoff, shootout reset...): only valid while the puck really is in this net
     if(puck.inNet===i&&!(Math.abs(puck.x-50)<NH+1&&puck.y>n.y0-1&&puck.y<n.y1+1))puck.inNet=-1;
     const mouth=Math.abs(puck.x-50)<NH-PR*.4,wasOut=sg>0?py>=fr:py<=fr,nowIn=sg>0?puck.y<fr:puck.y>fr;
-    if(puck.inNet!==i&&wasOut&&nowIn&&mouth){
+    const ownFront=loose||(sg>0?puck.owner.y>fr:puck.owner.y<fr); // a carrier only stuffs it in from in front of the goal line
+    if(puck.inNet!==i&&wasOut&&nowIn&&mouth&&ownFront){
       if(loose&&puck.high&&puck.shot&&Math.random()<.12){ // rang the crossbar: back out it comes
         puck.y=fr+sg*.05;puck.vy=-puck.vy*.55;puck.vx*=.8;puck.high=false;ironHit('bar',puck.lastTeam);continue}
+      puck.inNet=i;
+    }
+    // inside the net without a proper entry through the mouth (pushed in by a collision, or a stick reaching
+    // into the mesh): if it came from in front of the goal it counts as going in, otherwise it pops back out
+    const inside=Math.abs(puck.x-50)<NH&&(sg>0?puck.y<fr&&puck.y>n.y0-PR:puck.y>fr&&puck.y<n.y1+PR);
+    if(inside&&puck.inNet!==i){
+      const fromFront=Math.abs(px-50)<NH&&(sg>0?py>fr-1.2:py<fr+1.2)&&Math.abs(puck.x-50)<NH-PR*.4;
+      if(!loose||!fromFront){netEject(n,false);continue}
       puck.inNet=i;
     }
     if(puck.inNet===i){
@@ -2622,6 +2640,12 @@ function netPuck(px,py){
         if(pin){setTimeout(()=>toast('POST AND IN!','small',1300),1100);pbp('Post and in!',3);if(n.def===1&&!netOn())questEvent('postin')}
         return}
       if(sg>0?puck.y>fr+PR:puck.y<fr-PR)puck.inNet=-1; // came back out the front
+      // stopped dead on the goal line inside the mouth: over the line counts, otherwise nudge it back out
+      else if(loose&&hyp(puck.vx,puck.vy)<3){puck.stuckT=(puck.stuckT||0)+1/120;
+        if(puck.stuckT>.35){const over=sg>0?puck.y<fr-.15:puck.y>fr+.15;
+          if(over&&(phase==='play'||phase==='so')){puck.stuckT=0;goal(1-n.def,n);return}
+          netEject(n,true)}}
+      else puck.stuckT=0;
       continue;
     }
     // everywhere else the net is a wall
