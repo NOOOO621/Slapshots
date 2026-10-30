@@ -3723,11 +3723,15 @@ async function watchGame(code,label){
   try{await loadPeer()}catch(_){frSay('Can\'t connect here. Open the game from its website.');return}
   closeNet();const opts=await peerOpts();let peer;try{peer=new Peer(opts)}catch(_){frSay('Can\'t connect here.');return}
   netPeer=peer;specPending=true;gGid=null;let tries=0;
-  setTimeout(()=>{if(netPeer===peer&&netRole!=='spec'){specPending=false;frSay('Couldn\'t reach that game. It may have just ended.')}},15000);
+  let linked=false;const who=String(label).split(' vs ')[0];
+  setTimeout(()=>{if(netPeer===peer&&netRole!=='spec'&&!linked){specPending=false;frSay('Couldn\'t reach that game. It may have just ended, or their internet is blocking it.')}},15000);
   peer.on('error',e=>{if(netPeer!==peer)return;if(e&&e.type==='peer-unavailable'){if(++tries<3){setTimeout(()=>{if(netPeer===peer&&netRole!=='spec')dial()},1500);return}specPending=false;frSay('No live game with that code right now. Check the code: the game has to be going (or hosting) on their screen.');return}});
   peer.on('open',dial);
   function dial(){const conn=peer.connect(PEER_PREFIX+code,{reliable:false,serialization:'json'});netConn=conn;
-    conn.on('open',()=>{const hi=()=>{if(netConn!==conn||!conn.open||gGid!==null)return;conn.send({t:'watch',name:acctName()||curUser});setTimeout(hi,800)};hi()});
+    conn.on('open',()=>{linked=true;frSay('Found '+who+'\'s game. Loading it...');
+      setTimeout(()=>{if(netPeer===peer&&netConn===conn&&netRole!=='spec')frSay('Found '+who+'\'s game, but it isn\'t sending yet. Their game has to be open and on screen (not in another tab or a locked phone). Still trying...')},6000);
+      setTimeout(()=>{if(netPeer===peer&&netConn===conn&&netRole!=='spec'){specPending=false;try{conn.close()}catch(_){}frSay(who+'\'s game never started sending. Ask them to open the game on screen, then tap Watch again.')}},30000);
+      const hi=()=>{if(netConn!==conn||!conn.open||gGid!==null)return;conn.send({t:'watch',name:acctName()||curUser});setTimeout(hi,800)};hi()});
     conn.on('data',m=>guestData(m));
     conn.on('close',()=>{if(netConn===conn&&netRole==='spec')leaveNet('The game is over.')})}
 }
@@ -5326,12 +5330,12 @@ function snapshot(){
       while(a.length>12&&!a[a.length-1])a.pop();return a}), // trailing zeros left off (they read back as 0)
     p:[r1(puck.x),r1(puck.y),r0(puck.vx),r0(puck.vy),puck.high||puck.saucer?1:0,puck.owner?ents.indexOf(puck.owner):-1],
     h:ents.indexOf(slot[1].human&&pctx===0?slot[1].human:null),
-    sc:score,sh:shots,pe:period,cl:r1(clock),ph:phase==='paused'?pausedFrom:phase,
+    sc:score,sh:shots,pe:period,cl:r1(clock),ph:phase==='paused'?pausedFrom:phase,pz:phase==='paused'||document.visibilityState==='hidden'?1:0,
     fo:[fo.dropped?1:0,r1(fo.t),r1(fo.dropAt),fo.dot||[50,100]],
     ln:lampNet,fl:r1(flash),so:so?so.res:null,ba:breakaway?ents.indexOf(breakaway.s):-1,
     ch:slot[1].charging?r2(slot[1].charge):-1,ev:evBuf.map(x=>[x.seq,...x.ev])};
 }
-var specs=[],specPending=false,specNames=['',''],liveJoin='';
+var specPz=false,specs=[],specPending=false,specNames=['',''],liveJoin='';
 function specMeta(){return{a:arenaIdx,n:curUser,fn:netRole?friendName:'CPU',m:teamN(),e:[...roster,...rosterG].map(s=>[s.num,s.card?s.card.name:0,s.card&&s.card.id||0])}}
 function addSpec(conn,m){
   if(specs.some(x=>x.conn===conn))return;
@@ -5373,9 +5377,15 @@ function castTick(){
   if(specs.length)specs=specs.filter(x=>x.conn.open!==false);
   if(!specs.length){netEv=[];return}
   const now=performance.now();if(now-castT<SNAP_MS*2-1)return;castT=now; // ~15 a second, same as friend-game watchers
-  const sn=snapshot();sn.meta=specMeta();
-  for(const x of specs){const d2=x.conn.dataChannel;if(x.conn.open&&!(d2&&d2.bufferedAmount>1500))try{x.conn.send(sn)}catch(_){}}
+  castSend();
 }
+function castSend(){const sn=snapshot();sn.meta=specMeta();
+  for(const x of specs){const d2=x.conn.dataChannel;if(x.conn.open&&!(d2&&d2.bufferedAmount>1500))try{x.conn.send(sn)}catch(_){}}}
+/* A hidden page (other tab, minimised, phone locked) gets no animation frames, so the game loop stops sending.
+   Keep a slow trickle going from a timer so watchers connect and see "paused" instead of waiting forever. */
+setInterval(()=>{try{const now=performance.now();
+  if(netRole==='host'&&now-lastSnap>600)hostTick();
+  else if(castPeer&&!netRole&&specs.length&&phase!=='menu'&&now-castT>600){castT=now;specs=specs.filter(x=>x.conn.open!==false);if(specs.length)castSend()}}catch(_){}},700);
 function hostTick(){
   if(!netConn||!netConn.open)return;
   const now=performance.now();if(now-lastSnap<snapMs-1)return;lastSnap=now;
@@ -5469,7 +5479,7 @@ function startGuestGame(m){
   applySkin('classic'); // first snapshot of a new game (or a rematch)
   friendName=cleanName(m.meta.n);
   if(netRole!=='guest'&&netRole!=='spec'){savedArena=arenaIdx}
-  if(specPending||netRole==='spec'){specPending=false;netRole='spec';myT=0;flipView=false;specNames=[m.meta.n||'Host',m.meta.fn||'Friend'];(document.body&&document.body.classList.add('spectating'));$('specBar').hidden=false;$('specWho').textContent=specNames[0]+' vs '+specNames[1]}
+  if(specPending||netRole==='spec'){specPending=false;netRole='spec';myT=0;flipView=false;specNames=[m.meta.n||'Host',m.meta.fn||'Friend'];(document.body&&document.body.classList.add('spectating'));$('specBar').hidden=false;specPz=false;$('specWho').textContent=specNames[0]+' vs '+specNames[1]}
   else{netRole='guest';myT=1;flipView=true}
   gGid=m.g;snapBuf=[];endShownGid=null;
   gTeamN=m.meta.m===5?5:3;arenaIdx=clamp(m.meta.a|0,0,ARENAS.length-1);resize(); // look of the host's arena, not saved
@@ -5524,6 +5534,7 @@ function applySnap(m){
   if(m.so){so={res:m.so};if($('soBar').hidden)$('soBar').hidden=false;renderSO()}else if(so){so=null;$('soBar').hidden=true}
   breakaway=m.ba>=0&&ents[m.ba]?{s:ents[m.ba]}:null;
   if(netRole!=='spec'){charging=m.ch>=0;charge=Math.max(0,m.ch)}
+  else{const pz=!!m.pz;if(pz!==specPz){specPz=pz;$('specWho').textContent=specNames[0]+' vs '+specNames[1]+(pz?' \u00b7 \u23F8 PAUSED / AWAY':'')}}
   const evs=(m.ev||[]).filter(e=>Array.isArray(e)&&e[0]>lastEvSeq).sort((a,b)=>a[0]-b[0]);
   for(const e of evs){lastEvSeq=e[0];const ev=e.slice(1);
     if(ev[0]==='fx')burst(+ev[1],+ev[2],ev[3],ev[4])
