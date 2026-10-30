@@ -766,6 +766,34 @@ html{touch-action:manipulation}
 @keyframes chPulse{50%{transform:scale(1.12) rotate(-6deg)}}
 @media (prefers-reduced-motion:reduce){.chIcon{animation:none}}
 .chWho{margin:0;font-size:18px}.chSub{margin:0;color:var(--muted);font-size:14px}
+#fsOv{z-index:45}.fsCard{gap:12px}#fsOv .card{grid-template-columns:minmax(0,1fr)}#fsOv .card>*{min-width:0}
+.frRow .nm{cursor:pointer;background:none;border:0;color:inherit;text-align:left;padding:0;font:inherit}
+.frRow .nm b{text-decoration:underline dotted rgba(255,255,255,.35);text-underline-offset:3px}
+.frRow .live{color:#ff6b78;font-weight:700}
+.frW{border:0;border-radius:8px;background:linear-gradient(#6aa5ff,#2457c9);color:#fff;font:700 14px var(--f-ui);letter-spacing:.06em;cursor:pointer;box-shadow:inset 0 -2px 0 #183c8c}
+#specBar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:35;display:flex;align-items:center;gap:12px;
+  background:rgba(6,10,16,.88);border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:8px 8px 8px 16px;font:700 15px var(--f-ui);letter-spacing:.06em;color:#fff;white-space:nowrap;max-width:calc(100vw - 24px)}
+#specBar span{overflow:hidden;text-overflow:ellipsis}#specBar b{color:var(--lamp)}
+#specBar button{border:0;border-radius:999px;background:#c8202f;color:#fff;font:700 14px var(--f-ui);padding:8px 14px;cursor:pointer}
+body.spectating #pad,body.spectating .keys,body.spectating #pullBtn,body.spectating #emBtn,body.spectating #pauseBtn,body.spectating #emPanel{visibility:hidden!important;pointer-events:none!important}
+.bGrid{display:grid;grid-template-columns:minmax(0,1fr);gap:10px}
+.bundle{position:relative;display:grid;gap:8px;padding:12px;border-radius:14px;border:2px solid var(--bc);
+  background:linear-gradient(135deg,color-mix(in srgb,var(--bc) 26%,#0b1220),#0b1220 70%);box-shadow:0 0 0 1px rgba(0,0,0,.4),0 6px 18px rgba(0,0,0,.35);overflow:hidden}
+.bundle::after{content:"";position:absolute;inset:-40% -10% auto auto;width:55%;height:120%;background:radial-gradient(closest-side,color-mix(in srgb,var(--bc) 30%,transparent),transparent);pointer-events:none}
+.bundle.gone{filter:saturate(.25) brightness(.75)}
+.bTop{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.bTag{font:700 11px var(--f-ui);letter-spacing:.12em;color:var(--bc)}
+.bSave{font:700 12px var(--f-ui);letter-spacing:.06em;background:var(--bc);color:#0b1220;border-radius:999px;padding:2px 9px;white-space:nowrap}
+.bName{font-family:var(--f-display);font-size:30px;line-height:.9;letter-spacing:.02em;color:#fff}
+.bItems{display:flex;flex-wrap:wrap;gap:6px;position:relative;z-index:1}
+.bIt{display:inline-flex;align-items:center;gap:6px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:4px 10px 4px 4px;font:600 14px var(--f-ui);color:var(--text)}
+.bI{display:grid;place-items:center;min-width:22px;height:22px;padding:0 4px;border-radius:999px;font:800 12px var(--f-ui);color:#0b1220}
+.bI.gd{background:linear-gradient(#ffe066,#e0a100)}.bI.gm{background:#35d07f}.bI.pk{background:#cfd8e3}.bI.pc{background:var(--rar,#a970ff);color:#fff}.bI.cd{background:#4fb6ff}
+.bundle .buy{position:relative;z-index:1;width:100%;padding:10px 0;border-radius:10px;font-weight:700;font-size:18px;display:flex;justify-content:center;align-items:center;gap:6px;border:0;cursor:pointer;
+  background:linear-gradient(180deg,#ffd54d,#e09a00);color:#2a1a00;box-shadow:inset 0 -4px 0 #9a6400}
+.bundle .buy.gemb{background:linear-gradient(#5fe39a,#1fa35a);color:#fff;text-shadow:0 1px 0 rgba(0,0,0,.45);box-shadow:inset 0 -4px 0 #0d6b3a}
+.bundle .buy svg{width:20px;height:20px;flex:none}
+.bundle .buy:disabled{background:#2a3649;box-shadow:none;color:var(--muted);text-shadow:none;cursor:default}
 </style>
 
 <div id="app">
@@ -788,6 +816,7 @@ html{touch-action:manipulation}
     <div class="emPick" id="emPick" hidden></div>
     <div id="pbp" aria-live="polite"></div>
     <div id="netBadge" hidden></div>
+    <div id="specBar" hidden><span>👁 WATCHING <b id="specWho"></b></span><button id="specLeave">LEAVE</button></div>
     <div id="boxBadge" hidden></div>
     <div id="replayBadge" hidden><i></i>REPLAY<small>tap to skip</small></div>
     <div id="soBar" hidden>
@@ -929,6 +958,16 @@ html{touch-action:manipulation}
         <p class="netMsg" id="profMsg" role="status"></p>
         <button class="boxBtn" id="xferBtn">📲 MOVE TO ANOTHER DEVICE</button>
         <button class="ghost" id="profClose">Back</button>
+      </div>
+    </div>
+
+    <div class="ov" id="fsOv" hidden>
+      <div class="card deckCard fsCard">
+        <div class="shead"><div class="result" id="fsName">FRIEND</div><span class="eyebrow" id="fsWho"></span></div>
+        <p class="frMe" id="fsLine"></p>
+        <div class="stTog" id="fsTog" role="group" aria-label="Which games"><button data-m="all" aria-pressed="true">ALL</button><button data-m="m3" aria-pressed="false">3 ON 3</button><button data-m="m5" aria-pressed="false">5 ON 5</button></div>
+        <div id="fsBody"></div>
+        <button class="go" id="fsDone">BACK</button>
       </div>
     </div>
 
@@ -1206,21 +1245,24 @@ const ARENAS=[
   {name:'Community Rink',sub:'Saturday morning ice',need:120,mark:'RINK',kick:'#e8b23a',glow:'rgba(90,130,200,.14)',ice:['#e6eff4','#f1f6f9']},
   {name:'Junior Barn',sub:'Loud crowd, tight boards',need:240,mark:'BARN',kick:'#c8462f',glow:'rgba(200,90,60,.14)',ice:['#e9eef1','#f4f6f8']},
   {name:'Pro Centre',sub:'Big-league speed',need:400,mark:'PRO',kick:'#2f6bff',glow:'rgba(60,110,255,.18)',ice:['#ecf2f6','#f7fafc']},
-  {name:'The Cup Dome',sub:'Final boss arena',need:600,mark:'CUP',kick:'#ffb627',glow:'rgba(255,182,39,.16)',ice:['#eef3f6','#fbfcfd']}
+  {name:'The Cup Dome',sub:'Championship ice',need:600,mark:'CUP',kick:'#ffb627',glow:'rgba(255,182,39,.16)',ice:['#eef3f6','#fbfcfd']},
+  {name:'Northern Lights',sub:'Outdoor classic under the aurora',need:800,mark:'AURORA',kick:'#35e0a0',glow:'rgba(60,230,170,.18)',ice:['#e2f1ee','#f1faf7']},
+  {name:'Legends Hall',sub:'Banners to the rafters',need:1000,mark:'HALL',kick:'#a970ff',glow:'rgba(170,110,255,.18)',ice:['#ebe9f4','#f7f6fb']},
+  {name:'Diamond Garden',sub:'The final boss arena',need:1300,mark:'DIAMOND',kick:'#4fd6ff',glow:'rgba(80,210,255,.2)',ice:['#e6f3f8','#f6fbfd']}
 ];
 const lerp5=(a,i)=>a[i];
 /* CPU players use the same attribute levels as your cards (+6% per level, every attribute).
    Arena 1: level 0 (identical to an unupgraded player). Arena 2: level 3. Then 5, 7, 10.
    shoot = how often the CPU looks to shoot/deke, fo = CPU faceoff reaction (s). */
-const CPU_LV=[0,3,5,7,10];
+const CPU_LV=[0,3,5,7,10,11,12,14];
 function arenaD(i){const L=CPU_LV[i];return{
   lvl:L,greact:.11*Math.pow(.94,L),glat:15.5*(1+.06*L),gctl:Math.min(.95,.65*(1+.06*L)),
-  shoot:lerp5([.65,1,1.1,1.2,1.3],i),fo:lerp5([.4,.28,.24,.2,.17],i),
-  pokeMul:lerp5([.55,.9,1,1.1,1.2],i), // how well CPU defenders time their stick checks
+  shoot:lerp5([.65,1,1.1,1.2,1.3,1.35,1.4,1.45],i),fo:lerp5([.4,.28,.24,.2,.17,.16,.15,.14],i),
+  pokeMul:lerp5([.55,.9,1,1.1,1.2,1.25,1.3,1.35],i), // how well CPU defenders time their stick checks
   // Arena 1 is the learning rink: the CPU goalie is slower to read shots and gives up more rebounds
   // Arena 1 is the learning rink: a slow, leaky CPU goalie, and sloppy skaters who ice it, miss passes and fumble catches
   ...(i===0?{greact:.15,glat:13,gctl:.45}:{}),
-  slop:[1,.45,0,0,0][i]}} // how sloppy the CPU is: Arena 1 very, Arena 2 a bit, then clean
+  slop:[1,.45,0,0,0,0,0,0][i]}} // how sloppy the CPU is: Arena 1 very, Arena 2 a bit, then clean
 let arenaIdx=0,trophies=0,trophies5=0,roadC3=[],roadC5=[];
 const curTr=()=>MODE5?trophies5:trophies; // each mode climbs its own road
 // g* = goalie: react (s before tracking a shot), lat (lateral speed), ctl (rebound control). fo = CPU faceoff reaction (s)
@@ -1270,6 +1312,14 @@ const CARDS=[
   {id:'blackwood',rar:'uncommon',name:'Ethan Blackwood',num:55,p:'LD',pos:'D',style:'Puck-mover',boost:{hands:1.06,spd:1.03},abil:null,desc:'Starts the rush from his own end.'},
   {id:'fischer',rar:'uncommon',name:'Noah Fischer',num:5,p:'RD',pos:'D',style:'Shutdown',boost:{def:1.08},abil:null,desc:'Quiet, smart, and always in the right spot.'},
   {id:'lund',rar:'uncommon',name:'Aaron Lund',num:33,p:'G',pos:'G',style:'Positional',boost:{greact:.95},abil:null,desc:'A steady goalie who is always square to the shooter.'},
+  {id:'okoye',rar:'uncommon',name:'Victor Okoye',num:13,p:'C',pos:'F',style:'Two-way',boost:{def:1.04,hands:1.04},abil:null,desc:'Back-checks as hard as he attacks.'},
+  {id:'lindqvist',rar:'uncommon',name:'Erik Lindqvist',num:92,p:'RW',pos:'F',style:'Sniper',boost:{shot:1.05,acc:1.06},abil:null,desc:'Picks corners from anywhere in the zone.'},
+  {id:'tremblay',rar:'uncommon',name:'Luc Tremblay',num:27,p:'LW',pos:'F',style:'Grinder',boost:{def:1.05,accel:1.04},abil:null,desc:'Wins every battle along the boards.'},
+  {id:'sato',rar:'uncommon',name:'Kenji Sato',num:19,p:'C',pos:'F',style:'Playmaker',boost:{hands:1.07},abil:null,desc:'Sees passing lanes nobody else does.'},
+  {id:'baptiste',rar:'uncommon',name:'Andre Baptiste',num:24,p:'RW',pos:'F',style:'Speedster',boost:{spd:1.07},abil:null,desc:'Blows past defenders on the outside.'},
+  {id:'novak',rar:'uncommon',name:'Pavel Novak',num:44,p:'LD',pos:'D',style:'Big shot',boost:{shot:1.07},abil:null,desc:'A point shot you can hear from the rafters.'},
+  {id:'oconnell',rar:'uncommon',name:'Liam O\'Connell',num:2,p:'RD',pos:'D',style:'Bruiser',boost:{def:1.06,spd:1.02},abil:null,desc:'Clears the front of the net, one way or another.'},
+  {id:'harju',rar:'uncommon',name:'Mikko Harju',num:31,p:'G',pos:'G',style:'Butterfly',boost:{glat:1.04,greact:.97},abil:null,desc:'Seals the ice and reads the play early.'},
   {id:'kimg',rar:'uncommon',name:'Jesse Kim',num:50,p:'G',pos:'G',style:'Athletic',boost:{glat:1.06},abil:null,desc:'Quick side to side. Makes the highlight-reel saves.'}
 ];
 const posOf=c=>!c?'':c.ultra?(c.kit||'?'):c.p||(c.pos==='G'?'G':c.pos==='D'?'D':'F');
@@ -1502,10 +1552,10 @@ const pick1=a=>a[Math.floor(Math.random()*a.length)];
 const ANNOUNCERS=false;
 let chatQ=[],chatT=0,lastChat=-99,said30=false,lastGoalInfo=null,lastBig=-99,lastLull=0;
 const TEAMN=t=>t===0?'Blue':'Red';
-function chat(lines,delay,force,who){if(!ANNOUNCERS)return;if(netRole==='guest'||!lines||!lines.length)return;if(chatQ.length&&!force)return;
+function chat(lines,delay,force,who){if(!ANNOUNCERS)return;if(remoteView()||!lines||!lines.length)return;if(chatQ.length&&!force)return;
   const add=lines.filter(l=>l&&l[1]).slice(0,5).map(l=>[l[0],SHE(l[1],l[2]||who)]);if(force==='append'&&chatQ.length){chatQ=chatQ.concat(add).slice(0,6);lastChat=time;return}
   chatQ=add;chatT=time+(delay||0);lastChat=time}
-function tickChat(){if(netRole==='guest'||!chatQ.length||time<chatT)return;if(phase==='menu'){chatQ=[];return}
+function tickChat(){if(remoteView()||!chatQ.length||time<chatT)return;if(phase==='menu'){chatQ=[];return}
   const[spk,txt]=chatQ.shift();lastPbp=-9;pbp(txt,2,spk,true);chatT=time+.9+txt.length*.058/(vRate||1);lastChat=time}
 const P_=(...a)=>pick1(a);
 const isShe=k=>!!(k&&k.card&&k.card.id==='charlotte');
@@ -1576,7 +1626,7 @@ function goalieStory(g){
   if(sv>=5&&ga===0)return `${N(g)} hasn't given up a thing. ${sv} for ${sv}.`;
   return styLine(g,'save')}
 function story(ev,k,extra){
-  if(!k||netRole==='guest'||chatQ.length||time-lastChat<3.5)return;
+  if(!k||remoteView()||chatQ.length||time-lastChat<3.5)return;
   let L=null;const n=N(k);
   if(ev==='save'){const gs=goalieStory(k);if(gs&&(Math.random()<.55||k.sv>=6))L=[['col',gs]]}
   else if(ev==='deke'){k.dk=(k.dk||0)+1;if(time-(k.dkSaid||-99)<30)return;const ms=k.dk===4,sty=STY[styleOf(k)]&&STY[styleOf(k)].deke;
@@ -1885,7 +1935,7 @@ const spinUnlocked=()=>trophies>=ARENAS[2].need;
    Arena 3 SPIN-O-RAMA  tap DEKE again mid-deke
    Arena 4 THE BOMB     wind a shot all the way up: a much harder slapshot the goalie reads late
    Arena 5 THE MICHIGAN tap DEKE low beside the net: lift it lacrosse-style and tuck it in high */
-const MOVES=[null,null,null,{n:'LEGEND SUPERS',how:'your legends can now use their SUPER button'},null,null];
+const MOVES=[null,null,null,{n:'LEGEND SUPERS',how:'your legends can now use their SUPER button'},null,null,null,null,null];
 /* SUPERS (from Arena 3): every legend has their own one-of-a-kind super. The meter fills as you play
    (faster when you shoot or hit); when it's full, hit SUPER (key C). Rival legends use theirs too.
    t: when the AI likes to use it. carry = with the puck, shot = about to shoot, pass = about to pass, def = defending. */
@@ -1940,11 +1990,14 @@ function pullGoalie(t,on,quiet){
   }
   paintPull();return true;
 }
-const isPulled=t=>{const g=rosterG.find(k=>k.team===t);return!!(g&&(netRole==='guest'?!goalies.includes(g)&&phase!=='so':g.pulled))};
+const remoteView=()=>netRole==='guest'||netRole==='spec';
+const isPulled=t=>{const g=rosterG.find(k=>k.team===t);return!!(g&&(remoteView()?!goalies.includes(g)&&phase!=='so':g.pulled))};
+let pullKey='';
 function paintPull(){const b=$('pullBtn');if(!b)return;const me=netRole==='guest'?1:0,pl=isPulled(me);
+  const key=pl+'|'+(phase==='play'||phase==='stop'||phase==='faceoff'||phase==='paused');if(key===pullKey)return;pullKey=key;
   b.classList.toggle('pulled',pl);const h=pl?'<b>\u{1F945}</b><span>BACK</span>':'<b>\u{1F945}</b><span>PULL G</span>';if(b.innerHTML!==h)b.innerHTML=h;b.title=pl?'Put your goalie back in':'Pull your goalie for an extra attacker';
   b.disabled=!(phase==='play'||phase==='stop'||phase==='faceoff'||phase==='paused')}
-function pressPull(){if(netRole==='guest'){audio();guestButton('pg');return}audio();const t=0;
+function pressPull(){if(remoteView()){audio();guestButton('pg');return}audio();const t=0;
   if(!(phase==='play'||phase==='stop'||phase==='faceoff'))return;
   if(isPulled(t))pullGoalie(t,false);else if(!pullGoalie(t,true))toast(puck.owner&&puck.owner.goalie&&puck.owner.team===t?'PASS IT FIRST':'CAN\'T PULL NOW','small',800)}
 // CPU coach: down by 1 or 2 late in regulation, with the puck in your end, he pulls his goalie
@@ -2081,7 +2134,7 @@ const AIM_SUPS={halvorsen:1,holm:1,price:1};
 let aimSup=null;
 const canAimSuper=s=>!!(s&&superOf(s)&&s.card&&AIM_SUPS[s.card.id]&&s.sup>=1&&puck.owner===s&&(phase==='play'||phase==='so')&&supersOn(s.team));
 function beginAim(px,py,kb){
-  if(netRole==='guest'||!canAimSuper(human))return false;
+  if(remoteView()||!canAimSuper(human))return false;
   const g=goalieOf(1-human.team),base=g&&g.x>=50?-.8:.8;
   aimSup={ax:base,base,high:false,sx:px,sy:py,kb:!!kb,t0:performance.now(),moved:false};charging=false;
   tone(700,.08,'sine',.04);return true}
@@ -2091,7 +2144,7 @@ function fireAim(){
   if(!a.moved&&performance.now()-a.t0<400){useSuper(human);return} // a quick tap: arm it, your next shot does it
   if(useSuper(human)){human.aimShot=a.ax;shoot(human,1,null,a.high)}
 }
-function moveSuper(){if(netRole==='guest'){audio();guestButton('m4');return}
+function moveSuper(){if(remoteView()){audio();guestButton('m4');return}
   if((phase!=='play'&&phase!=='so')||!human)return;audio();
   const S=superOf(human);if(!S){if((pctx||0)===0)toast('ONLY LEGENDS HAVE SUPERS','small',900);return}
   if(!(human.sup>=1)){if((pctx||0)===0)toast('SUPER CHARGING '+Math.floor((human.sup||0)*100)+'%','small',700);return}
@@ -2394,7 +2447,7 @@ function persona(s){
     dangly:a==='dangle'?rnd(1.4,1.7):rnd(.7,1.3),wob:rnd(0,6.28),wobF:rnd(.3,.7),loopR:rnd(4,6.5),loopW:rnd(.9,1.35)*(Math.random()<.5?-1:1),glide:rnd(.26,.36)};
 }
 function humanSteer(s,key,tx,ty,chasing,dt){
-  const P=persona(s),lvl=s.team===1&&!netOn()?[1.3,1.15,1,.9,.8][arenaIdx]:1;
+  const P=persona(s),lvl=s.team===1&&!netOn()?[1.3,1.15,1,.9,.8,.76,.72,.68][arenaIdx]:1;
   if(s.aimX==null||hyp(s.aimX-s.x,s.aimY-s.y)>90){s.aimX=s.x;s.aimY=s.y}
   if(s.aimKey!==key){s.aimKey=key;s.reactT=time+((key==='loose'||key==='rec')?0:P.react*lvl*(chasing?.7:1.2))} // reading the play (a loose puck: no hesitation)
   if(key==='loose'||key==='rec'){s.aimX=tx;s.aimY=ty;const dx=tx-s.x,dy=ty-s.y,d=hyp(dx,dy);if(d>.3){const v=maxSp(s);s.dvx=dx/d*v;s.dvy=dy/d*v}else{s.dvx=s.vx;s.dvy=s.vy}return}
@@ -2974,20 +3027,20 @@ function recordCareer(){
   for(const g of L.gl){const id=g.card&&g.card.id||'goalie';const p=c.gk[id]||(c.gk[id]={gp:0,w:0,sv:0,ga:0,so:0,nm:N(g)});
     p.gp++;if(win)p.w++;p.sv+=g.sv||0;p.ga+=gaReal;if(win&&gaReal===0)p.so++;p.nm=g.card&&g.card.name||N(g)}
   c.recent.unshift({r:win?'W':how?'O':'L',s:score[0]+'-'+score[1],m,h:how});c.recent=c.recent.slice(0,15);
-  try{localStorage.setItem(K('stats'),JSON.stringify(c));localStorage.setItem(K('at'),String(Date.now()))}catch(_){}cloudDirty();cloudPush(true)
+  try{localStorage.setItem(K('stats'),JSON.stringify(c));localStorage.setItem(K('at'),String(Date.now()))}catch(_){}cloudDirty();cloudPush(true);setTimeout(()=>{try{profileUp()}catch(_){}},500)
 }
 let stMode='all';
-function renderStats(){
-  const c=loadCareer(),r=c[stMode]||blankRec();
-  for(const b of $('stTog').querySelectorAll('button'))b.setAttribute('aria-pressed',String(b.dataset.m===stMode));
-  $('stWho').textContent=(curUser?curUser+' · ':'')+'Career';
-  if(!r.gp){$('stBody').innerHTML='<p class="stEmpty">No games yet'+(stMode==='all'?'':' in this mode')+'. Play a game against the CPU and your stats show up here.</p>';return}
+function statsInto(o){
+  const c=o.c,M=o.mode,r=c[M]||blankRec();
+  for(const b of $(o.tog).querySelectorAll('button'))b.setAttribute('aria-pressed',String(b.dataset.m===M));
+  $(o.whoEl).textContent=o.who;
+  if(!r.gp){$(o.body).innerHTML='<p class="stEmpty">No games yet'+(M==='all'?'':' in this mode')+(o.friend?'.':'. Play a game against the CPU and your stats show up here.')+'</p>';return}
   const f1=(a,b)=>b?(a/b).toFixed(1):'0.0',st=r.streak>0?'W'+r.streak:r.streak<0?'L'+(-r.streak):'-';
   const tile=(v,l,big)=>`<div class="stTile${big?' big':''}"><b>${v}</b><span>${l}</span></div>`;
-  const recent=c.recent.filter(x=>stMode==='all'||x.m===stMode).slice(0,10);
+  const recent=c.recent.filter(x=>M==='all'||x.m===M).slice(0,10);
   const plRows=Object.entries(c.pl).map(([id,p])=>({id,p,c:cardById(id)})).filter(x=>x.c).sort((x,y)=>(y.p.g+y.p.a)-(x.p.g+x.p.a)||y.p.g-x.p.g);
   const gkRows=Object.entries(c.gk).sort((x,y)=>y[1].gp-x[1].gp);
-  $('stBody').innerHTML=`
+  $(o.body).innerHTML=`
     <div class="stTiles">
       ${tile(`${r.w}-${r.l}-${r.otl}`,'Record (W-L-OTL)',true)}
       ${tile(r.gp,'Games')}${tile(pct(r.w,r.gp)+'%','Win %')}${tile(st,'Streak')}
@@ -2998,9 +3051,10 @@ function renderStats(){
       ${tile(pct(r.poss,r.possT)+'%','Possession')}${tile(r.best?'W'+r.best:'-','Best win streak')}${tile(r.bigW?r.bigW[0]+'-'+r.bigW[1]:'-','Biggest win')}
     </div>
     ${recent.length?`<div class="bxSec">Recent games</div><div class="stRec">${recent.map(x=>`<span class="${x.r==='W'?'w':x.r==='O'?'o':'l'}" title="${x.s}${x.h?' '+x.h:''}">${x.r==='O'?x.h:x.r}</span>`).join('')}</div>`:''}
-    ${plRows.length?`<div class="bxSec">Your players (all modes)</div><div class="stScroll"><table class="bxT"><tr><th>POS</th><th>PLAYER</th><th>GP</th><th>G</th><th>A</th><th>P</th><th>SOG</th><th>HIT</th></tr>${plRows.map(({p,c:cd})=>`<tr><td class="ps">${esc(posOf(cd))}</td><td class="nm">${esc(cd.name)}</td><td>${p.gp}</td><td>${p.g}</td><td>${p.a}</td><td class="pt">${p.g+p.a}</td><td>${p.sog}</td><td>${p.hits}</td></tr>`).join('')}</table></div>`:''}
-    ${gkRows.length?`<div class="bxSec">Your goalies (all modes)</div><div class="stScroll"><table class="bxT"><tr><th>POS</th><th>GOALIE</th><th>GP</th><th>W</th><th>SV%</th><th>GAA</th><th>SO</th></tr>${gkRows.map(([id,p])=>`<tr><td class="ps">G</td><td class="nm">${esc(p.nm)}</td><td>${p.gp}</td><td>${p.w}</td><td>${p.sv+p.ga?(p.sv/(p.sv+p.ga)).toFixed(3).replace(/^0/,''):'-'}</td><td>${f1(p.ga,p.gp)}</td><td>${p.so}</td></tr>`).join('')}</table></div>`:''}`;
+    ${plRows.length?`<div class="bxSec">${o.friend?'Their':'Your'} players (all modes)</div><div class="stScroll"><table class="bxT"><tr><th>POS</th><th>PLAYER</th><th>GP</th><th>G</th><th>A</th><th>P</th><th>SOG</th><th>HIT</th></tr>${plRows.map(({p,c:cd})=>`<tr><td class="ps">${esc(posOf(cd))}</td><td class="nm">${esc(cd.name)}</td><td>${p.gp}</td><td>${p.g}</td><td>${p.a}</td><td class="pt">${p.g+p.a}</td><td>${p.sog}</td><td>${p.hits}</td></tr>`).join('')}</table></div>`:''}
+    ${gkRows.length?`<div class="bxSec">${o.friend?'Their':'Your'} goalies (all modes)</div><div class="stScroll"><table class="bxT"><tr><th>POS</th><th>GOALIE</th><th>GP</th><th>W</th><th>SV%</th><th>GAA</th><th>SO</th></tr>${gkRows.map(([id,p])=>`<tr><td class="ps">G</td><td class="nm">${esc(p.nm)}</td><td>${p.gp}</td><td>${p.w}</td><td>${p.sv+p.ga?(p.sv/(p.sv+p.ga)).toFixed(3).replace(/^0/,''):'-'}</td><td>${f1(p.ga,p.gp)}</td><td>${p.so}</td></tr>`).join('')}</table></div>`:''}`;
 }
+function renderStats(){statsInto({c:loadCareer(),mode:stMode,body:'stBody',tog:'stTog',whoEl:'stWho',who:(curUser?curUser+' \u00b7 ':'')+'Career'})}
 function newGame(){
   marksPeriod=-1;
   applySkin(skin);
@@ -3072,7 +3126,7 @@ const ls={get:k=>{try{return localStorage.getItem(k)}catch(_){return null}},set:
 function profileList(){try{const a=JSON.parse(ls.get('slapshot-profiles')||'[]');return Array.isArray(a)?a.filter(x=>typeof x==='string'):[]}catch(_){return[]}}
 const K=k=>PKEY(curUser,k);
 function saveProgress(){if(!curUser)return;try{localStorage.setItem(K('at'),String(Date.now()));cloudDirty();localStorage.setItem(K('trophies'),String(trophies));localStorage.setItem(K('arena'),String(arenaIdx));
-  localStorage.setItem(K('cards'),JSON.stringify({owned,deck,decks,deckIdx,deckNames,lastDropDay,gold,prog,pucks,passClaimed,bonusClaimed,questsDay,quests,emotes,roadClaimed,roadC3,roadC5,trophies5,shopDay,shopBought,gems,skins,skin,featured}))}catch(_){}}
+  localStorage.setItem(K('cards'),JSON.stringify({owned,deck,decks,deckIdx,deckNames,lastDropDay,gold,prog,pucks,passClaimed,bonusClaimed,questsDay,quests,emotes,roadClaimed,roadC3,roadC5,trophies5,shopDay,shopBought,gems,skins,skin,featured,bundlesOnce}))}catch(_){}}
 /* ---------- emotes ----------
    Everyone starts with the first 3. The rest come from Epic (50%), Mythic (75%) and Legendary (always)
    star drops. Tap the bubble button on the rink (or T on a keyboard) and pick one; it pops up for both
@@ -3150,7 +3204,7 @@ let emotes=START_EMOTES.slice(),emCool=0,emTimers={};
 function resetProgress(){ // a brand-new player's starting point
   trophies=0;arenaIdx=0;owned=['bell','charlotte'];deck={F1:'charlotte',F2:null,D:'bell',G:null};
   decks=[deck];for(let i=1;i<DECKS_N;i++)decks.push({F1:null,F2:null,D:'bell',G:null});deckIdx=0;deckNames=DECK_DEF_NAMES.slice();lastDropDay='';dropPending=false;gold=100;
-  prog={bell:{copies:10,lv:{}},charlotte:{copies:0,lv:{}}};pucks=0;passClaimed=[];bonusClaimed=0;questsDay='';quests=[];emotes=START_EMOTES.slice();roadClaimed=[];roadC3=[];roadC5=[];trophies5=0;shopDay='';shopBought=[];gems=0;skins=['classic'];skin='classic';featured=null;
+  prog={bell:{copies:10,lv:{}},charlotte:{copies:0,lv:{}}};pucks=0;passClaimed=[];bonusClaimed=0;questsDay='';quests=[];emotes=START_EMOTES.slice();roadClaimed=[];roadC3=[];roadC5=[];trophies5=0;shopDay='';shopBought=[];gems=0;skins=['classic'];skin='classic';featured=null;bundlesOnce=[];
 }
 let charlotteNew=false;
 function loadProgress(){resetProgress();if(!curUser)return;try{
@@ -3171,7 +3225,7 @@ function loadProgress(){resetProgress();if(!curUser)return;try{
     lastDropDay=c.lastDropDay||'';gold=Math.max(0,+c.gold||0)+(fresh?100:0);
     if(c.questsDay&&Array.isArray(c.quests)){questsDay=c.questsDay;quests=c.quests.filter(q=>questById(q.id))}
     if(c.shopDay&&Array.isArray(c.shopBought)){shopDay=c.shopDay;shopBought=c.shopBought}
-    gems=Math.max(0,+c.gems||0);if(Array.isArray(c.skins))skins=[...new Set(['classic',...c.skins.filter(skinById)])];skin=skinById(c.skin)&&skins.includes(c.skin)?c.skin:'classic';featured=owned.includes(c.featured)?c.featured:null;
+    gems=Math.max(0,+c.gems||0);bundlesOnce=Array.isArray(c.bundlesOnce)?c.bundlesOnce.filter(x=>typeof x==='string'):[];if(Array.isArray(c.skins))skins=[...new Set(['classic',...c.skins.filter(skinById)])];skin=skinById(c.skin)&&skins.includes(c.skin)?c.skin:'classic';featured=owned.includes(c.featured)?c.featured:null;
     if(Array.isArray(c.roadClaimed))roadClaimed=c.roadClaimed.filter(n=>Number.isFinite(n));
     trophies5=Math.max(0,+c.trophies5||0);if(Array.isArray(c.roadC3))roadC3=c.roadC3.filter(n=>Number.isFinite(n));if(Array.isArray(c.roadC5))roadC5=c.roadC5.filter(n=>Number.isFinite(n));
     if(Array.isArray(c.emotes))emotes=[...new Set([...START_EMOTES,...c.emotes.filter(emoteById)])];
@@ -3384,7 +3438,11 @@ function acctTrophies(){const n=acctName();if(n&&n===curUser)return[trophies,tro
 function inMatch(){return !!netRole||($('menuOv').hidden&&$('endOv').hidden&&['play','faceoff','goal','replay','so','stop','inter'].includes(phase))}
 async function profileUp(extra){
   if(!acct||!fbDb)return;const n=acctName();if(!n)return;const[t,t5]=acctTrophies();
-  try{await fbDb.collection('profiles').doc(acct.uid).set(Object.assign({name:n,lower:lowerName(n),tr:t,tr5:t5,seen:Date.now(),st:inMatch()?'game':'on'},extra||{}),{merge:true});profErr=''}catch(e){console.warn('profile',e);profErr=(e&&e.code)||'error';renderFriends()}
+  let live=null;
+  if(netRole==='host'&&hostCode&&netConn&&netConn.open)live={code:hostCode,a:n,b:friendName||'Friend'};
+  else if(netRole==='guest'&&liveJoin)live={code:liveJoin,a:friendName||'Friend',b:n};
+  let stats=null;try{stats=careerPublic()}catch(_){}
+  try{await fbDb.collection('profiles').doc(acct.uid).set(Object.assign({name:n,lower:lowerName(n),tr:t,tr5:t5,seen:Date.now(),st:inMatch()?'game':'on',live,stats},extra||{}),{merge:true});profErr=''}catch(e){console.warn('profile',e);profErr=(e&&e.code)||'error';renderFriends()}
 }
 async function claimName(name){
   for(let i=0;i<40;i++){const n=i?cleanName(name.slice(0,13)+' '+(i+1)):name,ref=fbDb.collection('usernames').doc(lowerName(n));
@@ -3449,8 +3507,11 @@ function renderFriends(){
   if(inFr.length)h+=`<div class="frHead">Friend requests</div><div class="frList">${inFr.map(r=>`<div class="frRow"><i class="dot on"></i><div class="nm"><b>${esc(r.fromName||'?')}</b><span>wants to be friends</span></div><div class="frBtns"><button class="frOk" data-acc="${esc(r.id)}">Accept</button><button class="frX" data-dec="${esc(r.id)}">\u2715</button></div></div>`).join('')}</div>`;
   const rows=mine.map(id=>{const p=frProfs[id],[cls,txt]=frStatus(p),mutual=p&&Array.isArray(p.friends)&&p.friends.includes(me);
     const busy=chOut&&chOut.to===id;
-    return`<div class="frRow"><i class="dot ${cls}"></i><div class="nm"><b>${esc(p?p.name:'...')}</b><span>${mutual?txt+' \u00b7 \u{1F3C6} '+(p.tr||0):'Request pending'}</span></div>
-      <div class="frBtns"><button class="frCh" data-ch="${esc(id)}" ${mutual&&!p.gone&&!netRole?'':'disabled'}>${busy?'SENT':'\u2694\uFE0F PLAY'}</button><button class="frX" data-rm="${esc(id)}" aria-label="Remove friend">${frDelArm===id?'Remove?':'\u2715'}</button></div></div>`});
+    const live=mutual&&p.live&&p.live.code&&cls==='game';
+    const sub=!mutual?'Request pending':live?`<span class="live">\u{1F534} LIVE</span> ${esc(p.live.a)} vs ${esc(p.live.b)}`:txt+' \u00b7 \u{1F3C6} '+(p.tr||0);
+    const act=live?`<button class="frW" data-w="${esc(id)}" ${netRole?'disabled':''}>\u{1F441} WATCH</button>`:`<button class="frCh" data-ch="${esc(id)}" ${mutual&&!p.gone&&!netRole?'':'disabled'}>${busy?'SENT':'\u2694\uFE0F PLAY'}</button>`;
+    return`<div class="frRow"><i class="dot ${cls}"></i><button class="nm" data-st="${esc(id)}" aria-label="See stats"><b>${esc(p?p.name:'...')}</b><span>${sub}</span></button>
+      <div class="frBtns">${act}<button class="frX" data-rm="${esc(id)}" aria-label="Remove friend">${frDelArm===id?'Remove?':'\u2715'}</button></div></div>`});
   h+=`<div class="frHead">Friends (${mine.length})</div>`+(rows.length?`<div class="frList">${rows.join('')}</div>`:'<p class="frEmpty">No friends yet. Type a friend\'s username above. They need an account too.</p>');
   if(outFr.length)h+=`<p class="frEmpty">Waiting for: ${outFr.map(r=>esc(r.toName||'?')).join(', ')}</p>`;
   const keep=$('frIn')?$('frIn').value:'',focused=document.activeElement&&document.activeElement.id==='frIn';
@@ -3460,6 +3521,8 @@ function renderFriends(){
   box.querySelectorAll('[data-dec]').forEach(b=>b.onclick=()=>reqDel(b.dataset.dec));
   box.querySelectorAll('[data-ch]').forEach(b=>b.onclick=()=>challenge(b.dataset.ch));
   box.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>removeFriend(b.dataset.rm));
+  box.querySelectorAll('[data-st]').forEach(b=>b.onclick=()=>openFriendStats(b.dataset.st));
+  box.querySelectorAll('[data-w]').forEach(b=>b.onclick=()=>{const p=frProfs[b.dataset.w];if(p&&p.live)watchGame(p.live.code,p.live.a+' vs '+p.live.b)});
 }
 const frSay=t=>{frMsgT=t;const m=$('frMsg');if(m)m.textContent=t};
 async function addFriend(){
@@ -3495,6 +3558,39 @@ async function challenge(uid){
     $('hostMsg').textContent='Challenge sent to '+p.name+'. Waiting for them to accept...';frSay('');tone(660,.08,'square',.04,990)}
   catch(e){chOut=null;frSay(fsErr(e))}
   renderFriends();
+}
+async function watchGame(code,label){
+  if(netRole||!code)return;audio();frSay('Connecting to '+label+'...');
+  try{await loadPeer()}catch(_){frSay('Can\'t connect here. Open the game from its website.');return}
+  closeNet();const opts=await peerOpts();let peer;try{peer=new Peer(opts)}catch(_){frSay('Can\'t connect here.');return}
+  netPeer=peer;specPending=true;gGid=null;let tries=0;
+  setTimeout(()=>{if(netPeer===peer&&netRole!=='spec'){specPending=false;frSay('Couldn\'t reach that game. It may have just ended.')}},15000);
+  peer.on('error',e=>{if(netPeer!==peer)return;if(e&&e.type==='peer-unavailable'){if(++tries<3){setTimeout(()=>{if(netPeer===peer&&netRole!=='spec')dial()},1500);return}specPending=false;frSay('That game has ended.');return}});
+  peer.on('open',dial);
+  function dial(){const conn=peer.connect(PEER_PREFIX+code,{reliable:false,serialization:'json'});netConn=conn;
+    conn.on('open',()=>{const hi=()=>{if(netConn!==conn||!conn.open||gGid!==null)return;conn.send({t:'watch',name:acctName()||curUser});setTimeout(hi,800)};hi()});
+    conn.on('data',m=>guestData(m));
+    conn.on('close',()=>{if(netConn===conn&&netRole==='spec')leaveNet('The game is over.')})}
+}
+function openFriendStats(id){
+  const p=frProfs[id];if(!p)return;audio();
+  fsView={id,mode:'all'};$('fsName').textContent=String(p.name||'FRIEND').toUpperCase();
+  const[cls,txt]=frStatus(p);$('fsWho').textContent=txt;
+  $('fsLine').innerHTML='\u{1F3C6} <b>'+(p.tr||0)+'</b> trophies (3 on 3) \u00b7 <b>'+(p.tr5||0)+'</b> (5 on 5)';
+  paintFriendStats();$('fsOv').hidden=false;$('fsOv').scrollTop=0;
+}
+var fsView=null;
+function paintFriendStats(){const p=fsView&&frProfs[fsView.id];if(!p)return;
+  const c=p.stats&&p.stats.all?Object.assign({m3:blankRec(),m5:blankRec(),pl:{},gk:{},recent:[]},p.stats):null;
+  if(!c){$('fsBody').innerHTML='<p class="stEmpty">'+esc(p.name||'They')+' hasn\'t shared stats yet. They show up after they open the newest version of the game.</p>';for(const b of $('fsTog').querySelectorAll('button'))b.setAttribute('aria-pressed',String(b.dataset.m===fsView.mode));return}
+  statsInto({c,mode:fsView.mode,body:'fsBody',tog:'fsTog',whoEl:'fsWho',who:$('fsWho').textContent,friend:true});
+}
+// the slice of career stats friends can see: records, recent results, top players and goalies
+function careerPublic(){
+  const c=loadCareer(),pl={},gk={};
+  Object.entries(c.pl||{}).sort((a,b)=>(b[1].g+b[1].a)-(a[1].g+a[1].a)).slice(0,8).forEach(([k,v])=>pl[k]=v);
+  Object.entries(c.gk||{}).sort((a,b)=>b[1].gp-a[1].gp).slice(0,3).forEach(([k,v])=>gk[k]=v);
+  return{all:c.all,m3:c.m3,m5:c.m5,pl,gk,recent:(c.recent||[]).slice(0,10)};
 }
 function cancelChallenges(){for(const r of frOut)if(r.type==='ch')reqDel(r.id);chOut=null}
 function checkCh(){
@@ -3671,7 +3767,7 @@ function confettiDOM(col){const host=$('ulBurst');host.innerHTML='';const cols=[
   for(let i=0;i<46;i++){const d=document.createElement('i');const a=Math.random()*Math.PI*2,r=90+Math.random()*170;
     d.style.cssText=`--dx:${Math.cos(a)*r}px;--dy:${Math.sin(a)*r-60}px;--rot:${Math.random()*720-360}deg;background:${cols[i%cols.length]};animation-delay:${Math.random()*.15}s`;host.append(d)}
   setTimeout(()=>{host.innerHTML=''},2200)}
-function closeUnlock(){const c=UL&&UL.c;$('unlockOv').hidden=true;UL=null;renderArenas();try{if(!$('deckOv').hidden)renderDeck()}catch(_){}if(c&&c.ultra&&!sharkPos())setTimeout(openPos,250)}
+function closeUnlock(){const c=UL&&UL.c;$('unlockOv').hidden=true;UL=null;renderArenas();if(packQ.length)setTimeout(nextPack,300);try{if(!$('deckOv').hidden)renderDeck()}catch(_){}if(c&&c.ultra&&!sharkPos())setTimeout(openPos,250)}
 function showDrop(minTier){
   const{tier,rw}=rollDrop(minTier);
   // 3 chances: the star starts at its lowest possible rarity, and each of the 3 taps can upgrade it
@@ -3727,10 +3823,65 @@ const giftReady=()=>{shopRoll();return!shopBought.includes('gift')};
 function dealsToday(){ // 3 legends you own, picked by the date so the deals stay put all day
   const pool=owned.slice();let h=0;for(const ch of today())h=(h*31+ch.charCodeAt(0))>>>0;
   const out=[];while(pool.length&&out.length<3){h=(h*1103515245+12345)>>>0;out.push(pool.splice(h%pool.length,1)[0])}return out}
+/* ---------- BUNDLES ----------
+   Several rewards for less than buying them one by one. Paid with gold or gems (earned in the game).
+   'once' = one time ever, 'day' = once a day (resets at midnight with the other deals). */
+var bundlesOnce=[],packQ=[];
+function nextPack(){if(!packQ.length||!$('dropOv').hidden||!$('unlockOv').hidden)return;const t=packQ.shift();showDrop(t);if(packQ.length)$('dropHint').textContent='Tap the pack! '+packQ.length+' more after this one'}
+function dayHash(salt){let h=0;for(const ch of today()+salt)h=(h*31+ch.charCodeAt(0))>>>0;return h}
+function bundleCard(){ // today's featured player for the Daily Bundle (one you own, not already in today's card deals)
+  const pool=owned.filter(id=>!dealsToday().includes(id));const list=pool.length?pool:owned;return list[dayHash('b')%list.length]}
+const BUNDLES=[
+  {id:'starter',lim:'once',n:'Starter Bundle',tag:'ONE TIME ONLY',save:'BEST VALUE',col:'#35d07f',cost:{gems:80},items:[{gold:2000},{pucks:60},{pack:1}]},
+  {id:'daily',lim:'day',n:'Daily Bundle',tag:'NEW EVERY DAY',save:'+ BONUS GEMS',col:'#4fb6ff',cost:{gold:1200},items:[{cards:'daily',n:25},{gems:3},{gold:100}]},
+  {id:'deck',lim:'day',n:'Deck Booster',tag:'YOUR WHOLE DECK',save:'ALL 4 PLAYERS',col:'#ffb627',cost:{gold:2200},items:[{deckCards:15}]},
+  {id:'packs',lim:'day',n:'Pack Party',tag:'3 PACKS',save:'OPEN 3 IN A ROW',col:'#a970ff',cost:{gems:320},items:[{pack:1},{pack:1},{pack:2}]},
+  {id:'pro',lim:'day',n:'Pro Bundle',tag:'BIG ONE',save:'MYTHIC PACK',col:'#ff5a67',cost:{gems:700},items:[{pack:3},{gold:3000},{pucks:100},{gems:20}]},
+  {id:'legend',lim:'day',n:'Legend Bundle',tag:'GUARANTEED LEGEND',save:'PREMIUM',col:'#ffc629',cost:{gems:1100},items:[{pack:4},{pack:2},{gold:5000}]},
+];
+const bundleKey=b=>b.lim==='once'?'once':'b-'+b.id;
+const bundleGone=b=>b.lim==='once'?bundlesOnce.includes(b.id):shopBought.includes('b-'+b.id);
+const canAfford=c=>(c.gold==null||gold>=c.gold)&&(c.gems==null||gems>=c.gems);
+function itemChip(it){
+  const packName=t=>(SHOP_DROPS[t-1]||{n:'Card pack'}).n;
+  if(it.gold)return`<span class="bIt"><b class="bI gd">G</b>${it.gold.toLocaleString()} gold</span>`;
+  if(it.gems)return`<span class="bIt"><b class="bI gm">\u25C6</b>${it.gems} gems</span>`;
+  if(it.pucks)return`<span class="bIt"><b class="bI pk">\u25CF</b>${it.pucks} pucks</span>`;
+  if(it.pack)return`<span class="bIt"><b class="bI pc" style="--rar:${RARITY[it.pack].c}">\u2605</b>${packName(it.pack)}</span>`;
+  if(it.cards){const c=cardById(it.cards==='daily'?bundleCard():it.cards);return c?`<span class="bIt"><b class="bI cd">${esc(posOf(c))}</b>${it.n} ${esc(c.name.split(' ').slice(-1)[0])} cards</span>`:''}
+  if(it.deckCards){const ids=SLOTS.map(x=>deck[x.k]).filter(Boolean);return`<span class="bIt"><b class="bI cd">\u00d7${ids.length}</b>${it.deckCards} cards for each player in your deck</span>`}
+  return'';
+}
+function bundlesHTML(coin,gem){
+  return`<div class="shopSec"><div class="eyebrow">Bundles \u00b7 more for less</div><div class="bGrid">${BUNDLES.map(b=>{const gone=bundleGone(b),ok=canAfford(b.cost);
+    const price=b.cost.gems!=null?gem+b.cost.gems:coin+b.cost.gold;
+    return`<div class="bundle${gone?' gone':''}" style="--bc:${b.col}"><div class="bTop"><span class="bTag">${b.tag}</span><span class="bSave">${b.save}</span></div>
+      <div class="bName">${b.n}</div><div class="bItems">${b.items.map(itemChip).join('')}</div>
+      <button class="buy${b.cost.gems!=null?' gemb':''}" data-buy="bundle-${b.id}" ${gone||!ok?'disabled':''}>${gone?(b.lim==='once'?'OWNED':'BACK TOMORROW'):price}</button></div>`}).join('')}</div></div>`;
+}
+function buyBundle(id){
+  const b=BUNDLES.find(x=>x.id===id);if(!b||bundleGone(b)||!canAfford(b.cost))return;
+  if(b.cost.gold)gold-=b.cost.gold;if(b.cost.gems)gems-=b.cost.gems;
+  if(b.lim==='once')bundlesOnce.push(b.id);else shopBought.push('b-'+b.id);
+  const got=[];
+  for(const it of b.items){
+    if(it.gold){gold+=it.gold;got.push('+'+it.gold+' GOLD')}
+    if(it.gems){gems+=it.gems;got.push('+'+it.gems+' GEMS')}
+    if(it.pucks){pucks+=it.pucks;got.push('+'+it.pucks+' PUCKS')}
+    if(it.cards){const cid=it.cards==='daily'?bundleCard():it.cards;if(cid){progOf(cid).copies+=it.n;got.push('+'+it.n+' '+cardById(cid).name.split(' ').slice(-1)[0].toUpperCase()+' CARDS')}}
+    if(it.deckCards){for(const x of SLOTS){const cid=deck[x.k];if(cid)progOf(cid).copies+=it.deckCards}got.push('+'+it.deckCards+' CARDS EACH')}
+    if(it.pack)packQ.push(it.pack);
+  }
+  saveProgress();horn();shake=Math.max(shake,.2);
+  toast(b.n.toUpperCase()+'!','',1500);if(got.length)setTimeout(()=>toast(got.join(' \u00b7 '),'small',2200),700);
+  renderShop();renderArenas();
+  if(packQ.length)setTimeout(nextPack,got.length?1300:300);
+}
 function renderShop(){
   shopRoll();const coin='<svg class="coin" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><text x="12" y="16.5" text-anchor="middle">G</text></svg>';
   const g=shopBought.includes('gift');
-  let h=`<div class="shopSec"><div class="eyebrow">Daily gift</div><div class="shopGrid"><div class="offer free"><span class="fr">FREE</span>
+  const gemI='<svg class="gem" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12l4 6-10 12L2 9z" fill="#35d07f" stroke="#0d6b3a" stroke-width="1.5" stroke-linejoin="round"/><path d="M2 9h20M8 3l4 6 4-6M12 9 7 9l5 12 5-12" fill="none" stroke="#bff5d8" stroke-width="1" opacity=".8"/></svg>';
+  let h=bundlesHTML(coin,gemI)+`<div class="shopSec"><div class="eyebrow">Daily gift</div><div class="shopGrid"><div class="offer free"><span class="fr">FREE</span>
     <span><span class="onm">${g?'Come back tomorrow':'Free gift!'}</span><span class="os" style="display:block">Gold or player cards, every day.</span></span>
     <button class="buy" data-buy="gift" ${g?'disabled':''}>${g?'CLAIMED':'CLAIM'}</button></div></div></div>`;
   h+=`<div class="shopSec"><div class="eyebrow">Card deals · 10 cards</div><div class="shopGrid">${dealsToday().map(id=>{const c=cardById(id),k='deal-'+id,b=shopBought.includes(k),cost=c.starter?120:200;
@@ -3762,6 +3913,7 @@ function buy(k,el){
     if(!skins.includes(sk.id)){if(gems<sk.cost)return;gems-=sk.cost;skins.push(sk.id);toast('NEW JERSEY!','small',1000);horn()}
     skin=sk.id;applySkin(skin);tone(700,.12,'triangle',.06,1050)}
   else if(k.startsWith('drop')){const d=SHOP_DROPS[+k.slice(4)];if(!d||gems<d.cost)return;gems-=d.cost;saveProgress();showDrop(d.min)}
+  else if(k.startsWith('bundle-')){buyBundle(k.slice(7));return}
   saveProgress();renderShop();renderArenas();
 }
 $('shopList').addEventListener('click',e=>{const b=e.target.closest('[data-buy]');if(b&&!b.disabled)buy(b.dataset.buy,b)});
@@ -3930,10 +4082,12 @@ function renderPass(){
    Prizes at trophy milestones (30 trophies = 1 win). Arena unlocks sit on the road as markers.
    Already past a milestone? It's waiting to be claimed. */
 /* Two roads, one per mode. A prize every 100 trophies (about every 3-4 wins). */
-const ROAD3=[{at:100,type:'gold',n:150},{at:200,type:'drop',min:1},{at:300,type:'cards',n:10},{at:400,type:'emote'},{at:500,type:'drop',min:2},
-  {at:600,type:'gems',n:15},{at:700,type:'gold',n:400},{at:800,type:'drop',min:3},{at:900,type:'cards',n:20},{at:1000,type:'drop',min:4}];
-const ROAD5=[{at:100,type:'cards',n:8},{at:200,type:'gold',n:200},{at:300,type:'drop',min:1},{at:400,type:'gems',n:10},{at:500,type:'emote'},
-  {at:600,type:'drop',min:2},{at:700,type:'cards',n:15},{at:800,type:'gold',n:500},{at:900,type:'drop',min:3},{at:1000,type:'drop',min:4}];
+const ROAD3=[{at:100,type:'gold',n:150},{at:200,type:'drop',min:1},{at:300,type:'unc'},{at:400,type:'emote'},{at:500,type:'drop',min:2},
+  {at:600,type:'gems',n:15},{at:700,type:'unc'},{at:800,type:'drop',min:3},{at:900,type:'cards',n:20},{at:1000,type:'drop',min:4},
+  {at:1100,type:'unc'},{at:1200,type:'gold',n:800},{at:1300,type:'drop',min:3},{at:1400,type:'unc'},{at:1500,type:'drop',min:4}];
+const ROAD5=[{at:100,type:'cards',n:8},{at:200,type:'unc'},{at:300,type:'drop',min:1},{at:400,type:'gems',n:10},{at:500,type:'emote'},
+  {at:600,type:'unc'},{at:700,type:'cards',n:15},{at:800,type:'gold',n:500},{at:900,type:'drop',min:3},{at:1000,type:'drop',min:4},
+  {at:1100,type:'unc'},{at:1200,type:'gems',n:20},{at:1300,type:'drop',min:3},{at:1400,type:'unc'},{at:1500,type:'drop',min:4}];
 let roadView=null; // which road the sheet shows (defaults to the mode you play)
 const rv=()=>roadView==null?MODE5:roadView,ROADof=m=>m?ROAD5:ROAD3,claimedOf=m=>m?roadC5:roadC3,trOf=m=>m?trophies5:trophies;
 const DROP_NAMES=['Card pack','Super Rare+ card pack','Epic+ card pack','Mythic+ card pack','Legendary card pack'];
@@ -3943,6 +4097,7 @@ function roadLabel(r){
   if(r.type==='cards')return[r.n+' player cards','For a random player you own'];
   if(r.type==='gems')return[r.n+' gems','Rare! Spend in the shop'];
   if(r.type==='emote')return['New emote','One you don\'t have yet'];
+  if(r.type==='unc')return['New uncommon player','A player you don\'t have yet'];
   return[DROP_NAMES[r.min],r.min>=4?'Guaranteed new legend':r.min>=2?'Could hold a new emote':'Gold, cards and more'];
 }
 const roadReady=()=>[0,1].reduce((n,m)=>n+ROADof(m).filter(r=>trOf(m)>=r.at&&!claimedOf(m).includes(r.at)).length,0);
@@ -3952,6 +4107,10 @@ function claimRoad(at){
   if(r.type==='gold'){gold+=r.n;tone(880,.2,'triangle',.06,1320);toast('+'+r.n+' GOLD','small',900)}
   else if(r.type==='gems'){gems+=r.n;tone(1320,.3,'sine',.06,1760);toast('+'+r.n+' GEMS','small',1100)}
   else if(r.type==='cards'){const id=pick1(owned);progOf(id).copies+=r.n;tone(660,.2,'triangle',.06,990);toast('+'+r.n+' '+cardById(id).name.split(' ').slice(-1)[0].toUpperCase()+' CARDS','small',1200)}
+  else if(r.type==='unc'){ // a new uncommon player joins (if you already have them all: a stack of cards instead)
+    const pool=CARDS.filter(c=>rarOf(c)==='uncommon'&&!owned.includes(c.id));
+    if(pool.length){const c=pick1(pool);owned.push(c.id);progOf(c.id);const sl=SLOTS.find(x=>x.pos===c.pos&&!deck[x.k]);if(sl)deck[sl.k]=c.id;saveProgress();renderRoad();renderArenas();openUnlock(c);return}
+    const mine=owned.filter(id=>rarOf(cardById(id))==='uncommon');const id=mine.length?pick1(mine):pick1(owned);progOf(id).copies+=25;toast('+25 '+cardById(id).name.split(' ').slice(-1)[0].toUpperCase()+' CARDS','small',1200)}
   else if(r.type==='emote'){
     const pool=EMOTES.filter(e=>!emotes.includes(e.id));
     if(pool.length){const e=pick1(pool);emotes.push(e.id);toast('NEW EMOTE: '+e.tx.toUpperCase(),'small',1500);tone(1046,.2,'triangle',.06,1568)}
@@ -3970,7 +4129,7 @@ function renderRoad(){
   const rows=[...ROAD.map(r=>({at:r.at,r})),...ARENAS.slice(1).map((a,i)=>({at:a.need,a,i:i+2}))].sort((x,y)=>x.at-y.at||(x.a?-1:1));
   $('roadTrack').innerHTML=rows.map(x=>{
     if(x.a)return`<div class="prow arena${trophies>=x.at?' done':''}"><span class="tn tr">${x.at}</span><span class="rw">Arena ${x.i}: ${x.a.name}<span class="rs">${trophies>=x.at?'Unlocked':'Unlocks here'}</span></span></div>`;
-    const[l,sub]=roadLabel(x.r),done=roadClaimed.includes(x.at),ready=!done&&trophies>=x.at,big=x.r.type==='drop'||x.r.type==='emote';
+    const[l,sub]=roadLabel(x.r),done=roadClaimed.includes(x.at),ready=!done&&trophies>=x.at,big=x.r.type==='drop'||x.r.type==='emote'||x.r.type==='unc';
     return`<div class="prow${done?' done':ready?' ready':''}${big?' big':''}"><span class="tn tr">${x.at}</span><span class="rw">${l}<span class="rs">${sub}</span></span>
       <button class="claim rclaim" data-at="${x.at}" ${ready?'':'disabled'}>${done?'CLAIMED':ready?'CLAIM':x.at+' trophies'}</button></div>`}).join('');
   const tr=$('roadTrack'),first=tr.querySelector('.prow.ready')||tr.querySelector('.prow:not(.done)');
@@ -4044,7 +4203,7 @@ function renderArenas(){
   paintRoadBtns();
   badge('passBdg',passReady());$('gemCount').textContent=gems;
   badge('questBdg',quests.filter(q=>!q.claimed&&q.prog>=questById(q.id).n).length);
-  {const A=ARENAS[arenaIdx],rv=[0,0,1,2,3][arenaIdx];$('modeName').textContent=A.name;
+  {const A=ARENAS[arenaIdx],rv=[0,0,1,2,3,3,4,4][arenaIdx];$('modeName').textContent=A.name;
    $('modeSub').textContent='ARENA '+(arenaIdx+1)+' \u00b7 CPU LV '+CPU_LV[arenaIdx];
    $('mRink').style.setProperty('--i0',A.ice[0]);$('mRink').style.setProperty('--i1',A.ice[1])}
   renderHero();badge('deckBdg',upgradable());badge('shopBdg',giftReady()?1:0);
@@ -4143,13 +4302,13 @@ function controlTeam(dt){
 let lastT=0,slowmo=0,vig=0,leadX=0,leadY=0,showRoles=true;
 try{showRoles=localStorage.getItem('slapshot-roles')!=='off'}catch(_){}
 function frame(t){
-  const rdt=clamp(lastT?(t-lastT)/1000:0,0,.05);lastT=t;
+  const rdt=clamp(lastT?(t-lastT)/1000:0,0,.05);lastT=t;autoQuality(rdt);
   // slow motion when a breakaway closes in on the goalie
   slowmo=0;
   if(breakaway&&(phase==='play'||phase==='so')&&!reduceMotion){const o=breakaway.s;if(hyp(50-o.x,atkY(o.team)-o.y)<18)slowmo=1}
   vig=0; // no screen darkening
   const dt=rdt*(slowmo?.8:1);
-  if(netRole==='guest'){time+=rdt;guestTick(rdt*GAME_SPEED)}
+  if(remoteView()){time+=rdt;guestTick(rdt*GAME_SPEED)}
   else if(phase!=='paused'&&phase!=='inter'&&phase!=='end'&&phase!=='menu')update(dt*GAME_SPEED);
   else{time+=dt}
   if(netRole==='host')hostTick();
@@ -4167,20 +4326,23 @@ function frame(t){
   camX+=(tgx-camX)*Math.min(1,rdt*2.5);
   camX=viewW>=W+6?W/2:clamp(camX,viewW/2-3,W-viewW/2+3);
   ox=cw/2-camX*sc;
-  draw();requestAnimationFrame(frame);
+  // the lobby covers the whole rink: don't paint what nobody can see
+  if($('menuOv').hidden||phase!=='menu')draw();requestAnimationFrame(frame);
 }
 
 /* ---------- HUD ---------- */
-let lastHas=null,toastTimer=0;
+let lastHas=null,toastTimer=0,lastChargeCss='';
+const txtCache={};function setTxt(id,v){v=String(v);if(txtCache[id]===v)return;txtCache[id]=v;const e=$(id);if(e)e.textContent=v}
 const fmt=s=>{s=Math.ceil(s);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
 function paintBox(){const b=$('boxBadge');if(!b)return;const boxed=roster.filter(k=>k.boxT&&k.boxT>time&&!skaters.includes(k));
   const t=boxed.length?boxed.map(k=>'\u{1F6A8} #'+k.num+' OFF THE ICE '+Math.ceil(k.boxT-time)+'s').join(' \u00b7 '):'';if(b.textContent!==t)b.textContent=t;if(b.hidden===!t)return;b.hidden=!t}
 function updateHud(){
   if(netRole!=='guest')paintBox();
   paintPull();
-  $('s0').textContent=score[myT];$('s1').textContent=score[1-myT];
-  $('per').textContent=PNAMES[Math.min(period,3)-1];
-  $('clk').textContent=period===3&&so?so.res[myT].filter(Boolean).length+'–'+so.res[1-myT].filter(Boolean).length:fmt(clock);
+  // only touch the page when something changed (rewriting text 60 times a second makes the browser re-lay-out the page)
+  setTxt('s0',score[myT]);setTxt('s1',score[1-myT]);
+  setTxt('per',PNAMES[Math.min(period,3)-1]);
+  setTxt('clk',period===3&&so?so.res[myT].filter(Boolean).length+'–'+so.res[1-myT].filter(Boolean).length:fmt(clock));
   const has=!!(puck&&human&&puck.owner===human);
   const mode=has?(isBH(human)&&!charging?'bh':'shoot'):'check';
   if(mode!==lastHas){lastHas=mode;const b=$('bShoot');b.innerHTML=mode==='bh'?'BACK<br>HAND':mode==='shoot'?'SHOOT':'CHECK';
@@ -4191,7 +4353,7 @@ function updateHud(){
     const pl=has?'PASS':'SWITCH';if($('bPass').textContent!==pl)$('bPass').textContent=pl;
     paintMoves(has);
   }
-  $('bShoot').style.setProperty('--c',charging?charge.toFixed(3):0);
+  {const cv2=charging?charge.toFixed(2):'0';if(cv2!==lastChargeCss){lastChargeCss=cv2;$('bShoot').style.setProperty('--c',cv2)}}
   {const hasP=!!(puck&&human&&puck.owner===human);
    const ks=hasP?(charging?'winding up':isBH(human)?'backhand':'shoot'):'check',
      kk=hasP?'deke':'poke',kp=hasP?'pass':'switch';
@@ -4219,10 +4381,19 @@ function toast(text,cls,ms,team){
 
 /* ---------- rendering ---------- */
 const cv=$('cv'),ctx=cv.getContext('2d');
+/* AUTO QUALITY: the rink is drawn at up to 2x screen sharpness. If a phone can't keep 60 frames a second
+   during play, it steps the sharpness down (2 -> 1.5 -> 1.25 -> 1) until it's smooth; fast phones stay sharp. */
+let qCap=2,qSlow=0,qN=0;
+function autoQuality(rdt){
+  if(phase!=='play'||document.visibilityState==='hidden'||rdt<=0||rdt>=.05)return;
+  qN++;if(rdt>.021)qSlow++;
+  if(qN>=120){const bad=qSlow/qN;qN=0;qSlow=0;
+    if(bad>.25&&qCap>1){qCap=qCap>1.5?1.5:qCap>1.25?1.25:1;resize()}}
+}
 let cw=300,ch=400,sc=3,ox=0,dpr=1,iceGrad=null,camX=50,lockedW=0;const ZOOM=1.4;
 const scratches=Array.from({length:160},()=>({x:rnd(2,98),y:rnd(2,198),a:rnd(0,Math.PI),l:rnd(1.5,6)}));
 function resize(){
-  const r=$('stage').getBoundingClientRect(),nd=Math.min(2,window.devicePixelRatio||1);
+  const r=$('stage').getBoundingClientRect(),nd=Math.min(qCap,window.devicePixelRatio||1);
   const nw=Math.max(50,r.width),nh=Math.max(50,r.height),pw=Math.round(nw*nd),ph=Math.round(nh*nd);
   const sizeChanged=cv.width!==pw||cv.height!==ph;
   dpr=nd;cw=nw;ch=nh;
@@ -4474,18 +4645,25 @@ function winFaceoff(w){
   if(w===0)questEvent('faceoff');
   lastPbp=-9;pbp(`${N(c)} wins the draw${puck.passTo?` back to ${N(puck.passTo)}`:''}.`,1);
 }
-function pressShoot(){if(netRole==='guest'){audio();guestButton('sd');return}if(phase==='replay'){skipReplay();return}if(phase==='faceoff'){faceoffPress();return}if((phase!=='play'&&phase!=='so')||!human)return;audio();
+let gShootT=0,gShootTm=0,gHold=false,gShot=null,gEnd=null;
+function pressShoot(){if(remoteView()){audio();
+    // the friend decides tap-or-hold on their own phone (a laggy link can't turn a tap into a wind-up)
+    if(!(human&&puck.owner===human&&(phase==='play'||phase==='so'))){gShootT=0;gHold=false;guestButton('sd');return}
+    gShootT=performance.now();gHold=false;clearTimeout(gShootTm);gShootTm=setTimeout(()=>{if(gShootT){gShootT=0;if(human&&puck.owner===human){gHold=true;guestButton('sh')}}},WRIST_HOLD);return}if(phase==='replay'){skipReplay();return}if(phase==='faceoff'){faceoffPress();return}if((phase!=='play'&&phase!=='so')||!human)return;audio();
   if(puck.owner===human){
     if(time-(human.recvT||-9)<.45&&human.cd<=0){shoot(human,.9,input.x,wantsHigh());puck.bh=true;toast('ONE-TIMER','small',600)}
     else if(isBH(human)&&human.cd<=0)backhand(human,input.x,wantsHigh());else{human.sdT=performance.now();charging=false;charge=0}}else humanCheck()}
 const WRIST_HOLD=180; // ms: let go before this and it's a wrist shot
-function releaseShoot(){if(netRole==='guest'){guestButton('su');return}
+function releaseShoot(){if(remoteView()){
+    if(gShootT){clearTimeout(gShootTm);gShootT=0;if(human&&puck.owner===human){guestButton('w');predictShot(.62)}return}
+    if(gHold){gHold=false;guestButton('su');predictShot(Math.max(.6,charge));return}
+    guestButton('su');return}
   const ok=(phase==='play'||phase==='so')&&human&&puck.owner===human;
   if(charging){charging=false;if(human)human.sdT=0;if(ok)shoot(human,Math.max(.6,charge),input.x,wantsHigh());return} // slapshot
   if(human&&human.sdT){human.sdT=0;if(ok&&human.cd<=0){shoot(human,.62,input.x,wantsHigh());puck.kind='wrist';toast('WRIST SHOT','small',450)}}} // quick release
 function holdCheck(){if(human&&human.sdT&&!charging){if(puck.owner!==human)human.sdT=0;else if(performance.now()-human.sdT>WRIST_HOLD){charging=true;charge=.15}}}
-function pressSkill(){if(netRole==='guest'){audio();guestButton('k');return}if(phase==='replay'){skipReplay();return}if(phase==='faceoff'){faceoffPress();return}if((phase!=='play'&&phase!=='so')||!human)return;audio();if(puck.owner===human){charging=false;humanDeke()}else humanPoke()}
-function pressPass(){if(netRole==='guest'){audio();guestButton('p');return}if(phase==='replay'){skipReplay();return}if(phase==='faceoff'){faceoffPress();return}if(phase!=='play')return;if(!human)return;audio();
+function pressSkill(){if(remoteView()){audio();guestButton('k');return}if(phase==='replay'){skipReplay();return}if(phase==='faceoff'){faceoffPress();return}if((phase!=='play'&&phase!=='so')||!human)return;audio();if(puck.owner===human){charging=false;humanDeke()}else humanPoke()}
+function pressPass(){if(remoteView()){audio();guestButton('p');return}if(phase==='replay'){skipReplay();return}if(phase==='faceoff'){faceoffPress();return}if(phase!=='play')return;if(!human)return;audio();
   if(puck.owner===human){charging=false;pass(human,input.x,input.y,false)}else switchPlayer()}
 function releasePass(){} // a pass happens on press; kept so older friend clients don't break
 
@@ -4495,19 +4673,19 @@ function releasePass(){} // a pass happens on press; kept so older friend client
    BOMB     a short wind-up, then a slapshot about 40% harder that the goalie reads late
    MICHIGAN from low beside their net: lift it on the blade and tuck it in high */
 function canAct(){return(phase==='play'||phase==='so')&&human&&puck.owner===human&&!(human.mich>0)&&!(human.bombT>0)}
-function moveSaucer(){if(netRole==='guest'){audio();guestButton('m2');return}
+function moveSaucer(){if(remoteView()){audio();guestButton('m2');return}
   if(phase!=='play'||!hasMove(2)||!canAct())return;audio();charging=false;pass(human,input.x,input.y,false,true)}
-function moveSpin(){if(netRole==='guest'){audio();guestButton('m3');return}
+function moveSpin(){if(remoteView()){audio();guestButton('m3');return}
   if(!hasMove(3)||!canAct()||human.dekeCd>0||human.spin>0)return;audio();charging=false;
   const s=human,proj=input.x*-s.fy+input.y*s.fx;s.dekeSide=Math.abs(proj)>.3?Math.sign(proj):(s.dekeSide||1);spinMove(s)}
-function moveBomb(){if(netRole==='guest'){audio();guestButton('m4');return}
+function moveBomb(){if(remoteView()){audio();guestButton('m4');return}
   if(!hasMove(4)||!canAct()||human.cd>0)return;audio();charging=false;
   human.bombT=.45;noise(.3,.25,500);tone(160,.45,'sawtooth',.04,320);toast('BOMB INCOMING','small',500)}
 function bombFire(s){ // runs as that player, when the wind-up finishes
   if(puck.owner!==s||(phase!=='play'&&phase!=='so'))return;
   shoot(s,1,input.x,wantsHigh());puck.vx*=1.35;puck.vy*=1.35;puck.bomb=true;shake=Math.max(shake,.45);noise(.16,.6,900);
   toast('THE BOMB!','small',800);pbp(pick1([`${N(s)} unloads THE BOMB!`,`What a cannon from ${N(s)}!`]),3)}
-function moveMich(){if(netRole==='guest'){audio();guestButton('m5');return}
+function moveMich(){if(remoteView()){audio();guestButton('m5');return}
   if(!hasMove(5)||!canAct())return;
   if(!michSpot(human)){if(pctx===0)toast('GET LOW BESIDE THEIR NET','small',900);return}
   audio();charging=false;michigan(human)}
@@ -4545,7 +4723,7 @@ function primaryAction(){
 }
 // Esc = back out of a menu screen, otherwise pause
 function backAction(){
-  for(const[ov,btn]of[['boxOv','boxDone'],['statsOv','statsDone'],['deckOv','deckDone'],['passOv','passDone'],['roadOv','roadDone'],['shopOv','shopDone'],['helpOv','helpDone'],['questOv','questDone'],['arenaOv','arenaDone'],['superOv','superDone'],['voiceOv','vDone'],['netOv','netCancel'],['xferOv','xferClose'],['authOv','authClose'],['profOv','profClose']])
+  for(const[ov,btn]of[['boxOv','boxDone'],['statsOv','statsDone'],['deckOv','deckDone'],['passOv','passDone'],['roadOv','roadDone'],['shopOv','shopDone'],['helpOv','helpDone'],['questOv','questDone'],['arenaOv','arenaDone'],['superOv','superDone'],['voiceOv','vDone'],['netOv','netCancel'],['xferOv','xferClose'],['authOv','authClose'],['fsOv','fsDone'],['profOv','profClose']])
     if(visible(ov)){if(visible(btn)||SHEETS.some(x=>x[0]===ov))$(btn).click();return}
   togglePause();
 }
@@ -4596,7 +4774,7 @@ $('ulDone').addEventListener('click',closeUnlock);
 $('posGrid').addEventListener('click',e=>{const b=e.target.closest('[data-pos]');if(b)choosePos(b.dataset.pos)});
 $('posLater').addEventListener('click',()=>{$('posOv').hidden=true});
 $('dropReward').addEventListener('click',e=>{if(e.target.closest('#ulGo')){$('dropOv').hidden=true;drop=null;const c=pendingUnlock;pendingUnlock=null;openUnlock(c)}});
-$('dropDone').addEventListener('click',()=>{$('dropOv').hidden=true;drop=null;if(pendingUnlock){const c=pendingUnlock;pendingUnlock=null;openUnlock(c)}else if(owned.includes('shark')&&!sharkPos())setTimeout(openPos,250);if(!$('passOv').hidden)renderPass();if(!$('roadOv').hidden)renderRoad()});
+$('dropDone').addEventListener('click',()=>{$('dropOv').hidden=true;drop=null;if(pendingUnlock){const c=pendingUnlock;pendingUnlock=null;openUnlock(c)}else if(packQ.length)setTimeout(nextPack,250);else if(owned.includes('shark')&&!sharkPos())setTimeout(openPos,250);if(!$('passOv').hidden)renderPass();if(!$('roadOv').hidden)renderRoad()});
 const openPass=()=>{$('passOv').hidden=false;renderPass()};
 const openRoad=()=>{$('roadOv').hidden=false;renderRoad()};
 $('roadBtn').addEventListener('click',openRoad);$('roadBtn2').addEventListener('click',openRoad);
@@ -4853,12 +5031,14 @@ function cleanDeck(d){ // the friend's deck arrives over the network: keep numbe
 }
 function setBoard(){
   const g=netRole==='guest',on=!!netRole;
+  if(netRole==='spec'){$('tn0').textContent=String(specNames[0]||'HOST').toUpperCase().slice(0,10);$('tn1').textContent=String(specNames[1]||'GUEST').toUpperCase().slice(0,10);
+    $('bt0').className='team home';$('bt1').className='team away';$('son0').textContent=String(specNames[0]||'HOST').toUpperCase().slice(0,10);$('son1').textContent=String(specNames[1]||'GUEST').toUpperCase().slice(0,10);$('son0').className='soName home';$('son1').className='soName away';return}
   $('tn0').textContent=(curUser||'YOU').toUpperCase().slice(0,10);$('tn1').textContent=on?(friendName||'FRIEND').toUpperCase().slice(0,10):'CPU';
   $('bt0').className='team '+(g?'away':'home');$('bt1').className='team '+(g?'home':'away');
   $('son0').textContent='YOU';$('son1').textContent=on?'FRIEND':'CPU';
   $('son0').className='soName '+(g?'away':'home');$('son1').className='soName '+(g?'home':'away');
 }
-function hideAllOv(){['superOv','shopOv','helpOv','questOv','arenaOv','roadOv','profOv','xferOv','authOv','boxOv','statsOv','menuOv','endOv','interOv','pauseOv','soBar','netOv','deckOv','passOv','voiceOv','dropOv'].forEach(i=>$(i).hidden=true)}
+function hideAllOv(){['superOv','shopOv','helpOv','questOv','arenaOv','roadOv','profOv','xferOv','authOv','fsOv','boxOv','statsOv','menuOv','endOv','interOv','pauseOv','soBar','netOv','deckOv','passOv','voiceOv','dropOv'].forEach(i=>$(i).hidden=true)}
 
 // ----- host -----
 /* Hosting has to survive the host leaving the game to text the code: phones pause background pages,
@@ -4894,11 +5074,12 @@ async function hostGame(reuse){
     if(t==='network'||t==='server-error'||t==='socket-error'||t==='socket-closed'){if(netPeer===peer&&!peer.destroyed){$('hostMsg').textContent='Reconnecting...';setTimeout(()=>{try{if(peer.disconnected)peer.reconnect()}catch(_){}},1500)}return}
     if(!netRole){netMsg(NO_NET);$('hostBtn').disabled=false}});
   peer.on('connection',conn=>{
-    if(netConn&&netConn.open){try{conn.close()}catch(_){}return} // one friend at a time
+    // spectators say "watch" first; anyone else while a game is on is turned away (one opponent at a time)
+    conn.on('data',m=>{if(m&&m.t==='bye'&&conn!==netConn){specs=specs.filter(x=>x.conn!==conn);try{conn.close()}catch(_){}return}if(m&&m.t==='watch'){if(conn===netConn&&!netRole){netConn=null;$('hostMsg').textContent='Waiting for your friend to join...'}addSpec(conn,m);return}if(conn===netConn)hostData(m)});
+    if(netConn&&netConn.open){setTimeout(()=>{if(!specs.some(x=>x.conn===conn))try{conn.close()}catch(_){}},5000);return}
     netConn=conn;
     $('hostMsg').textContent='Your friend found the game. Linking your phones...';
     conn.on('open',()=>{rememberCode('');$('hostMsg').textContent='Linked! Starting...'});
-    conn.on('data',m=>hostData(m));
     // a link that fails before the game starts must NOT end hosting: the friend just tries again
     const dropped=()=>{if(netConn!==conn)return;netConn=null;
       if(netRole)leaveNet('Your friend left the game.');else $('hostMsg').textContent='Waiting for your friend to join...'};
@@ -4913,8 +5094,9 @@ async function hostGame(reuse){
    The friend draws other players ~90 ms in the past, smoothly between two snapshots, and draws
    their OWN skater ahead of the host using their own pad, so moving feels immediate. */
 const SNAP_MS=33,INTERP_MS=90;
+let snapMs=SNAP_MS,snapEval=0,snapSkips=0;
 let evSeq=0,evBuf=[],gameId=0,lastBtnSeq=0,guestTs=0;
-const BTN={pg:()=>{const t=1;if(!(phase==='play'||phase==='stop'||phase==='faceoff'))return;if(isPulled(t))pullGoalie(t,false);else pullGoalie(t,true)},sd:pressShoot,su:releaseShoot,k:pressSkill,p:pressPass,pu:releasePass,m2:moveSaucer,m3:moveSpin,m4:moveSuper};
+const BTN={pg:()=>{const t=1;if(!(phase==='play'||phase==='stop'||phase==='faceoff'))return;if(isPulled(t))pullGoalie(t,false);else pullGoalie(t,true)},sd:pressShoot,su:releaseShoot,w:()=>{pressShoot();if(human&&human.sdT&&!charging)releaseShoot()},sh:()=>{pressShoot();if(human&&human.sdT&&!charging&&puck.owner===human){charging=true;charge=.15}},k:pressSkill,p:pressPass,pu:releasePass,m2:moveSaucer,m3:moveSpin,m4:moveSuper};
 function hostData(m){
   if(!m||typeof m!=='object')return;
   if(m.t==='hello'){if(netRole==='host')return; // repeated hello: game already running
@@ -4930,6 +5112,7 @@ function hostData(m){
   if(m.t==='bye')leaveNet('Your friend left the game.');
 }
 function netStartGame(){
+  setTimeout(()=>{try{profileUp()}catch(_){}},300);
   // friend games are 3 on 3 (teamN() checks netOn())
   savedArena=arenaIdx;hideAllOv();setBoard();clearPbp();
   D=Object.assign(arenaD(2),{lvl:0,shoot:1,pokeMul:1,fo:.25}); // even ground for both
@@ -4946,11 +5129,13 @@ let snapN=0,hostRtt=0;
 function snapshot(){
   const ents=[...roster,...rosterG],now=performance.now(),r1=v=>Math.round((v||0)*10)/10,r2=v=>(v>0?Math.round(v*100)/100:0),r0=v=>Math.round(v||0);
   for(const ev of netEv.splice(0))evBuf.push({seq:++evSeq,at:now,ev});
-  evBuf=evBuf.filter(x=>now-x.at<800);
-  const meta=snapN++%10===0?{a:arenaIdx,n:curUser,e:ents.map(s=>[s.num,s.card?s.card.name:0,s.card&&s.card.id||0])}:0;
+  evBuf=evBuf.filter(x=>now-x.at<600);
+  const meta=snapN++%20===0?{a:arenaIdx,n:curUser,fn:friendName,e:ents.map(s=>[s.num,s.card?s.card.name:0,s.card&&s.card.id||0])}:0;
   return{t:'s',ts:Math.round(now),pt:guestTs,ab:lastBtnSeq,g:gameId,meta,rt:Math.round(hostRtt),
     end:phase==='end'?[score,shots,period]:0,
-    e:ents.map(s=>[r1(s.x),r1(s.y),Math.round(Math.atan2(s.fy,s.fx)*180/Math.PI),r0(s.vx),r0(s.vy),r2(s.deke),r2(s.spin),r2(s.fly),r2(s.pokeT),r2(s.bhWin),s.dekeSide,all.includes(s)?1:0,r1(Math.max(0,s.dekeCd)),r1(Math.max(0,s.poke)),r2(Math.min(1,s.sup||0))]),
+    e:ents.map(s=>{const on=all.includes(s);if(!on)return[0,0,0,0,0,0,0,0,0,0,1,0]; // on the bench: nothing to draw
+      const a=[r1(s.x),r1(s.y),Math.round(Math.atan2(s.fy,s.fx)*180/Math.PI),r0(s.vx),r0(s.vy),r2(s.deke),r2(s.spin),r2(s.fly),r2(s.pokeT),r2(s.bhWin),s.dekeSide,1,r1(Math.max(0,s.dekeCd)),r1(Math.max(0,s.poke)),Math.round(Math.min(1,s.sup||0)*20)/20];
+      while(a.length>12&&!a[a.length-1])a.pop();return a}), // trailing zeros left off (they read back as 0)
     p:[r1(puck.x),r1(puck.y),r0(puck.vx),r0(puck.vy),puck.high||puck.saucer?1:0,puck.owner?ents.indexOf(puck.owner):-1],
     h:ents.indexOf(slot[1].human&&pctx===0?slot[1].human:null),
     sc:score,sh:shots,pe:period,cl:r1(clock),ph:phase==='paused'?pausedFrom:phase,
@@ -4958,13 +5143,28 @@ function snapshot(){
     ln:lampNet,fl:r1(flash),so:so?so.res:null,ba:breakaway?ents.indexOf(breakaway.s):-1,
     ch:slot[1].charging?r2(slot[1].charge):-1,ev:evBuf.map(x=>[x.seq,...x.ev])};
 }
+var specs=[],specPending=false,specNames=['',''],liveJoin='';
+function specMeta(){return{a:arenaIdx,n:curUser,fn:friendName,e:[...roster,...rosterG].map(s=>[s.num,s.card?s.card.name:0,s.card&&s.card.id||0])}}
+function addSpec(conn,m){
+  if(specs.some(x=>x.conn===conn))return;
+  if(specs.length>=4||!netRole){try{conn.send({t:'bye'});conn.close()}catch(_){}return}
+  specs.push({conn,name:cleanName(m&&m.name)||'A friend'});
+  conn.on('close',()=>{specs=specs.filter(x=>x.conn!==conn)});conn.on('error',()=>{specs=specs.filter(x=>x.conn!==conn)});
+  toast('\u{1F441} '+String(specs[specs.length-1].name).toUpperCase()+' IS WATCHING','small',1600);
+}
 function hostTick(){
   if(!netConn||!netConn.open)return;
-  const now=performance.now();if(now-lastSnap<SNAP_MS)return;lastSnap=now;
+  const now=performance.now();if(now-lastSnap<snapMs-1)return;lastSnap=now;
   if(phase==='menu')return;
-  // if the link is backed up, skip this one rather than queue it: a late snapshot is worse than none
-  const dc=netConn.dataChannel;if(dc&&dc.bufferedAmount>16000){snapN++;return}
-  netSend(snapshot());
+  // fast lane: a clean, quick link gets twice the updates (less delay); any backlog drops it straight back
+  if(now-snapEval>2000){snapEval=now;snapMs=snapSkips===0?16.7:SNAP_MS;snapSkips=0}
+  // if the last snapshot hasn't even left yet (slow relay link), skip this one: queuing them up is what
+  // makes a friend game fall a second behind. A fresh snapshot next time is always better than a stale one.
+  const dc=netConn.dataChannel;if(dc&&dc.bufferedAmount>900){snapN++;snapSkips++;if(snapMs<SNAP_MS){snapMs=SNAP_MS;snapEval=now}return}
+  const n=snapN,sn=snapshot();netSend(sn);
+  // spectators get every other snapshot, and only when the game link has room: watching never slows the game
+  if(specs.length)specs=specs.filter(x=>x.conn.open!==false);
+  if(specs.length&&n%(snapMs<SNAP_MS?4:2)===0&&!(dc&&dc.bufferedAmount>300)){sn.meta=sn.meta||specMeta();for(const x of specs){const d2=x.conn.dataChannel;if(x.conn.open&&!(d2&&d2.bufferedAmount>1500))try{x.conn.send(sn)}catch(_){}}}
 }
 function netEnd(){
   phase='end';$('soBar').hidden=true;
@@ -4975,11 +5175,15 @@ function netEnd(){
 }
 function showNetEnd(sc,sh,pe){
   const mine=sc[myT],theirs=sc[1-myT],how=pe===3?'SO':pe===2?'OT':'';
+  if(netRole==='spec'){$('endKicker').textContent='Friend game'+(how?' / '+how:'');$('endTitle').textContent=String(specNames[sc[0]>sc[1]?0:1]||'').toUpperCase()+' WINS';
+    $('eS0').textContent=sc[0];$('eS1').textContent=sc[1];$('eShots').textContent=sh[0]+' \u2013 '+sh[1];
+    $('endRewards').hidden=true;$('dropBtn').hidden=true;$('passBtn2').hidden=true;$('roadBtn2').hidden=true;$('unlockMsg').hidden=true;$('boxBtn').hidden=true;$('stars').innerHTML='';
+    $('againBtn').hidden=true;$('netWait').hidden=false;$('netWait').textContent='Watching. If they play a rematch, it starts here.';$('menuBtn').textContent='Stop watching';$('endOv').hidden=false;return}
   $('endKicker').textContent='Friend game'+(how?' / '+how:'');
   $('endTitle').textContent=mine>theirs?'YOU WIN':'FRIEND WINS';
   $('eS0').textContent=mine;$('eS1').textContent=theirs;$('eShots').textContent=sh[myT]+' – '+sh[1-myT];
   $('endRewards').hidden=true;$('dropBtn').hidden=true;$('passBtn2').hidden=true;$('roadBtn2').hidden=true;$('unlockMsg').hidden=true;
-  $('againBtn').hidden=netRole==='guest';$('againBtn').textContent='REMATCH';$('netWait').hidden=netRole!=='guest';
+  $('againBtn').hidden=netRole==='guest';$('againBtn').textContent='REMATCH';$('netWait').hidden=netRole!=='guest';$('netWait').textContent='Waiting for your friend to start a rematch.';
   $('menuBtn').textContent='Leave';$('endOv').hidden=false;
 }
 
@@ -4988,7 +5192,7 @@ async function joinGame(){
   // codes never use 0, O, 1 or I, so read look-alikes as the letters they must be
   const code=$('joinCode').value.toUpperCase().replace(/[^A-Z0-9]/g,'').replace(/[0O]/g,'Q').replace(/[1I]/g,'L');
   if(code.length!==5){netMsg('Codes are 5 letters and numbers.');return}
-  $('joinCode').value=code;
+  $('joinCode').value=code;liveJoin=code;
   netMsg('Connecting...');$('joinBtn').disabled=true;audio();
   try{await loadPeer()}catch(_){netMsg(NO_NET);$('joinBtn').disabled=false;return}
   closeNet();
@@ -5021,6 +5225,7 @@ async function joinGame(){
     conn.on('close',()=>{if(netConn===conn&&netRole)leaveNet('The host left the game.')});
   }
 }
+let lastHostTsG=0,sendGap=33,gDelay=0;
 let gGid=null,snapBuf=[],lastEvSeq=0,btnSeq=0,btnQ=[],rtt=120,clockOff=null,endShownGid=null,gMeta=null,lastHostTs=0,arrJit=8,lastArr=0;
 function guestData(m){
   if(!m||typeof m!=='object')return;
@@ -5028,8 +5233,8 @@ function guestData(m){
     if(m.meta)gMeta=m.meta;
     if(m.g!==gGid){if(!m.meta)return;startGuestGame(m)} // a new game starts on the next snapshot that carries names
     applySnap(m);return}
-  if(netRole!=='guest')return;
-  if(m.t==='bye')leaveNet('The host left the game.');
+  if(!remoteView())return;
+  if(m.t==='bye')leaveNet(netRole==='spec'?'The game is over.':'The host left the game.');
 }
 function guestOwnAttrs(){ // so our local copy of our skater skates exactly like the host's copy
   const d=deckPayload();for(const s of roster)if(s.team===1){const p=d.sk[s.i];s.attr=Object.assign({spd:1,shot:1,acc:1,hands:1,def:1,accel:1},p?p.attr:{})}
@@ -5039,21 +5244,25 @@ function startGuestGame(m){
   resetIce();
   applySkin('classic'); // first snapshot of a new game (or a rematch)
   friendName=cleanName(m.meta.n);
-  if(netRole!=='guest'){savedArena=arenaIdx}
-  netRole='guest';myT=1;flipView=true;gGid=m.g;snapBuf=[];endShownGid=null;
+  if(netRole!=='guest'&&netRole!=='spec'){savedArena=arenaIdx}
+  if(specPending||netRole==='spec'){specPending=false;netRole='spec';myT=0;flipView=false;specNames=[m.meta.n||'Host',m.meta.fn||'Friend'];document.body.classList.add('spectating');$('specBar').hidden=false;$('specWho').textContent=specNames[0]+' vs '+specNames[1]}
+  else{netRole='guest';myT=1;flipView=true}
+  gGid=m.g;snapBuf=[];endShownGid=null;
   arenaIdx=clamp(m.meta.a|0,0,ARENAS.length-1);resize(); // look of the host's arena, not saved
   hideAllOv();setBoard();clearPbp();so=null;score=[0,0];shots=[0,0];period=1;clock=PERIOD;setup();faceoff(true);phase='faceoff';camY=100;
-  for(const s of[...roster,...rosterG]){s.tx=undefined;s.pred=null}puck.tx=undefined;guestOwnAttrs();
+  for(const s of[...roster,...rosterG]){s.tx=undefined;s.pred=null}puck.tx=undefined;if(netRole==='guest')guestOwnAttrs();
+  try{profileUp()}catch(_){}
   $('joinBtn').disabled=false;updateHud();
 }
-function guestButton(code){ // numbered so a dropped packet can't lose a shot or a deke
+function guestButton(code){if(netRole==='spec')return; // numbered so a dropped packet can't lose a shot or a deke
   btnQ.push([++btnSeq,code]);sendInput(true);
 }
-let lastInAt=0;
+let lastInAt=0,lastInX=0,lastInY=0;
 function sendInput(force){
-  const now=performance.now();if(!force&&now-lastInAt<SNAP_MS)return;lastInAt=now;
+  const now=performance.now(),moved=Math.abs(input.x-lastInX)>.06||Math.abs(input.y-lastInY)>.06;
+  if(!force&&now-lastInAt<(moved?15:SNAP_MS))return;lastInAt=now;lastInX=input.x;lastInY=input.y;
   // the input itself is tiny; skip it if the link is backed up (the next one carries the same buttons)
-  const dc=netConn&&netConn.dataChannel;if(!force&&dc&&dc.bufferedAmount>8000)return;
+  const dc=netConn&&netConn.dataChannel;if(!force&&dc&&dc.bufferedAmount>300)return;
   netSend({t:'in',x:Math.round(-input.x*100)/100,y:Math.round(-input.y*100)/100,ts:Math.round(now),hp:lastHostTs,b:btnQ.slice(-12)});
 }
 const SWAP_TOAST={'GOAL!':'FRIEND SCORES','TOP SHELF!':'FRIEND SCORES','CPU SCORES':'GOAL!','CPU ROOFS IT':'TOP SHELF!','BREAKAWAY!':'FRIEND BREAKAWAY','CPU BREAKAWAY':'BREAKAWAY!',
@@ -5075,7 +5284,7 @@ function applySnap(m){
     return[+c[0],+c[1],Math.cos(ang),Math.sin(ang),+c[3]||0,+c[4]||0,+c[5]||0,+c[6]||0,+c[7]||0,+c[8]||0,+c[9]||0,c[10]||1,mt?mt[0]:0,mt?mt[1]:0,c[11],+c[12]||0,+c[13]||0,+c[14]||0,mt?mt[2]:0]});
   if(Number.isFinite(+m.ts))lastHostTs=+m.ts;
   // how bumpy the connection is: smoothing delay grows on a jittery link and shrinks on a clean one
-  if(lastArr){const gap=now-lastArr;arrJit+=(Math.abs(gap-SNAP_MS)-arrJit)*.08}lastArr=now;
+  if(lastArr&&Number.isFinite(+m.ts)&&lastHostTsG){const gap=now-lastArr,sg=Math.max(1,m.ts-lastHostTsG);arrJit+=(Math.abs(gap-sg)-arrJit)*.08;sendGap+=(Math.min(60,sg)-sendGap)*.1}lastArr=now;if(Number.isFinite(+m.ts))lastHostTsG=+m.ts;
   m.at=now;snapBuf.push(m);if(snapBuf.length>40)snapBuf.shift();
   if(Array.isArray(m.e))m.e.forEach((a,i)=>{const s=ents[i];if(!s||!Array.isArray(a))return;
     if(s.tx===undefined){s.x=a[0];s.y=a[1]}
@@ -5084,13 +5293,13 @@ function applySnap(m){
   skaters=roster.filter(s=>s.on);goalies=rosterG.filter(s=>s.on);all=[...skaters,...goalies];
   const p=m.p||[];if(puck.tx===undefined){puck.x=p[0];puck.y=p[1]}
   puck.tx=p[0];puck.ty=p[1];puck.vx=p[2];puck.vy=p[3];puck.high=!!p[4];puck.owner=p[5]>=0?ents[p[5]]:null;puck.snapT=time;
-  human=m.h>=0?ents[m.h]:null;
+  human=netRole==='spec'?null:m.h>=0?ents[m.h]:null;
   score=m.sc||score;shots=m.sh||shots;period=m.pe||1;clock=+m.cl||0;phase=String(m.ph||'play');
   if(Array.isArray(m.fo)){fo.dropped=!!m.fo[0];fo.t=m.fo[1];fo.dropAt=m.fo[2]||1;fo.dot=m.fo[3];fo.done=phase!=='faceoff'}
   lampNet=m.ln;flash=Math.max(flash,m.fl||0);
   if(m.so){so={res:m.so};if($('soBar').hidden)$('soBar').hidden=false;renderSO()}else if(so){so=null;$('soBar').hidden=true}
   breakaway=m.ba>=0&&ents[m.ba]?{s:ents[m.ba]}:null;
-  charging=m.ch>=0;charge=Math.max(0,m.ch);
+  if(netRole!=='spec'){charging=m.ch>=0;charge=Math.max(0,m.ch)}
   const evs=(m.ev||[]).filter(e=>Array.isArray(e)&&e[0]>lastEvSeq).sort((a,b)=>a[0]-b[0]);
   for(const e of evs){lastEvSeq=e[0];const ev=e.slice(1);
     if(ev[0]==='fx')burst(+ev[1],+ev[2],ev[3],ev[4])
@@ -5098,12 +5307,15 @@ function applySnap(m){
     if(ev[0]==='cel'){const ents=[...roster,...rosterG],sc=ents[+ev[2]]||null;cellyFx(+ev[1],sc)}
     if(ev[0]==='hat'){spawnHats();setTimeout(()=>{toast('\u{1F3A9} HAT TRICK! \u{1F3A9}','',2200);crowdRoar(3)},700)}
     if(ev[0]==='gb'){setTimeout(()=>showGoalBar(+ev[1],ev[2],ev[3],String(ev[4]||'').replace(/(\d+)\u2013(\d+)$/,(m,x,y)=>y+'\u2013'+x)),500)}
-    if(ev[0]==='t'){const tx=SWAP_TOAST[ev[1]]||ev[1].replace(/^CPU /,'');toast(tx,ev[2],ev[3],ev[4]==='home'?'away':ev[4]==='away'?'home':'')}
+    if(ev[0]==='t'&&netRole==='spec'){const n0=String(specNames[0]||'HOST').toUpperCase(),n1=String(specNames[1]||'GUEST').toUpperCase();
+      const tx=String(ev[1]).replace(/^CPU SCORES$/,n1+' SCORES').replace(/^CPU ROOFS IT$/,n1+' ROOFS IT').replace(/^GOAL!$/,n0+' SCORES').replace(/^TOP SHELF!$/,n0+' TOP SHELF').replace(/^CPU /,n1+' ').replace(/^(ICING|OFFSIDE)$/,n0+' $1').replace(/^YOUR SHOT$/,n0+' SHOOTS');
+      toast(tx,ev[2],ev[3],ev[4])}
+    else if(ev[0]==='t'){const tx=SWAP_TOAST[ev[1]]||ev[1].replace(/^CPU /,'');toast(tx,ev[2],ev[3],ev[4]==='home'?'away':ev[4]==='away'?'home':'')}
     else if(ev[0]==='tg')toast(ev[1],ev[2],ev[3]);
-    else if(ev[0]==='p'){lastPbp=-9;pbp(guestPbp(ev[1]),ev[2],ev[3],ev[3]==='col')}
+    else if(ev[0]==='p'){lastPbp=-9;pbp(netRole==='spec'?String(ev[1]).replace(/The CPU/g,specNames[1]||'The friend').replace(/\bYou\b/g,specNames[0]||'The host'):guestPbp(ev[1]),ev[2],ev[3],ev[3]==='col')}
     else if(ev[0]==='s')sfx(ev[1]);
     else if(ev[0]==='h'){horn();shake=Math.max(shake,.6)}
-    else if(ev[0]==='em'){if(ev[1]!==myT)showEmote(ev[1],ev[2])} // our own emote already showed when we tapped
+    else if(ev[0]==='em'){if(ev[1]!==myT||netRole==='spec')showEmote(ev[1],ev[2])} // our own emote already showed when we tapped
   }
   if(m.end&&endShownGid!==m.g){endShownGid=m.g;phase='end';$('soBar').hidden=true;showNetEnd(m.end[0],m.end[1],m.end[2])}
 }
@@ -5120,14 +5332,42 @@ function interpAt(i,t,isPuck){
   if(hyp(Bv[0]-A[0],Bv[1]-A[1])>15)return[Bv[0],Bv[1]]; // teleport (faceoff, shootout reset): don't slide
   const k=clamp((t-a.ts)/Math.max(1,b.ts-a.ts),0,1);return[A[0]+(Bv[0]-A[0])*k,A[1]+(Bv[1]-A[1])*k];
 }
+/* The friend's own shot leaves their stick on their screen the moment they let go, aimed the way the host
+   will aim it, then lines up with the host's puck once that arrives (and gives way if the host's version
+   went differently: a block, a save, a deflection). */
+function predictShot(power){
+  const me=human;if(!me||puck.owner!==me||!(phase==='play'||phase==='so'))return;
+  const aim=-input.x,g=goalieOf(1-me.team),edge=NH-1.1;
+  const ax=Math.abs(aim)>.3?50+Math.sign(aim)*edge:(g&&g.x>=50?50-edge:50+edge),ty=atkY(me.team)+(me.team?2:-2);
+  const dx=ax-puck.x,dy=ty-puck.y,d=hyp(dx,dy)||1,sp=(62+power*58)*((me.attr&&me.attr.shot)||1);
+  gShot={x:puck.x,y:puck.y,vx:dx/d*sp,vy:dy/d*sp,t0:performance.now(),conf:false};gEnd=null;
+}
+function flyShot(dt,hostNow){
+  const G=gShot,now=performance.now(),el=now-G.t0;
+  G.x+=G.vx*dt;G.y+=G.vy*dt;const v=hyp(G.vx,G.vy);if(v>0){const nv=Math.max(0,v-(ICE_FR+AIR*v)*dt),f=nv/v;G.vx*=f;G.vy*=f}
+  confine(G,PR,.6,.9);
+  const nw=snapBuf[snapBuf.length-1],hp=nw&&nw.p;let end=el>900;
+  if(hp&&nw.at>G.t0){
+    if(hp[5]<0){ // the host has let it go too: follow the host's live puck
+      const hv=hyp(hp[2],hp[3]),dot=(hp[2]*G.vx+hp[3]*G.vy)/((hv*hyp(G.vx,G.vy))||1);
+      if(hv<15||dot<.8)end=true; // stopped, saved or deflected: the host's version takes over
+      else{G.conf=true; // our shot left earlier than the host's (by the time our button took to get there): keep that
+        // head start at first and let it shrink gently, so the puck never visibly slides backwards
+        const lead=Math.max(0,rtt/2000*(1-el/700)),age=(Math.max(0,(hostNow-nw.ts)/1000)+lead)*GAME_SPEED,lx=hp[0]+hp[2]*age,ly=hp[1]+hp[3]*age,k=Math.min(1,dt*4);
+        G.x+=(lx-G.x)*k;G.y+=(ly-G.y)*k;G.vx=hp[2];G.vy=hp[3]}
+    }else if(G.conf||el>rtt+260)end=true; // the host never shot it (puck lost first), or someone has it now
+  }
+  if(end){gEnd={x:G.x,y:G.y,t:now};gShot=null;return}
+  puck.x=G.x;puck.y=G.y;
+}
 function guestTick(dt){
   shake=Math.max(0,shake-dt*2.2);flash=Math.max(0,flash-dt*.9);
-  readInput();sendInput(false);
+  const spec=netRole==='spec';if(!spec){readInput();sendInput(false)}
   if(clockOff!==null&&snapBuf.length){
-    const now=performance.now(),hostNow=now-clockOff,rt=hostNow-clamp(40+arrJit*2.5,50,170),ents=[...roster,...rosterG];
+    const now=performance.now(),hostNow=now-clockOff,rt=hostNow-(gDelay=spec?clamp(220+arrJit*4,260,600):clamp(Math.min(sendGap,33)*1.2+arrJit*2.2,32,170)),ents=[...roster,...rosterG];
     ents.forEach((s,i)=>{if(s.tx===undefined)return;const q=interpAt(i,rt,false);if(q){s.x=q[0];s.y=q[1]}});
     // a loose puck is drawn closer to live than the players (it moves in straight, predictable lines)
-    const pq=interpAt(0,hostNow-clamp(20+arrJit,25,80),true);if(pq){puck.x=pq[0];puck.y=pq[1]}
+    const pq=interpAt(0,spec?rt:hostNow-clamp(20+arrJit,25,80),true);if(pq){puck.x=pq[0];puck.y=pq[1]}
     /* Your own skater is simulated right here on your phone with the game's own skating physics, so the
        stick responds instantly. The host is the boss, though: we steer our copy toward where the host
        will have us once our latest stick input reaches it (newest position + one round trip ahead). */
@@ -5153,7 +5393,9 @@ function guestTick(dt){
       s.x=s.rx;s.y=s.ry;
     }
     // a carried puck stays glued to whoever is carrying it, as they're drawn
-    if(puck.owner&&puck.tx!==undefined&&puck.owner.tx!==undefined){const o=puck.owner;puck.x=o.x+(puck.tx-o.tx);puck.y=o.y+(puck.ty-o.ty)}
+    if(gShot)flyShot(dt,hostNow);
+    else if(puck.owner&&puck.tx!==undefined&&puck.owner.tx!==undefined){const o=puck.owner;puck.x=o.x+(puck.tx-o.tx);puck.y=o.y+(puck.ty-o.ty)}
+    if(!gShot&&gEnd){const k=(performance.now()-gEnd.t)/140;if(k>=1)gEnd=null;else{puck.x=gEnd.x+(puck.x-gEnd.x)*k;puck.y=gEnd.y+(puck.y-gEnd.y)*k}}
   }
   puck.trail.push({x:puck.x,y:puck.y});if(puck.trail.length>7)puck.trail.shift();
   if(phase!=='menu'&&phase!=='end')updateHud();
@@ -5168,14 +5410,17 @@ async function checkRoute(){ // are the phones linked directly, or bouncing thro
 function paintBadge(){
   const b=$('netBadge');if(!netRole||phase==='menu'){if(!b.hidden)b.hidden=true;return}
   const now=performance.now();if(now-routeAt>3000){routeAt=now;checkRoute()}
+  if(netRole==='spec'){b.hidden=true;return}
   const ms=Math.round(netRole==='guest'?rtt:hostRtt);if(!ms){b.hidden=true;return}
   b.hidden=false;b.textContent='PING '+ms+' ms'+(netRoute?' \u00b7 '+netRoute:'');
   b.className=ms<90?'good':ms<180?'ok':'bad';
 }
 function leaveNet(msg){
-  const was=netRole;netSend({t:'bye'});netSend({t:'bye'});netSend({t:'bye'});closeNet();hostCode='';gGid=null;snapBuf=[];btnQ=[];clockOff=null;
+  const was=netRole;specPending=false;document.body.classList.remove('spectating');$('specBar').hidden=true;
+  if(netRole==='host')for(const x of specs)try{x.conn.send({t:'bye'});x.conn.close()}catch(_){}specs=[];netSend({t:'bye'});netSend({t:'bye'});netSend({t:'bye'});closeNet();hostCode='';gGid=null;snapBuf=[];btnQ=[];clockOff=null;
   netRole=null;myT=0;flipView=false;guestDeck=null;guestSpin=false;guestArenas=1;slot[1].human=null;netEv=[];
-  if(was==='guest'){arenaIdx=savedArena}
+  if(was==='guest'||was==='spec'){arenaIdx=savedArena}
+  setTimeout(()=>{try{profileUp()}catch(_){}},50);
   setArena(arenaIdx); // restores this device's arena difficulty
   setBoard();hideAllOv();so=null;
   $('endRewards').hidden=false;$('againBtn').hidden=false;$('netWait').hidden=true;$('menuBtn').textContent='Arenas';
@@ -5203,6 +5448,9 @@ $('whoBtn').addEventListener('click',openProfiles);
 $('profClose').addEventListener('click',closeProfiles);
 $('xferBtn').addEventListener('click',()=>{audio();openXfer()});
 $('authClose').addEventListener('click',closeAuth);
+$('fsDone').addEventListener('click',()=>{$('fsOv').hidden=true});
+$('fsTog').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||!fsView)return;fsView.mode=b.dataset.m;paintFriendStats()});
+$('specLeave').addEventListener('click',()=>leaveNet('You stopped watching.'));
 $('chYes').addEventListener('click',()=>answerCh(true));$('chNo').addEventListener('click',()=>answerCh(false));
 $('auTog').addEventListener('click',e=>{const b=e.target.closest('button');if(b)auTab(b.dataset.a)});
 $('auForm').addEventListener('submit',auSubmit);
@@ -5240,6 +5488,7 @@ function sendEmote(id){
   const now=performance.now();if(now<emCool)return;emCool=now+3000;
   closeEmotePicker();$('emBtn').classList.add('cool');setTimeout(()=>$('emBtn').classList.remove('cool'),3000);
   audio();
+  if(netRole==='spec')return;
   if(netRole==='guest'){showEmote(1,id);guestButton('e:'+id);return}
   showEmote(myT,id);
 }
