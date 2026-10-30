@@ -1483,7 +1483,7 @@ let netRole=null,netConn=null,netPeer=null,netEv=[],netMute=false,guestDeck=null
 let pctx=0;
 const slot=[{human:null,input:{x:0,y:0},charging:false,charge:0,switchLock:0},{human:null,input:{x:0,y:0},charging:false,charge:0,switchLock:0}];
 const netOn=()=>netRole==='host';
-var castPeer=null,castCode='',castT=0,gTeamN=3;
+var castPeer=null,castCode='',castT=0,gTeamN=3,castBusy=false,castTry=0;
 const bc=()=>netRole==='host'||(!!castPeer&&!netRole&&specs.length>0); // send this moment to watchers?
 function saveSlot(o){o.human=human;o.input={x:input.x,y:input.y};o.charging=charging;o.charge=charge;o.switchLock=switchLock}
 function loadSlot(o){human=o.human;input.x=o.input.x;input.y=o.input.y;charging=o.charging;charge=o.charge;switchLock=o.switchLock}
@@ -3585,7 +3585,7 @@ function paintAcct(){
    Nobody writes anyone else's documents: accepting a friend adds them to YOUR list and marks the request;
    the sender sees that and adds you to theirs. A challenge hosts a game (the usual code) and sends the
    code in a request; the friend gets a pop-up and joins it with one tap. */
-var nameOk=null,nameErr='',profErr='',frUnsub=[],frIn=[],frOut=[],myProf=null,frProfs={},pendingCh=null,chShownId='',chToastId='',frHb=0,frPoll=0,frDelArm='',frMsgT='',chOut=null;
+var frPollN=0,nameOk=null,nameErr='',profErr='',frUnsub=[],frIn=[],frOut=[],myProf=null,frProfs={},pendingCh=null,chShownId='',chToastId='',frHb=0,frPoll=0,frDelArm='',frMsgT='',chOut=null;
 const FV=()=>window.firebase.firestore.FieldValue;
 const lowerName=n=>String(n||'').trim().toLowerCase();
 const CH_TTL=120000,ONLINE_MS=150000;
@@ -3599,7 +3599,7 @@ async function profileUp(extra){
   else if(netRole==='guest'&&liveJoin)live={code:liveJoin,a:friendName||'Friend',b:n};
   else if(!netRole&&castPeer&&castCode&&phase!=='menu')live={code:castCode,a:n,b:'CPU',cpu:1};
   let stats=null;try{stats=careerPublic()}catch(_){}
-  try{await fbDb.collection('profiles').doc(acct.uid).set(Object.assign({name:n,lower:lowerName(n),tr:t,tr5:t5,seen:Date.now(),st:inMatch()?'game':'on',live,stats},extra||{}),{merge:true});profErr=''}catch(e){console.warn('profile',e);profErr=(e&&e.code)||'error';renderFriends()}
+  try{await fbDb.collection('profiles').doc(acct.uid).set(Object.assign({name:n,lower:lowerName(n),tr:t,tr5:t5,seen:Date.now(),st:inMatch()?'game':'on',live,stats,cv:2},extra||{}),{merge:true});profErr=''}catch(e){console.warn('profile',e);profErr=(e&&e.code)||'error';renderFriends()}
 }
 async function claimName(name){
   for(let i=0;i<40;i++){const n=i?cleanName(name.slice(0,13)+' '+(i+1)):name,ref=fbDb.collection('usernames').doc(lowerName(n));
@@ -3619,7 +3619,7 @@ function startSocial(){
   frUnsub.push(c.where('from','==',me).onSnapshot(q=>{frOut=docs(q);onOutgoing()},e=>console.warn('out',e)));
   frUnsub.push(fbDb.collection('profiles').doc(me).onSnapshot(d=>{myProf=d.exists?d.data():null;refreshFriends()},e=>console.warn('me',e)));
   frHb=setInterval(()=>{if(document.visibilityState!=='hidden')profileUp()},60000);
-  frPoll=setInterval(()=>{if(!$('netOv').hidden||(!netRole&&!$('menuOv').hidden))refreshFriends()},20000);
+  frPoll=setInterval(()=>{if(!$('netOv').hidden||(!netRole&&!$('menuOv').hidden&&++frPollN%2===0))refreshFriends()},10000);
 }
 const reqDel=id=>fbDb.collection('requests').doc(id).delete().catch(()=>{});
 function onIncoming(){
@@ -3667,7 +3667,7 @@ function renderFriends(){
   const rows=mine.map(id=>{const p=frProfs[id],[cls,txt]=frStatus(p),mutual=p&&Array.isArray(p.friends)&&p.friends.includes(me);
     const busy=chOut&&chOut.to===id;
     const live=mutual&&p.live&&p.live.code&&cls==='game';
-    const sub=!mutual?'Request pending':live?`<span class="live">\u{1F534} LIVE</span> ${esc(p.live.a)} vs ${esc(p.live.b)}`:txt+' \u00b7 \u{1F3C6} '+(p.tr||0);
+    const sub=!mutual?'Request pending':live?`<span class="live">\u{1F534} LIVE</span> ${esc(p.live.a)} vs ${esc(p.live.b)}`:cls==='game'&&!(p.cv>=2)?'In a game \u00b7 they need to reload the game to be watched':txt+' \u00b7 \u{1F3C6} '+(p.tr||0);
     const act=live?`<button class="frW" data-w="${esc(id)}" ${netRole?'disabled':''}>\u{1F441} WATCH</button>`:`<button class="frCh" data-ch="${esc(id)}" ${mutual&&!p.gone&&!netRole?'':'disabled'}>${busy?'SENT':'\u2694\uFE0F PLAY'}</button>`;
     return`<div class="frRow"><i class="dot ${cls}"></i><button class="nm" data-st="${esc(id)}" aria-label="See stats"><b>${esc(p?p.name:'...')}</b><span>${sub}</span></button>
       <div class="frBtns">${act}<button class="frX" data-rm="${esc(id)}" aria-label="Remove friend">${frDelArm===id?'Remove?':'\u2715'}</button></div></div>`});
@@ -4496,6 +4496,7 @@ function frame(t){
   else{time+=dt}
   if(netRole==='host')hostTick();
   else if(castPeer)castTick();
+  else if(!netRole&&acct&&phase!=='menu'&&phase!=='end'&&performance.now()-castTry>4000){castTry=performance.now();if(inMatch())startCast()}
   if(netRole!=='guest'&&phase!=='paused')tickChat();
   if(netRole||!$('netBadge').hidden)paintBadge();
   if(!posAsked&&phase==='menu'&&curUser&&owned.includes('shark')&&!sharkPos()&&!$('menuOv').hidden&&$('profOv').hidden&&$('dropOv').hidden&&$('unlockOv').hidden){posAsked=true;setTimeout(openPos,300)}
@@ -5343,15 +5344,19 @@ function addSpec(conn,m){
    vs the CPU starts. Friends see LIVE and tap Watch, exactly like a friend game. Nothing is sent until
    someone is watching, and the link closes at the menu or when a friend game starts. */
 async function startCast(){
-  if(castPeer||netRole||!acct||!fbDb||!(myProf&&myProf.friends&&myProf.friends.length))return;
+  if(castBusy||castPeer||netRole||!acct||!fbDb||!(myProf&&myProf.friends&&myProf.friends.length))return;
+  castBusy=true;try{await openCast()}catch(_){}castBusy=false;
+}
+async function openCast(){
   try{await loadPeer()}catch(_){return}
   if(castPeer||netRole||phase==='menu')return;
   const code=makeCode();let peer;try{peer=new Peer(PEER_PREFIX+code,await peerOpts())}catch(_){return}
   if(castPeer||netRole||phase==='menu'){try{peer.destroy()}catch(_){}return}
   castPeer=peer;
+  setTimeout(()=>{if(castPeer===peer&&!castCode)stopCast(true)},12000); // never opened: drop it, the game loop tries again
   peer.on('open',()=>{if(castPeer!==peer)return;castCode=code;try{profileUp()}catch(_){}});
   peer.on('disconnected',()=>{if(castPeer!==peer||peer.destroyed)return;setTimeout(()=>{try{if(castPeer===peer&&peer.disconnected)peer.reconnect()}catch(_){}},800)});
-  peer.on('error',e=>{if(castPeer!==peer)return;if(e&&e.type==='unavailable-id'){stopCast(true);setTimeout(startCast,500)}});
+  peer.on('error',e=>{if(castPeer!==peer)return;if(!castCode||(e&&e.type==='unavailable-id'))stopCast(true)}); // the game loop opens a fresh one
   peer.on('connection',conn=>{
     conn.on('data',m=>{if(castPeer!==peer)return;if(m&&m.t==='watch'){const had=specs.length;addSpec(conn,m);if(!had&&specs.length){netEv=[];evBuf=[]}}else if(m&&m.t==='bye'){specs=specs.filter(x=>x.conn!==conn);try{conn.close()}catch(_){}}});
     setTimeout(()=>{if(!specs.some(x=>x.conn===conn))try{conn.close()}catch(_){}},8000)});
