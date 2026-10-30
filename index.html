@@ -795,6 +795,28 @@ body.spectating #pad,body.spectating .keys,body.spectating #pullBtn,body.spectat
 .bundle .buy svg{width:20px;height:20px;flex:none}
 .bundle .buy:disabled{background:#2a3649;box-shadow:none;color:var(--muted);text-shadow:none;cursor:default}
 #netOv .joinRow{grid-template-columns:minmax(0,1fr) auto auto}#netOv .joinRow .frW{padding:0 12px}
+.ownerMini{font-size:20px;border-color:rgba(255,90,103,.55)!important}
+#ownerOv{z-index:45}.ownerCard{gap:14px;grid-template-columns:minmax(0,1fr)}.ownerCard>*,.ownerHead>div{min-width:0}
+.ownerHead .result{font-size:clamp(26px,9vw,40px)!important;overflow-wrap:anywhere}
+.supInfo em{font-style:normal}.supS{display:none}@media (max-width:400px){.supL{display:none}.supS{display:inline}}
+@media (max-width:360px){.oLink span{display:none}}
+.ownerHead{display:flex;align-items:center;gap:14px}.ownerAv{flex:none;width:64px;height:64px;border-radius:50%;display:grid;place-items:center;font-size:36px;background:radial-gradient(circle at 35% 30%,#ff7a85,#b3121f);box-shadow:0 0 0 3px rgba(255,255,255,.15),0 8px 20px rgba(200,20,40,.35)}
+.ownerSub{margin:4px 0 0;color:#ff8a94;font:700 13px var(--f-ui);letter-spacing:.08em;text-transform:uppercase}
+.ownerTxt{margin:0;color:var(--muted);line-height:1.45}
+.ownerLinks{display:grid;gap:8px}
+.oLink{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;color:#fff;text-decoration:none;font:700 17px var(--f-ui);letter-spacing:.04em;box-shadow:inset 0 -3px 0 rgba(0,0,0,.25)}
+.oLink svg{width:24px;height:24px;flex:none;fill:#fff}.oLink span{margin-left:auto;font-weight:600;font-size:14px;opacity:.9}
+.oLink.yt{background:#e62117}.oLink.ig{background:linear-gradient(45deg,#f09433,#dc2743 50%,#bc1888)}.oLink.tt{background:#111;border:1px solid #333;box-shadow:inset 3px 0 0 #25f4ee,inset -3px 0 0 #fe2c55}
+.passSeason{margin:0;color:var(--lamp);font:700 14px var(--f-ui);letter-spacing:.04em}
+#musOv{z-index:45}.musCard{gap:10px;grid-template-columns:minmax(0,1fr)}.musCard>*{min-width:0}
+.musGrid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.musGrid button,.gsRow{border:1px solid var(--edge);background:var(--panel-2);color:var(--text);border-radius:10px;padding:10px 8px;font:700 15px var(--f-ui);cursor:pointer;text-align:left}
+.musGrid button[aria-pressed="true"],.gsRow[aria-pressed="true"]{border-color:var(--lamp);box-shadow:0 0 0 1px var(--lamp) inset;background:rgba(255,182,39,.12)}
+.musList{display:grid;gap:6px}
+.gsRow{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px}.gsRow span{display:grid;min-width:0}.gsRow small{font-weight:500;color:var(--muted);font-size:12px}
+.gsPlay{border:0;border-radius:999px;width:40px;height:40px;background:#2f6bff;color:#fff;font-size:16px;cursor:pointer;flex:none}
+.auReset{display:grid;gap:10px}.auReset[hidden]{display:none}.auSent{background:rgba(53,208,127,.1);border:1px solid #2fa96a;border-radius:10px;padding:12px;line-height:1.45;font-size:15px;color:var(--text);overflow-wrap:anywhere}
+#auForm[hidden],#auTog[hidden]{display:none!important}
 </style>
 
 <div id="app">
@@ -863,7 +885,7 @@ body.spectating #pad,body.spectating .keys,body.spectating #pullBtn,body.spectat
           <div class="chip gd"><svg class="coin" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><text x="12" y="16.5" text-anchor="middle">G</text></svg><b id="goldCount">0</b></div>
           <div class="chip gm"><svg class="gem" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12l4 6-10 12L2 9z" fill="#35d07f" stroke="#0d6b3a" stroke-width="1.5" stroke-linejoin="round"/><path d="M2 9h20M8 3l4 6 4-6M12 9 7 9l5 12 5-12" fill="none" stroke="#bff5d8" stroke-width="1" opacity=".8"/></svg><b id="gemCount">0</b></div>
         </div>
-        <div class="supRow"><button class="supInfo" id="supInfoBtn">⚡ WHO HAS WHICH SUPER? <span>▶ watch</span></button><button class="helpMini" id="helpBtn" aria-label="Help">?</button></div>
+        <div class="supRow"><button class="supInfo" id="supInfoBtn">⚡ <em class="supL">WHO HAS WHICH SUPER?</em><em class="supS">SUPERS GUIDE</em> <span>▶ watch</span></button><button class="helpMini ownerMini" id="ownerBtn" aria-label="About the owner" title="About the owner">🦈</button><button class="helpMini" id="helpBtn" aria-label="Help">?</button></div>
         <h1 class="logo">SLAPSHOT <b>3V3</b></h1>
         <div class="stageRow">
           <div class="rail">
@@ -893,7 +915,7 @@ body.spectating #pad,body.spectating .keys,body.spectating #pullBtn,body.spectat
           <button class="modeBox" id="modeBtn"><span class="mRink" id="mRink"></span><span class="mTxt"><b id="modeName">Arena 1</b><span id="modeSub">CPU LV 0</span></span><span class="mChg">CHANGE</span></button>
           <button class="battle" id="playBtn"><span>PLAY</span></button>
         </div>
-        <div class="lobbyLinks"><button class="link" id="voiceBtn2">Music: on</button></div>
+        <div class="lobbyLinks"><button class="link" id="voiceBtn2">🎵 Music &amp; goal songs</button></div>
       </div>
     </div>
 
@@ -962,6 +984,29 @@ body.spectating #pad,body.spectating .keys,body.spectating #pullBtn,body.spectat
       </div>
     </div>
 
+    <div class="ov" id="musOv" hidden>
+      <div class="card musCard">
+        <div class="result" style="font-size:40px">MUSIC</div>
+        <button class="boxBtn" id="musToggle">Music: on</button>
+        <div class="bxSec">Background music</div>
+        <div class="musGrid" id="bgmList"></div>
+        <div class="bxSec">Your goal song</div>
+        <p class="frEmpty" style="margin:0">Plays after the horn when YOUR team scores. Tap ▶ to hear it.</p>
+        <div class="musList" id="gsList"></div>
+        <button class="go" id="musDone">DONE</button>
+      </div>
+    </div>
+
+    <div class="ov" id="ownerOv" hidden>
+      <div class="card ownerCard">
+        <div class="eyebrow">About the owner</div>
+        <div class="ownerHead"><span class="ownerAv">🦈</span><div><div class="result" style="font-size:40px;line-height:.9">ANGRYREDSHARK</div><p class="ownerSub">Creator of Slapshot 3v3</p></div></div>
+        <p class="ownerTxt">Slapshot 3v3 is built and run by AngryRedShark. Follow for hockey, game updates, new players and arenas before anyone else.</p>
+        <div class="ownerLinks" id="ownerLinks"></div>
+        <button class="go" id="ownerDone">BACK</button>
+      </div>
+    </div>
+
     <div class="ov" id="fsOv" hidden>
       <div class="card deckCard fsCard">
         <div class="shead"><div class="result" id="fsName">FRIEND</div><span class="eyebrow" id="fsWho"></span></div>
@@ -996,6 +1041,14 @@ body.spectating #pad,body.spectating .keys,body.spectating #pullBtn,body.spectat
           <button class="go" id="auGo" type="submit">SIGN IN</button>
         </form>
         <button class="linkBtn" id="auForgot" type="button">Forgot password?</button>
+        <div class="auReset" id="auReset" hidden>
+          <div class="result" style="font-size:30px">RESET PASSWORD</div>
+          <p class="xLead">Type the email you signed up with. We'll email you a link to pick a new password.</p>
+          <label class="auF"><span>Email</span><input id="auREmail" type="email" autocomplete="email" inputmode="email" spellcheck="false"></label>
+          <button class="go" id="auRGo" type="button">SEND RESET LINK</button>
+          <div class="auSent" id="auSent" hidden></div>
+          <button class="linkBtn" id="auRBack" type="button">← Back to sign in</button>
+        </div>
         <p class="netMsg" id="auMsg" role="status"></p>
         <p class="auPriv">We store your email, username and game progress so you can load it on other devices. Nothing else. You can delete your account any time from the Players screen.</p>
         <button class="ghost" id="authClose">Back</button>
@@ -1059,7 +1112,8 @@ body.spectating #pad,body.spectating .keys,body.spectating #pullBtn,body.spectat
     <div class="ov sheet" id="passOv" hidden>
       <div class="card passCard">
         <div class="result" style="font-size:44px">PUCK PASS</div>
-        <p>Every goal you score earns 10 pucks. Fill a tier to unlock its reward. Every tier is free.</p>
+        <p>Every goal you score earns 10 pucks. Fill a tier to unlock its reward. Every tier is free and the pass never ends: tiers 1-50 cost 30 pucks, then each tier costs 5 more.</p>
+        <p class="passSeason" id="passSeason"></p>
         <div class="copies"><span id="passTierLbl">TIER 1</span><span class="bar"><i id="passBar" style="width:0%"></i></span><b id="passPk">0/30</b></div>
         <div class="ptrack" id="passTrack"></div>
         <button class="go" id="passDone">DONE</button>
@@ -1477,8 +1531,10 @@ function brush(t,v,len){const n=Math.floor(ac.sampleRate*len),b=ac.createBuffer(
 function musTick(){if(!ac||!MUS.master)return;
   const want=musVol();if(Math.abs(MUS.master.gain.value-want)>.01&&!MUS.ducking)MUS.master.gain.setTargetAtTime(want,ac.currentTime,.4);
   if(!MUS.on||!soundOn){MUS.next=ac.currentTime+.1;return}
+  MUS.bpm=(BGM_STYLES.find(x=>x.id===bgmStyle)||BGM_STYLES[0]).bpm;
   const beat=60/MUS.bpm,eighth=beat/2;
   if(MUS.next<ac.currentTime)MUS.next=ac.currentTime+.05;
+  if(bgmStyle!=='jazz'){while(MUS.next<ac.currentTime+.25){styleStep(bgmStyle,MUS.step%8,MUS.bar,MUS.next,beat,eighth);MUS.next+=eighth;MUS.step++;if(MUS.step%8===0)MUS.bar++}return}
   while(MUS.next<ac.currentTime+.25){
     const st=MUS.step%8,t=MUS.next+(st%2?eighth*.18:0),[root,ch]=PROG[MUS.bar%PROG.length]; // swing: off-beats land late
     if(st===0){for(const n of ch)rhodes(t,n,beat*2.2,.045);bass(t,root,beat*.95)}
@@ -1489,17 +1545,93 @@ function musTick(){if(!ac||!MUS.master)return;
     brush(t,.012,.04);
     if(Math.random()<(st%2?.25:.45)){melIdx=clamp(melIdx+pick1([-2,-1,-1,1,1,2,0]),0,SCALE.length-1);vibe(t,SCALE[melIdx],beat*1.6)}
     MUS.next+=eighth;MUS.step++;if(MUS.step%8===0)MUS.bar++}}
+/* ---------- MORE MUSIC ----------
+   Background styles (pick in the Music menu) and goal songs. Everything is original and made live
+   with Web Audio: no recordings, nothing to download. */
+const BGM_STYLES=[{id:'jazz',n:'Elevator Jazz',bpm:88},{id:'rock',n:'Arena Rock',bpm:118},{id:'synth',n:'Night Drive Synth',bpm:100},{id:'chip',n:'8-Bit Arcade',bpm:138}];
+const GOAL_SONGS=[{id:'organ',n:'Stadium Organ',d:'The classic rink organ riff'},{id:'rock',n:'Rock Anthem',d:'Drums and a crunchy guitar riff'},{id:'synth',n:'Synth Drop',d:'Build-up, then the drop'},
+  {id:'brass',n:'Brass Fanfare',d:'Trumpets and timpani'},{id:'stomp',n:'Stomp Clap',d:'Whole arena stomps along'},{id:'disco',n:'Disco Lights',d:'Four on the floor'},{id:'chip',n:'8-Bit Victory',d:'Old-school arcade win'}];
+let bgmStyle='jazz',goalSong='random';
+try{bgmStyle=BGM_STYLES.some(x=>x.id===localStorage.getItem('slapshot-bgm'))?localStorage.getItem('slapshot-bgm'):'jazz';const gs=localStorage.getItem('slapshot-goalsong');goalSong=gs==='random'||GOAL_SONGS.some(x=>x.id===gs)?gs:'random'}catch(_){}
+// instruments (dest = where the sound goes)
+function oscNote(dest,type,m,at,d,v,o){o=o||{};const f=mtof(m),g=ac.createGain();let last=g;
+  const n=o.unison||1;for(let i=0;i<n;i++){const os=ac.createOscillator();os.type=type;os.frequency.value=f;os.detune.value=n>1?(i-(n-1)/2)*(o.spread||12):(o.detune||0);os.connect(g);os.start(at);os.stop(at+d+.05)}
+  if(o.lp){const lp=ac.createBiquadFilter();lp.type='lowpass';lp.Q.value=o.q||1;lp.frequency.setValueAtTime(o.lp,at);if(o.lpTo)lp.frequency.exponentialRampToValueAtTime(o.lpTo,at+Math.min(d,o.lpT||d));g.connect(lp);last=lp}
+  const a=o.att||.008;g.gain.setValueAtTime(0,at);g.gain.linearRampToValueAtTime(v/n,at+a);if(o.hold)g.gain.setValueAtTime(v/n,at+d*o.hold);g.gain.exponentialRampToValueAtTime(.0001,at+d);last.connect(dest)}
+function kickAt(dest,at,v){const o=ac.createOscillator(),g=ac.createGain();o.type='sine';o.frequency.setValueAtTime(150,at);o.frequency.exponentialRampToValueAtTime(42,at+.12);g.gain.setValueAtTime(v||.5,at);g.gain.exponentialRampToValueAtTime(.0001,at+.28);o.connect(g).connect(dest);o.start(at);o.stop(at+.3)}
+function noiseAt(dest,at,d,v,type,fc,q){const n=Math.max(1,Math.floor(ac.sampleRate*d)),b=ac.createBuffer(1,n,ac.sampleRate),a=b.getChannelData(0);for(let i=0;i<n;i++)a[i]=(Math.random()*2-1)*Math.pow(1-i/n,2);
+  const src=ac.createBufferSource(),f=ac.createBiquadFilter(),g=ac.createGain();src.buffer=b;f.type=type;f.frequency.value=fc;if(q)f.Q.value=q;g.gain.value=v;src.connect(f).connect(g).connect(dest);src.start(at)}
+const snareAt=(dest,at,v)=>{noiseAt(dest,at,.18,v||.35,'bandpass',1900,.8);oscNote(dest,'triangle',55,at,.09,(v||.35)*.5)};
+const hatAt=(dest,at,v,open)=>noiseAt(dest,at,open?.22:.05,v||.12,'highpass',7500);
+const clapAt=(dest,at,v)=>{for(const dt of[0,.012,.024])noiseAt(dest,at+dt,.09,(v||.3)*.6,'bandpass',1500,1.2)};
+function crashAt(dest,at,v){noiseAt(dest,at,1.6,v||.18,'highpass',5000)}
+function guitar(dest,root,at,d,v){ // a crunchy power chord: root, fifth, octave through distortion
+  const ws=ac.createWaveShaper(),cv=new Float32Array(512);for(let i=0;i<512;i++){const x=i/256-1;cv[i]=Math.tanh(x*6)}ws.curve=cv;const lp=ac.createBiquadFilter();lp.type='lowpass';lp.frequency.value=2600;const g=ac.createGain();g.gain.value=v||.12;
+  ws.connect(lp).connect(g).connect(dest);for(const iv of[0,7,12])oscNote(ws,'sawtooth',root+iv,at,d,.5,{unison:2,spread:9,hold:.7})}
+const brassAt=(dest,m,at,d,v)=>oscNote(dest,'sawtooth',m,at,d,v||.16,{unison:3,spread:8,lp:500,lpTo:3200,lpT:.12,att:.03,hold:.8});
+const supersaw=(dest,m,at,d,v)=>oscNote(dest,'sawtooth',m,at,d,v||.14,{unison:5,spread:16,lp:5000,att:.005,hold:.5});
+const chipAt=(dest,m,at,d,v)=>oscNote(dest,'square',m,at,d,v||.09,{hold:.8,att:.002});
+function timpani(dest,m,at,v){const o=ac.createOscillator(),g=ac.createGain();o.type='sine';o.frequency.setValueAtTime(mtof(m)*1.2,at);o.frequency.exponentialRampToValueAtTime(mtof(m),at+.08);g.gain.setValueAtTime(v||.35,at);g.gain.exponentialRampToValueAtTime(.0001,at+.8);o.connect(g).connect(dest);o.start(at);o.stop(at+.85);noiseAt(dest,at,.12,.1,'lowpass',400)}
+// ----- background styles, one eighth-note step at a time -----
+function styleStep(id,st,bar,t,beat,e){const B=MUS.bus;
+  if(id==='rock'){ // driving arena rock: E C G D
+    const roots=[40,36,43,38],r=roots[bar%4];
+    oscNote(B,'sawtooth',r,t,e*.9,.07,{lp:700,hold:.6});
+    if(st===0||st===4)kickAt(B,t,.32);if(st===3&&Math.random()<.5)kickAt(B,t,.22);if(st===2||st===6)snareAt(B,t,.16);hatAt(B,t,st%2?.025:.04);
+    if(st===0)guitar(B,r+12,t,beat*1.8,.035);if(st===4)guitar(B,r+12,t,beat*1.6,.028);
+    if(bar%4===3&&st===6)crashAt(B,t+e,.05);
+  }else if(id==='synth'){ // night-drive synthwave: Am F C G with a 16th-note arpeggio
+    const ch=[[57,60,64],[53,57,60],[48,52,55],[55,59,62]][bar%4];
+    if(st===0)for(const n of ch)oscNote(B,'sawtooth',n,t,beat*4,.022,{unison:2,spread:14,lp:1400,att:.25,hold:.8});
+    oscNote(B,'sawtooth',ch[0]-24,t,e*.9,.06,{lp:500});
+    for(const k of[0,1]){const n=ch[(st*2+k)%3]+12+(((st*2+k)%6)>2?12:0);oscNote(B,'square',n,t+k*e/2,e*.45,.018,{lp:2600})}
+    if(st===0||st===4)kickAt(B,t,.28);if(st===2||st===6){snareAt(B,t,.1);clapAt(B,t,.08)}
+  }else if(id==='chip'){ // 8-bit arcade: C Am F G, square lead wanders a pentatonic scale
+    const roots=[48,45,41,43],r=roots[bar%4];
+    oscNote(B,'triangle',r+(st%4===2?7:0),t,e*.9,.09,{hold:.7});
+    if(st%2)noiseAt(B,t,.03,.05,'highpass',8000);if(st===0||st===4)noiseAt(B,t,.08,.12,'lowpass',300);
+    if(Math.random()<.62){melIdx=clamp(melIdx+pick1([-2,-1,1,1,2,0]),0,8);const sc=[72,74,76,79,81,84,86,88,91];chipAt(B,sc[melIdx],t,e*(Math.random()<.3?1.8:.9),.035)}
+  }
+}
+// ----- goal songs: start at time T, played on dest -----
+function playGoalSong(id,T){
+  if(!ac)return;const out=ac.createGain(),comp=ac.createDynamicsCompressor();out.gain.value=1;out.connect(comp).connect(ac.destination);const D=out;
+  if(id==='organ'){const org=(m,at,d,v)=>{for(const[h,a]of[[1,1],[2,.5],[3,.28],[4,.15]])oscNote(D,'sine',m+12*Math.log2(h),at,d,(v||.09)*a,{hold:.85,att:.01})};
+    const q=.16;[[72,0,1],[72,1,1],[72,2,1],[69,3,1],[72,4,2],[74,6,1],[76,7,3]].forEach(([m,b,l])=>{org(m,T+b*q,l*q*.92);org(m-12,T+b*q,l*q*.92,.035)});for(const b of[10,11,12])clapAt(D,T+b*q,.35);noiseAt(D,T+12*q+.1,.6,.09,'bandpass',900);return 13*q}
+  if(id==='rock'){const q=60/140/2;const riff=[[40,0,2],[40,2,1],[43,3,1],[45,4,2],[43,6,1],[40,7,1],[47,8,2],[45,10,2],[43,12,1],[45,13,1],[40,14,2]];
+    riff.forEach(([m,b,l])=>guitar(D,m+12,T+b*q,l*q*.95,.09));for(let b=0;b<16;b+=2){if(b%8===0||b%8===6)kickAt(D,T+b*q,.4);if(b%8===4)snareAt(D,T+b*q,.32);hatAt(D,T+b*q,.08)}crashAt(D,T,.22);crashAt(D,T+16*q,.25);guitar(D,52,T+16*q,1.2,.09);kickAt(D,T+16*q,.4);return 16*q+1.2}
+  if(id==='synth'){const q=60/128/4;for(let i=0;i<16;i++){oscNote(D,'square',[60,64,67,72][i%4]+(i>=8?5:0),T+i*q,q*.9,.05,{lp:600+i*300});if(i>=8)snareAt(D,T+i*q,.06+i*.012)}
+    const Dr=T+16*q;noiseAt(D,T,16*q,.05,'highpass',2000);for(let k=0;k<8;k++){kickAt(D,Dr+k*q*2,.55);if(k%2)supersaw(D,[64,67,71][k%3]+12,Dr+k*q*2+q,q*1.4,.12);oscNote(D,'sawtooth',40,Dr+k*q*2,q*1.8,.12,{lp:300})}
+    supersaw(D,76,Dr,q*2,.1);supersaw(D,79,Dr+12*q,q*4,.12);return 32*q+.3}
+  if(id==='brass'){const q=60/120/4;timpani(D,43,T,.35);[[67,0,1],[67,1,1],[67,2,1],[72,3,5],[67,8,2],[72,10,1],[76,11,5]].forEach(([m,b,l])=>{brassAt(D,m,T+b*q*2,l*q*2*.95,.16);brassAt(D,m-12,T+b*q*2,l*q*2*.95,.08)});
+    timpani(D,48,T+6*q,.3);timpani(D,43,T+16*q,.3);timpani(D,48,T+22*q,.45);crashAt(D,T+22*q,.18);return 32*q+.2}
+  if(id==='stomp'){const q=.3;const pat=[[0,'s'],[1,'s'],[2,'c'],[3,'s'],[3.5,'s'],[4,'c'],[5,'s'],[6,'s'],[7,'c'],[7.5,'c']];pat.forEach(([b,k])=>{if(k==='s'){kickAt(D,T+b*q,.6);noiseAt(D,T+b*q,.15,.15,'lowpass',250)}else clapAt(D,T+b*q,.45)});
+    for(const n of[60,64,67])oscNote(D,'sawtooth',n,T+8*q,.6,.07,{unison:2,lp:2400,hold:.6});noiseAt(D,T+8*q,.7,.14,'bandpass',800);return 8*q+.7}
+  if(id==='disco'){const q=60/124/2;for(let b=0;b<16;b++){if(b%2===0)kickAt(D,T+b*q,.45);else hatAt(D,T+b*q,.12,true);if(b%4===2)clapAt(D,T+b*q,.3);
+      oscNote(D,'sawtooth',[45,57][b%2]+(b>=8?5:0),T+b*q,q*.8,.12,{lp:900})}
+    [[69,1],[72,3],[76,5],[74,6],[72,7],[74,9],[76,11],[81,13]].forEach(([m,b])=>oscNote(D,'square',m,T+b*q,q*1.4,.06,{lp:3000}));for(const n of[69,72,76])oscNote(D,'sawtooth',n,T+16*q,.9,.06,{unison:3,lp:3000,hold:.4});return 16*q+.9}
+  if(id==='chip'){const q=.09;[[72,0],[76,1],[79,2],[84,3],[79,4],[84,5],[88,6],[91,8]].forEach(([m,b],i)=>chipAt(D,m,T+b*q,i===7?q*6:q*.95,.13));
+    [[48,0],[55,2],[60,4],[55,6],[48,8]].forEach(([m,b])=>oscNote(D,'triangle',m,T+b*q,q*2,.14));for(let b=0;b<8;b+=2)noiseAt(D,T+b*q,.04,.08,'highpass',7000);return 14*q}
+  return 0}
+const pickGoalSong=()=>goalSong==='random'?pick1(GOAL_SONGS).id:goalSong;
+function previewSong(id){audio();if(!ac)return;duckMusic(4);playGoalSong(id,ac.currentTime+.05)}
 function musStart(){if(!ac)return;musOut();if(!MUS.timer)MUS.timer=setInterval(musTick,60)}
 function duckMusic(sec){if(!MUS.master||!ac)return;const t=ac.currentTime,g=MUS.master.gain;MUS.ducking=true;g.cancelScheduledValues(t);g.setValueAtTime(g.value,t);g.linearRampToValueAtTime(.04,t+.15);
   g.setValueAtTime(.04,t+sec);g.linearRampToValueAtTime(musVol(),t+sec+1.2);setTimeout(()=>{MUS.ducking=false},(sec+1.3)*1000)}
-function paintMusicBtns(){const t='Music: '+(MUS.on?'on':'off');for(const id of['voiceBtn','voiceBtn2']){const b=$(id);if(b&&b.textContent!==t)b.textContent=t}}
+function paintMusicBtns(){const t='Music: '+(MUS.on?'on':'off');for(const id of['voiceBtn']){const b=$(id);if(b&&b.textContent!==t)b.textContent=t}}
+function renderMusic(){
+  $('musToggle').textContent='🎵 Music: '+(MUS.on?'ON':'OFF');
+  $('bgmList').innerHTML=BGM_STYLES.map(x=>`<button data-bgm="${x.id}" aria-pressed="${bgmStyle===x.id}">${x.n}</button>`).join('');
+  $('gsList').innerHTML=[{id:'random',n:'🎲 Random',d:'A different one every goal'},...GOAL_SONGS].map(x=>`<div class="gsRow" role="button" tabindex="0" data-gs="${x.id}" aria-pressed="${goalSong===x.id}"><span>${x.n}<small>${x.d}</small></span>${x.id==='random'?'':`<button class="gsPlay" data-play="${x.id}" aria-label="Play ${x.n}">▶</button>`}</div>`).join('');
+}
+function openMusic(){audio();renderMusic();$('musOv').hidden=false}
 function toggleMusic(){MUS.on=!MUS.on;try{localStorage.setItem('slapshot-music',MUS.on?'on':'off')}catch(_){}audio();paintMusicBtns()}
 
 function tone(f,d,type,v,slide){if(!ac||!soundOn)return;const t=ac.currentTime,o=ac.createOscillator(),g=ac.createGain();o.type=type||'square';o.frequency.setValueAtTime(f,t);if(slide)o.frequency.exponentialRampToValueAtTime(slide,t+d);g.gain.setValueAtTime(v||.05,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g).connect(ac.destination);o.start(t);o.stop(t+d+.03)}
 function noise(d,v,fc){if(!ac||!soundOn)return;const t=ac.currentTime,n=Math.floor(ac.sampleRate*d),b=ac.createBuffer(1,n,ac.sampleRate),a=b.getChannelData(0);for(let i=0;i<n;i++)a[i]=(Math.random()*2-1)*(1-i/n);const s=ac.createBufferSource();s.buffer=b;const f=ac.createBiquadFilter();f.type='bandpass';f.frequency.value=fc;const g=ac.createGain();g.gain.value=v;s.connect(f).connect(g).connect(ac.destination);s.start(t)}
 // the crowd: a roar that swells and fades
 function cheer(){if(!ac||!soundOn)return;for(let k=0;k<3;k++)setTimeout(()=>noise(1.6-k*.3,.07-k*.015,500+k*450),k*140)}
-function horn(){if(netRole==='host')netEv.push(['h']);if(!ac||!soundOn)return;const t=ac.currentTime;duckMusic(5.2);
+function horn(team){if(netRole==='host')netEv.push(['h',team]);if(!ac||!soundOn)return;const t=ac.currentTime,mine=team==null||team===myT||netRole==='spec';duckMusic(mine?8:3.6);
   const out=ac.createGain(),lp=ac.createBiquadFilter(),ws=ac.createWaveShaper(),dl=ac.createDelay(1),fb=ac.createGain(),wet=ac.createGain();
   const cv=new Float32Array(256);for(let i=0;i<256;i++){const x=i/128-1;cv[i]=Math.tanh(x*2.2)}ws.curve=cv;
   lp.type='lowpass';lp.Q.value=3;lp.frequency.setValueAtTime(380,t);lp.frequency.linearRampToValueAtTime(1500,t+.22);lp.frequency.setValueAtTime(1500,t+2.5);lp.frequency.linearRampToValueAtTime(600,t+3.2);
@@ -1509,14 +1641,9 @@ function horn(){if(netRole==='host')netEv.push(['h']);if(!ac||!soundOn)return;co
   const vib=ac.createOscillator(),vg=ac.createGain();vib.frequency.value=5.2;vg.gain.value=1.4;vib.connect(vg);vib.start(t);vib.stop(t+3.4);
   for(const f of[116.54,146.83,174.61,233.08])for(const dt of[-5,5]){const o=ac.createOscillator();o.type=f>200?'square':'sawtooth';o.frequency.value=f;o.detune.value=dt;vg.connect(o.frequency);
     const g=ac.createGain();g.gain.value=f>200?.18:.32;o.connect(g).connect(lp);o.start(t);o.stop(t+3.4)}
-  // goal song: a stadium-organ riff, the crowd claps along, "HEY!"
-  const T=t+3.05,org=(m,at,d,v)=>{for(const[h,a]of[[1,1],[2,.5],[3,.28],[4,.15]]){const o=ac.createOscillator(),g=ac.createGain();o.type='sine';o.frequency.value=mtof(m)*h;
-    g.gain.setValueAtTime(0,at);g.gain.linearRampToValueAtTime((v||.06)*a,at+.01);g.gain.setValueAtTime((v||.06)*a,at+d*.85);g.gain.linearRampToValueAtTime(0,at+d);o.connect(g).connect(ac.destination);o.start(at);o.stop(at+d+.02)}};
-  const q=.16;[[72,0,1],[72,1,1],[72,2,1],[69,3,1],[72,4,2],[74,6,1],[76,7,3]].forEach(([m,b,l])=>{org(m,T+b*q,l*q*.92);org(m-12,T+b*q,l*q*.92,.035)});
-  const clap=at=>{const n=Math.floor(ac.sampleRate*.08),b=ac.createBuffer(1,n,ac.sampleRate),a=b.getChannelData(0);for(let i=0;i<n;i++)a[i]=(Math.random()*2-1)*Math.pow(1-i/n,3);
-    const src=ac.createBufferSource(),bp=ac.createBiquadFilter(),g=ac.createGain();src.buffer=b;bp.type='bandpass';bp.frequency.value=1500;g.gain.value=.25;src.connect(bp).connect(g).connect(ac.destination);src.start(at)};
-  for(const b of[10,11,12])clap(T+b*q);
-  setTimeout(()=>{if(soundOn)noise(.6,.09,900)},(3.05+12*q+.1)*1000)}
+  // then the goal song (yours, when your team scores)
+  if(mine)playGoalSong(pickGoalSong(),t+3.05);
+}
 function sfx(k){if(netRole==='host')netEv.push(['s',k]);switch(k){
   case'shot':noise(.09,.5,1800);tone(160,.08,'square',.04,80);break;
   case'pass':noise(.05,.25,2400);break;
@@ -1992,6 +2119,13 @@ function pullGoalie(t,on,quiet){
   }
   paintPull();return true;
 }
+/* ---------- ABOUT THE OWNER ----------
+   The owner's links. Change a handle here and the About screen updates. */
+const OWNER_LINKS=[
+  {k:'yt',n:'YouTube',h:'@angryredshark1',u:'https://www.youtube.com/@angryredshark1',ic:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23 7.2a3 3 0 0 0-2.1-2.1C19 4.6 12 4.6 12 4.6s-7 0-8.9.5A3 3 0 0 0 1 7.2 31 31 0 0 0 .5 12 31 31 0 0 0 1 16.8a3 3 0 0 0 2.1 2.1c1.9.5 8.9.5 8.9.5s7 0 8.9-.5a3 3 0 0 0 2.1-2.1 31 31 0 0 0 .5-4.8 31 31 0 0 0-.5-4.8zM9.7 15.1V8.9l5.8 3.1z"/></svg>'},
+  {k:'ig',n:'Instagram',h:'@angryredshark1',u:'https://www.instagram.com/angryredshark1/',ic:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.2c3.2 0 3.6 0 4.8.1 3.3.1 4.8 1.7 4.9 4.9.1 1.3.1 1.6.1 4.8s0 3.6-.1 4.8c-.1 3.2-1.7 4.8-4.9 4.9-1.3.1-1.6.1-4.8.1s-3.6 0-4.8-.1c-3.3-.1-4.8-1.7-4.9-4.9C2.2 15.6 2.2 15.2 2.2 12s0-3.6.1-4.8C2.4 3.9 3.9 2.4 7.2 2.3c1.2-.1 1.6-.1 4.8-.1zM12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0 8.2a3.2 3.2 0 1 1 0-6.4 3.2 3.2 0 0 1 0 6.4zm5.2-9.6a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4z"/></svg>'},
+  {k:'tt',n:'TikTok',h:'@angryredshark1',u:'https://www.tiktok.com/@angryredshark1',ic:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.6 2h-3.3v13.3a2.9 2.9 0 1 1-2.9-2.9c.3 0 .6 0 .9.1V9.1a6.3 6.3 0 1 0 5.3 6.2V8.7a8 8 0 0 0 4.7 1.5V6.9a4.7 4.7 0 0 1-4.7-4.9z"/></svg>'}];
+function openOwner(){audio();$('ownerLinks').innerHTML=OWNER_LINKS.map(l=>`<a class="oLink ${l.k}" href="${esc(l.u)}" target="_blank" rel="noopener noreferrer">${l.ic}${l.n}<span>${esc(l.h)}</span></a>`).join('');$('ownerOv').hidden=false}
 const remoteView=()=>netRole==='guest'||netRole==='spec';
 const isPulled=t=>{const g=rosterG.find(k=>k.team===t);return!!(g&&(remoteView()?!goalies.includes(g)&&phase!=='so':g.pulled))};
 let pullKey='';
@@ -2916,7 +3050,7 @@ function goal(team,net){
       if(sc&&sc.card&&sc.card.id==='bell')questEvent('beck');
     }
   }
-  toast(team===0?(top?'TOP SHELF!':'GOAL!'):(top?'CPU ROOFS IT':'CPU SCORES'),'',2200,team===0?'home':'away');horn();updateHud();
+  toast(team===0?(top?'TOP SHELF!':'GOAL!'):(top?'CPU ROOFS IT':'CPU SCORES'),'',2200,team===0?'home':'away');horn(team);updateHud();
 }
 let gbTimer=0,sbTimer=0;
 function showSupBar(team,who,S){
@@ -3099,7 +3233,7 @@ function soUpdate(dt){
 function soResult(scored,label){
   so.res[so.turn].push(scored);phase='soWait';phaseT=2.2;charging=false;breakaway=null;
   for(const s of all){s.dvx=s.dvy=0}
-  if(scored){horn();flash=1;shake=.6;toast(so.turn===0?'SCORES!':'CPU SCORES','',1500,so.turn===0?'home':'away');pbp(`${N(skaters[0])} scores!`,3)}
+  if(scored){horn(so.turn);flash=1;shake=.6;toast(so.turn===0?'SCORES!':'CPU SCORES','',1500,so.turn===0?'home':'away');pbp(`${N(skaters[0])} scores!`,3)}
   else{toast(label,'small',1000);pbp(label==='SAVE'?`Stopped by ${N(goalies[0])}!`:label==='TIME'?'Out of time, no goal.':`${N(skaters[0])} misses.`,3)}
   renderSO();
 }
@@ -3128,7 +3262,7 @@ const ls={get:k=>{try{return localStorage.getItem(k)}catch(_){return null}},set:
 function profileList(){try{const a=JSON.parse(ls.get('slapshot-profiles')||'[]');return Array.isArray(a)?a.filter(x=>typeof x==='string'):[]}catch(_){return[]}}
 const K=k=>PKEY(curUser,k);
 function saveProgress(){if(!curUser)return;try{localStorage.setItem(K('at'),String(Date.now()));cloudDirty();localStorage.setItem(K('trophies'),String(trophies));localStorage.setItem(K('arena'),String(arenaIdx));
-  localStorage.setItem(K('cards'),JSON.stringify({owned,deck,decks,deckIdx,deckNames,lastDropDay,gold,prog,pucks,passClaimed,bonusClaimed,questsDay,quests,emotes,roadClaimed,roadC3,roadC5,trophies5,shopDay,shopBought,gems,skins,skin,featured,bundlesOnce}))}catch(_){}}
+  localStorage.setItem(K('cards'),JSON.stringify({owned,deck,decks,deckIdx,deckNames,lastDropDay,gold,prog,pucks,passClaimed,bonusClaimed,passMonth,questsDay,quests,emotes,roadClaimed,roadC3,roadC5,trophies5,shopDay,shopBought,gems,skins,skin,featured,bundlesOnce}))}catch(_){}}
 /* ---------- emotes ----------
    Everyone starts with the first 3. The rest come from Epic (50%), Mythic (75%) and Legendary (always)
    star drops. Tap the bubble button on the rink (or T on a keyboard) and pick one; it pops up for both
@@ -3206,7 +3340,7 @@ let emotes=START_EMOTES.slice(),emCool=0,emTimers={};
 function resetProgress(){ // a brand-new player's starting point
   trophies=0;arenaIdx=0;owned=['bell','charlotte'];deck={F1:'charlotte',F2:null,D:'bell',G:null};
   decks=[deck];for(let i=1;i<DECKS_N;i++)decks.push({F1:null,F2:null,D:'bell',G:null});deckIdx=0;deckNames=DECK_DEF_NAMES.slice();lastDropDay='';dropPending=false;gold=100;
-  prog={bell:{copies:10,lv:{}},charlotte:{copies:0,lv:{}}};pucks=0;passClaimed=[];bonusClaimed=0;questsDay='';quests=[];emotes=START_EMOTES.slice();roadClaimed=[];roadC3=[];roadC5=[];trophies5=0;shopDay='';shopBought=[];gems=0;skins=['classic'];skin='classic';featured=null;bundlesOnce=[];
+  prog={bell:{copies:10,lv:{}},charlotte:{copies:0,lv:{}}};pucks=0;passClaimed=[];bonusClaimed=0;passMonth='';questsDay='';quests=[];emotes=START_EMOTES.slice();roadClaimed=[];roadC3=[];roadC5=[];trophies5=0;shopDay='';shopBought=[];gems=0;skins=['classic'];skin='classic';featured=null;bundlesOnce=[];
 }
 let charlotteNew=false;
 function loadProgress(){resetProgress();if(!curUser)return;try{
@@ -3231,7 +3365,7 @@ function loadProgress(){resetProgress();if(!curUser)return;try{
     if(Array.isArray(c.roadClaimed))roadClaimed=c.roadClaimed.filter(n=>Number.isFinite(n));
     trophies5=Math.max(0,+c.trophies5||0);if(Array.isArray(c.roadC3))roadC3=c.roadC3.filter(n=>Number.isFinite(n));if(Array.isArray(c.roadC5))roadC5=c.roadC5.filter(n=>Number.isFinite(n));
     if(Array.isArray(c.emotes))emotes=[...new Set([...START_EMOTES,...c.emotes.filter(emoteById)])];
-    pucks=Math.max(0,+c.pucks||0);passClaimed=Array.isArray(c.passClaimed)?c.passClaimed:[];bonusClaimed=+c.bonusClaimed||0;
+    pucks=Math.max(0,+c.pucks||0);passClaimed=Array.isArray(c.passClaimed)?c.passClaimed:[];bonusClaimed=+c.bonusClaimed||0;passMonth=typeof c.passMonth==='string'?c.passMonth:'';
     if(c.prog){prog=c.prog;
       // shot power / accuracy are no longer upgradeable: refund any levels bought there
       for(const id in prog){const p=prog[id],cd=cardById(id);if(!cd||cd.pos==='G')continue;
@@ -3360,7 +3494,7 @@ function fbErr(e){const c=(e&&e.code)||'';return({
   'auth/email-already-in-use':'There\'s already an account with that email. Tap SIGN IN instead.',
   'auth/weak-password':'Use a password with at least 6 characters.',
   'auth/invalid-credential':'Wrong email or password.','auth/wrong-password':'Wrong email or password.','auth/user-not-found':'No account with that email. Tap CREATE ACCOUNT.',
-  'auth/too-many-requests':'Too many tries. Wait a minute and try again.','auth/network-request-failed':'No connection. Check your internet and try again.',
+  'auth/too-many-requests':'Too many tries. Wait a few minutes and try again.','auth/missing-email':'Type your email first.','auth/network-request-failed':'No connection. Check your internet and try again.',
   'auth/operation-not-allowed':'Email sign-in isn\'t turned on in Firebase yet (Authentication \u2192 Sign-in method \u2192 Email/Password).',
   'auth/unauthorized-domain':'This website isn\'t on the Firebase authorized domains list yet.'}[c])||(/api-key/.test(c)?'The game\'s Firebase key isn\'t right. (Game owner: check the apiKey.)':'')||('Something went wrong'+(c?' ('+c+')':'')+'. Try again.')}
 function auTab(m){auMode=m;for(const b of $('auTog').querySelectorAll('button'))b.setAttribute('aria-pressed',String(b.dataset.a===m));
@@ -3370,7 +3504,7 @@ function auTab(m){auMode=m;for(const b of $('auTog').querySelectorAll('button'))
   auMsg('')}
 async function openAuth(m){
   if(!cloudOn()){profMsg('Online accounts aren\'t switched on for this copy of the game yet. (Game owner: add your Firebase config.)');return}
-  hideAllOv();$('authOv').hidden=false;auTab(m||'in');auMsg('');
+  hideAllOv();$('authOv').hidden=false;$('auReset').hidden=true;$('auTitle').hidden=false;$('auLead').hidden=false;$('auForm').hidden=false;$('auTog').hidden=false;auTab(m||'in');auMsg('');
   try{await fbInit()}catch(_){auMsg('Couldn\'t load sign-in. Check your connection, or open the game from its website.')}
   setTimeout(()=>{try{$('auEmail').focus()}catch(_){}},60)}
 function closeAuth(){$('authOv').hidden=true;openProfiles()}
@@ -3392,9 +3526,25 @@ async function auSubmit(e){
   }catch(err){pendingName='';auMsg(fbErr(err))}
   $('auGo').disabled=false;
 }
-async function auForgot(){
-  const email=$('auEmail').value.trim();if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){auMsg('Type your email above first, then tap Forgot password.');return}
-  try{await fbInit();await fbAuth.sendPasswordResetEmail(email);auMsg('Check your email for a link to reset your password.')}catch(err){auMsg(fbErr(err))}
+// Forgot password: its own little screen, so it's obvious what to do and whether it worked
+function auForgot(){
+  audio();$('auForm').hidden=true;$('auTog').hidden=true;$('auForgot').hidden=true;$('auTitle').hidden=true;$('auLead').hidden=true;$('auReset').hidden=false;$('auSent').hidden=true;$('auRGo').hidden=false;$('auRGo').disabled=false;auMsg('');
+  $('auREmail').value=$('auEmail').value.trim();setTimeout(()=>{try{$('auREmail').focus()}catch(_){}},50)}
+function auResetBack(){$('auReset').hidden=true;$('auTitle').hidden=false;$('auLead').hidden=false;$('auForm').hidden=false;$('auTog').hidden=false;auTab(auMode);auMsg('')}
+async function auSendReset(){
+  const email=$('auREmail').value.trim();
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){auMsg('Type the email you signed up with.');$('auREmail').focus();return}
+  $('auRGo').disabled=true;$('auRGo').textContent='SENDING...';auMsg('');
+  try{await fbInit();try{fbAuth.useDeviceLanguage()}catch(_){}
+    // the link in the email brings you back to the game after you set a new password
+    const back={url:location.origin+location.pathname};
+    try{await fbAuth.sendPasswordResetEmail(email,/^https?:/.test(location.origin)?back:undefined)}
+    catch(e){if(e&&/continue-uri|unauthorized/.test(e.code||''))await fbAuth.sendPasswordResetEmail(email);else throw e}
+    $('auRGo').hidden=true;$('auSent').hidden=false;
+    $('auSent').innerHTML='\u2705 <b>Reset link sent</b> to <b class="em"></b> (if there\'s an account with that email).<br>It comes from <b>noreply@slapshot-b7bdf.firebaseapp.com</b>. <b style="color:var(--lamp)">Check your Spam / Junk folder</b> if it\'s not in your inbox in a minute.<br>Open the link, pick a new password, then come back and sign in.';
+    $('auSent').querySelector('.em').textContent=email;$('auEmail').value=email;tone(880,.12,'sine',.05,1320);
+  }catch(err){auMsg(fbErr(err));$('auRGo').disabled=false}
+  $('auRGo').textContent='SEND RESET LINK';
 }
 function renameUser(from,to){
   const list=profileList();if(list.some(n=>n.toLowerCase()===to.toLowerCase()))return;
@@ -4039,24 +4189,47 @@ function setArena(i){
    star drop, tiers 10/20 Mythic-or-better, tier 30 a guaranteed Legendary. After tier 30, every
    60 more pucks fills the bonus bank for another star drop. */
 const PUCKS_PER_GOAL=10,PUCKS_PER_TIER=30,PASS_TIERS=30,BONUS_PUCKS=60;
-let pucks=0,passClaimed=[],bonusClaimed=0;
+let pucks=0,passClaimed=[],bonusClaimed=0,passMonth='';
+/* ENDLESS PASS: tiers never run out. Tiers 1-50 cost 30 pucks each; from tier 51 on, every tier costs
+   5 more than the one before (35, 40, 45...). The pass resets on the 1st of every month (a new season). */
+const PASS_FLAT=50,PASS_STEP=5;
+const tierCost=t=>t<=PASS_FLAT?PUCKS_PER_TIER:PUCKS_PER_TIER+PASS_STEP*(t-PASS_FLAT);
+const cumCost=t=>{if(t<=PASS_FLAT)return t*PUCKS_PER_TIER;const m=t-PASS_FLAT;return PASS_FLAT*PUCKS_PER_TIER+PUCKS_PER_TIER*m+PASS_STEP*m*(m+1)/2};
 function passReward(t){
-  if(t===8||t===16||t===24)return{type:'gems',n:t===24?20:10,label:(t===24?20:10)+' gems',sub:'Rare! Spend in the shop',big:true};
-  if(t===PASS_TIERS)return{type:'drop',min:4,label:'Legendary card pack',sub:'Guaranteed new legend',big:true};
-  if(t%10===0)return{type:'drop',min:3,label:'Mythic card pack',sub:'Mythic or better',big:true};
-  if(t%5===0)return{type:'drop',min:2,label:'Epic card pack',sub:'Epic or better',big:true};
-  if(t%3===0)return{type:'cards',n:t<15?5:8,label:(t<15?5:8)+' player cards',sub:'For a random player you own'};
-  if(t%2===0)return{type:'gold',n:150,label:'150 gold',sub:'Spend on upgrades'};
-  return{type:'gold',n:75,label:'75 gold',sub:'Spend on upgrades'};
+  if(t<=30){
+    if(t===8||t===16||t===24)return{type:'gems',n:t===24?20:10,label:(t===24?20:10)+' gems',sub:'Rare! Spend in the shop',big:true};
+    if(t===30)return{type:'drop',min:4,label:'Legendary card pack',sub:'Guaranteed new legend',big:true};
+    if(t%10===0)return{type:'drop',min:3,label:'Mythic card pack',sub:'Mythic or better',big:true};
+    if(t%5===0)return{type:'drop',min:2,label:'Epic card pack',sub:'Epic or better',big:true};
+    if(t%3===0)return{type:'cards',n:t<15?5:8,label:(t<15?5:8)+' player cards',sub:'For a random player you own'};
+    if(t%2===0)return{type:'gold',n:150,label:'150 gold',sub:'Spend on upgrades'};
+    return{type:'gold',n:75,label:'75 gold',sub:'Spend on upgrades'};
+  }
+  // past 30: the rewards keep coming, and get a little bigger the further you go
+  const g=Math.min(1000,150+Math.floor((t-30)/10)*50);
+  if(t%50===0)return{type:'drop',min:4,label:'Legendary card pack',sub:'Guaranteed new legend',big:true};
+  if(t%25===0)return{type:'drop',min:3,label:'Mythic card pack',sub:'Mythic or better',big:true};
+  if(t%10===0)return{type:'drop',min:2,label:'Epic card pack',sub:'Epic or better',big:true};
+  if(t%8===0)return{type:'gems',n:10,label:'10 gems',sub:'Rare! Spend in the shop',big:true};
+  if(t%5===0)return{type:'drop',min:1,label:'Super Rare card pack',sub:'Super Rare or better',big:true};
+  if(t%3===0)return{type:'cards',n:10,label:'10 player cards',sub:'For a random player you own'};
+  return{type:'gold',n:g,label:g+' gold',sub:'Spend on upgrades'};
 }
-const tierOf=()=>Math.min(PASS_TIERS,Math.floor(pucks/PUCKS_PER_TIER));
-const bonusReady=()=>Math.max(0,Math.floor(Math.max(0,pucks-PASS_TIERS*PUCKS_PER_TIER)/BONUS_PUCKS)-bonusClaimed);
-function passReady(){let n=0;for(let t=1;t<=tierOf();t++)if(!passClaimed.includes(t))n++;return n+bonusReady()}
+function tierOf(){let t=0;while(cumCost(t+1)<=pucks&&t<100000)t++;return t}
+const bonusReady=()=>0; // (the old bonus bank: the pass is endless now)
+function passReady(){passSeason();let n=0;const T=tierOf();for(let t=1;t<=T;t++)if(!passClaimed.includes(t))n++;return n}
+// a new month = a new season: the pass starts over
+const monthKey=()=>today().slice(0,7);
+function passSeason(){
+  if(!curUser)return;const m=monthKey();
+  if(!passMonth){passMonth=m;return}
+  if(passMonth!==m){passMonth=m;pucks=0;passClaimed=[];bonusClaimed=0;saveProgress();setTimeout(()=>toast('\u{1F3D2} NEW PUCK PASS SEASON!','',2200),400)}
+}
+function passEndsIn(){const d=new Date(),end=new Date(d.getFullYear(),d.getMonth()+1,1),ms=end-d,days=Math.floor(ms/864e5),hrs=Math.floor(ms%864e5/36e5);return days>0?days+'d '+hrs+'h':hrs+'h '+Math.floor(ms%36e5/6e4)+'m'}
 function claimTier(t){
-  if(t>0&&(passClaimed.includes(t)||tierOf()<t))return;
-  if(t===0&&bonusReady()<1)return;
-  const r=t===0?{type:'drop',min:1}:passReward(t);
-  if(t===0)bonusClaimed++;else passClaimed.push(t);
+  passSeason();
+  if(t<1||passClaimed.includes(t)||tierOf()<t)return;
+  const r=passReward(t);passClaimed.push(t);
   audio();
   if(r.type==='gold'){gold+=r.n;tone(880,.2,'triangle',.06,1320);toast('+'+r.n+' GOLD','small',900)}
   else if(r.type==='gems'){gems+=r.n;tone(1320,.3,'sine',.06,1760);toast('+'+r.n+' GEMS','small',1100)}
@@ -4065,18 +4238,19 @@ function claimTier(t){
   saveProgress();renderPass();renderArenas();
 }
 function renderPass(){
-  const t=tierOf(),into=t>=PASS_TIERS?(pucks-PASS_TIERS*PUCKS_PER_TIER)%BONUS_PUCKS:pucks%PUCKS_PER_TIER,need=t>=PASS_TIERS?BONUS_PUCKS:PUCKS_PER_TIER;
-  $('passTierLbl').textContent=t>=PASS_TIERS?'BONUS BANK':'TIER '+(t+1);
+  passSeason();
+  const t=tierOf(),into=pucks-cumCost(t),need=tierCost(t+1);
+  $('passTierLbl').textContent='TIER '+(t+1);
   $('passBar').style.width=Math.min(100,into/need*100)+'%';$('passPk').textContent=into+'/'+need;
-  let html='';
-  for(let i=1;i<=PASS_TIERS;i++){
+  $('passSeason').textContent='Season resets in '+passEndsIn()+' · claim your rewards before then';
+  let html='';const last=Math.max(30,t+15);
+  for(let i=1;i<=last;i++){
     const r=passReward(i),done=passClaimed.includes(i),ready=!done&&t>=i;
-    html+=`<div class="prow${done?' done':ready?' ready':''}${r.big?' big':''}" id="tier-${i}"><span class="tn">${i}</span><span class="rw">${r.label}<span class="rs">${r.sub}</span></span>
-      <button class="claim" data-t="${i}" ${ready?'':'disabled'}>${done?'CLAIMED':ready?'CLAIM':(i*PUCKS_PER_TIER)+' pucks'}</button></div>`;
+    if(i===PASS_FLAT+1)html+=`<div class="prow arena"><span class="tn">51+</span><span class="rw">Every tier from here costs ${PASS_STEP} more pucks<span class="rs">${tierCost(51)}, ${tierCost(52)}, ${tierCost(53)}... pucks per tier</span></span></div>`;
+    html+=`<div class="prow${done?' done':ready?' ready':''}${r.big?' big':''}" id="tier-${i}"><span class="tn">${i}</span><span class="rw">${r.label}<span class="rs">${r.sub}${i>PASS_FLAT?' · '+tierCost(i)+' pucks':''}</span></span>
+      <button class="claim" data-t="${i}" ${ready?'':'disabled'}>${done?'CLAIMED':ready?'CLAIM':cumCost(i)+' pucks'}</button></div>`;
   }
-  const b=bonusReady();
-  html+=`<div class="prow${b?' ready':''} big"><span class="tn">+</span><span class="rw">Bonus bank<span class="rs">Card pack every ${BONUS_PUCKS} pucks after tier ${PASS_TIERS}</span></span>
-    <button class="claim" data-t="0" ${b?'':'disabled'}>${b?'CLAIM ('+b+')':'after tier 30'}</button></div>`;
+  html+=`<div class="prow"><span class="tn">∞</span><span class="rw">The pass never ends<span class="rs">More tiers appear as you climb</span></span></div>`;
   const tr=$('passTrack');tr.innerHTML=html;
   // scroll to the first tier that isn't claimed yet
   const first=tr.querySelector('.prow.ready')||tr.querySelector('.prow:not(.done)');
@@ -4727,7 +4901,7 @@ function primaryAction(){
 }
 // Esc = back out of a menu screen, otherwise pause
 function backAction(){
-  for(const[ov,btn]of[['boxOv','boxDone'],['statsOv','statsDone'],['deckOv','deckDone'],['passOv','passDone'],['roadOv','roadDone'],['shopOv','shopDone'],['helpOv','helpDone'],['questOv','questDone'],['arenaOv','arenaDone'],['superOv','superDone'],['voiceOv','vDone'],['netOv','netCancel'],['xferOv','xferClose'],['authOv','authClose'],['fsOv','fsDone'],['profOv','profClose']])
+  for(const[ov,btn]of[['boxOv','boxDone'],['statsOv','statsDone'],['deckOv','deckDone'],['passOv','passDone'],['roadOv','roadDone'],['shopOv','shopDone'],['helpOv','helpDone'],['questOv','questDone'],['arenaOv','arenaDone'],['superOv','superDone'],['voiceOv','vDone'],['netOv','netCancel'],['xferOv','xferClose'],['authOv','authClose'],['fsOv','fsDone'],['ownerOv','ownerDone'],['musOv','musDone'],['profOv','profClose']])
     if(visible(ov)){if(visible(btn)||SHEETS.some(x=>x[0]===ov))$(btn).click();return}
   togglePause();
 }
@@ -4968,7 +5142,10 @@ function fillVoices(){
 function openVoice(){fillVoices();$('vOn').textContent='Announcer: '+(voiceOn?'on':'off');$('vPitch').value=vPitch;$('vRate').value=vRate;
   $('vPitchV').textContent=(+vPitch).toFixed(2);$('vRateV').textContent=(+vRate).toFixed(2);$('voiceOv').hidden=false}
 try{speechSynthesis.onvoiceschanged=()=>{if(!$('voiceOv').hidden)fillVoices()}}catch(_){}
-$('voiceBtn').addEventListener('click',toggleMusic);$('voiceBtn2').addEventListener('click',toggleMusic);paintMusicBtns();
+$('voiceBtn').addEventListener('click',toggleMusic);$('voiceBtn2').addEventListener('click',openMusic);paintMusicBtns();
+$('musToggle').addEventListener('click',()=>{toggleMusic();renderMusic()});$('musDone').addEventListener('click',()=>{$('musOv').hidden=true});
+$('bgmList').addEventListener('click',e=>{const b=e.target.closest('[data-bgm]');if(!b)return;bgmStyle=b.dataset.bgm;try{localStorage.setItem('slapshot-bgm',bgmStyle)}catch(_){}MUS.bar=0;MUS.step=0;if(!MUS.on){MUS.on=true;try{localStorage.setItem('slapshot-music','on')}catch(_){}paintMusicBtns()}audio();renderMusic()});
+$('gsList').addEventListener('click',e=>{const pl=e.target.closest('[data-play]');if(pl){previewSong(pl.dataset.play);return}const r=e.target.closest('[data-gs]');if(!r)return;goalSong=r.dataset.gs;try{localStorage.setItem('slapshot-goalsong',goalSong)}catch(_){}tone(660,.06,'triangle',.04);renderMusic()});
 $('vOn').addEventListener('click',()=>{voiceOn=!voiceOn;$('vOn').textContent='Announcer: '+(voiceOn?'on':'off');if(!voiceOn)try{speechSynthesis.cancel()}catch(_){}saveVoice()});
 $('vSel').addEventListener('change',e=>{vName=e.target.value;saveVoice()});
 $('vPitch').addEventListener('input',e=>{vPitch=+e.target.value;$('vPitchV').textContent=vPitch.toFixed(2);saveVoice()});
@@ -5042,7 +5219,7 @@ function setBoard(){
   $('son0').textContent='YOU';$('son1').textContent=on?'FRIEND':'CPU';
   $('son0').className='soName '+(g?'away':'home');$('son1').className='soName '+(g?'home':'away');
 }
-function hideAllOv(){['superOv','shopOv','helpOv','questOv','arenaOv','roadOv','profOv','xferOv','authOv','fsOv','boxOv','statsOv','menuOv','endOv','interOv','pauseOv','soBar','netOv','deckOv','passOv','voiceOv','dropOv'].forEach(i=>$(i).hidden=true)}
+function hideAllOv(){['superOv','shopOv','helpOv','questOv','arenaOv','roadOv','profOv','xferOv','authOv','fsOv','ownerOv','musOv','boxOv','statsOv','menuOv','endOv','interOv','pauseOv','soBar','netOv','deckOv','passOv','voiceOv','dropOv'].forEach(i=>$(i).hidden=true)}
 
 // ----- host -----
 /* Hosting has to survive the host leaving the game to text the code: phones pause background pages,
@@ -5249,7 +5426,7 @@ function startGuestGame(m){
   applySkin('classic'); // first snapshot of a new game (or a rematch)
   friendName=cleanName(m.meta.n);
   if(netRole!=='guest'&&netRole!=='spec'){savedArena=arenaIdx}
-  if(specPending||netRole==='spec'){specPending=false;netRole='spec';myT=0;flipView=false;specNames=[m.meta.n||'Host',m.meta.fn||'Friend'];document.body.classList.add('spectating');$('specBar').hidden=false;$('specWho').textContent=specNames[0]+' vs '+specNames[1]}
+  if(specPending||netRole==='spec'){specPending=false;netRole='spec';myT=0;flipView=false;specNames=[m.meta.n||'Host',m.meta.fn||'Friend'];(document.body&&document.body.classList.add('spectating'));$('specBar').hidden=false;$('specWho').textContent=specNames[0]+' vs '+specNames[1]}
   else{netRole='guest';myT=1;flipView=true}
   gGid=m.g;snapBuf=[];endShownGid=null;
   arenaIdx=clamp(m.meta.a|0,0,ARENAS.length-1);resize(); // look of the host's arena, not saved
@@ -5318,7 +5495,7 @@ function applySnap(m){
     else if(ev[0]==='tg')toast(ev[1],ev[2],ev[3]);
     else if(ev[0]==='p'){lastPbp=-9;pbp(netRole==='spec'?String(ev[1]).replace(/The CPU/g,specNames[1]||'The friend').replace(/\bYou\b/g,specNames[0]||'The host'):guestPbp(ev[1]),ev[2],ev[3],ev[3]==='col')}
     else if(ev[0]==='s')sfx(ev[1]);
-    else if(ev[0]==='h'){horn();shake=Math.max(shake,.6)}
+    else if(ev[0]==='h'){horn(ev[1]);shake=Math.max(shake,.6)}
     else if(ev[0]==='em'){if(ev[1]!==myT||netRole==='spec')showEmote(ev[1],ev[2])} // our own emote already showed when we tapped
   }
   if(m.end&&endShownGid!==m.g){endShownGid=m.g;phase='end';$('soBar').hidden=true;showNetEnd(m.end[0],m.end[1],m.end[2])}
@@ -5420,7 +5597,7 @@ function paintBadge(){
   b.className=ms<90?'good':ms<180?'ok':'bad';
 }
 function leaveNet(msg){
-  const was=netRole;specPending=false;document.body.classList.remove('spectating');$('specBar').hidden=true;
+  const was=netRole;specPending=false;(document.body&&document.body.classList.remove('spectating'));$('specBar').hidden=true;
   if(netRole==='host')for(const x of specs)try{x.conn.send({t:'bye'});x.conn.close()}catch(_){}specs=[];netSend({t:'bye'});netSend({t:'bye'});netSend({t:'bye'});closeNet();hostCode='';gGid=null;snapBuf=[];btnQ=[];clockOff=null;
   netRole=null;myT=0;flipView=false;guestDeck=null;guestSpin=false;guestArenas=1;slot[1].human=null;netEv=[];
   if(was==='guest'||was==='spec'){arenaIdx=savedArena}
@@ -5454,13 +5631,14 @@ $('xferBtn').addEventListener('click',()=>{audio();openXfer()});
 $('authClose').addEventListener('click',closeAuth);
 $('fsDone').addEventListener('click',()=>{$('fsOv').hidden=true});
 $('fsTog').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||!fsView)return;fsView.mode=b.dataset.m;paintFriendStats()});
+$('ownerBtn').addEventListener('click',openOwner);$('ownerDone').addEventListener('click',()=>{$('ownerOv').hidden=true});
 $('specLeave').addEventListener('click',()=>leaveNet('You stopped watching.'));
 $('watchBtn').addEventListener('click',()=>{const code=$('joinCode').value.toUpperCase().replace(/[^A-Z0-9]/g,'').replace(/[0O]/g,'Q').replace(/[1I]/g,'L');
   if(code.length!==5){netMsg('Type the 5-letter game code first, then tap Watch.');return}$('joinCode').value=code;watchGame(code,'game '+code)});
 $('chYes').addEventListener('click',()=>answerCh(true));$('chNo').addEventListener('click',()=>answerCh(false));
 $('auTog').addEventListener('click',e=>{const b=e.target.closest('button');if(b)auTab(b.dataset.a)});
 $('auForm').addEventListener('submit',auSubmit);
-$('auForgot').addEventListener('click',auForgot);
+$('auForgot').addEventListener('click',auForgot);$('auRGo').addEventListener('click',auSendReset);$('auRBack').addEventListener('click',auResetBack);$('auREmail').addEventListener('keydown',e=>{if(e.key==='Enter')auSendReset()});
 if(cloudOn())setTimeout(()=>{fbInit().catch(()=>{})},400); // already signed in on this device: reconnect and sync
 $('xferClose').addEventListener('click',closeXfer);
 $('xTog').addEventListener('click',e=>{const b=e.target.closest('button');if(b)xTab(b.dataset.x)});
