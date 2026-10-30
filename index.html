@@ -794,6 +794,7 @@ body.spectating #pad,body.spectating .keys,body.spectating #pullBtn,body.spectat
 .bundle .buy.gemb{background:linear-gradient(#5fe39a,#1fa35a);color:#fff;text-shadow:0 1px 0 rgba(0,0,0,.45);box-shadow:inset 0 -4px 0 #0d6b3a}
 .bundle .buy svg{width:20px;height:20px;flex:none}
 .bundle .buy:disabled{background:#2a3649;box-shadow:none;color:var(--muted);text-shadow:none;cursor:default}
+#netOv .joinRow{grid-template-columns:minmax(0,1fr) auto auto}#netOv .joinRow .frW{padding:0 12px}
 </style>
 
 <div id="app">
@@ -1037,7 +1038,8 @@ body.spectating #pad,body.spectating .keys,body.spectating #pullBtn,body.spectat
         <button class="go" id="hostBtn" style="font-size:24px">HOST A GAME</button>
         <div class="codeBox" id="codeBox" hidden><span class="eyebrow">Your game code</span><b id="myCode">-----</b><span id="hostMsg">Waiting for your friend to join...</span>
           <div class="row" style="width:100%"><button class="ghost" id="copyCode" hidden>Copy code</button><button class="ghost" id="stopHost" hidden>Stop hosting</button></div></div>
-        <div class="joinRow"><input id="joinCode" maxlength="5" placeholder="CODE" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Game code"><button class="ghost" id="joinBtn">Join</button></div>
+        <div class="joinRow"><input id="joinCode" maxlength="5" placeholder="CODE" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Game code"><button class="ghost" id="joinBtn">Join</button><button class="frW" id="watchBtn" aria-label="Watch this game">👁 Watch</button></div>
+        <p class="frEmpty" style="margin:0">Have a game code? <b style="color:var(--text)">Join</b> to play it, or <b style="color:var(--text)">Watch</b> to spectate it (up to 4 people can watch).</p>
         <p class="netMsg" id="netMsg" role="status"></p>
         <button class="ghost" id="netCancel">Back</button>
       </div>
@@ -3462,7 +3464,7 @@ function startSocial(){
   frUnsub.push(c.where('from','==',me).onSnapshot(q=>{frOut=docs(q);onOutgoing()},e=>console.warn('out',e)));
   frUnsub.push(fbDb.collection('profiles').doc(me).onSnapshot(d=>{myProf=d.exists?d.data():null;refreshFriends()},e=>console.warn('me',e)));
   frHb=setInterval(()=>{if(document.visibilityState!=='hidden')profileUp()},60000);
-  frPoll=setInterval(()=>{if(!$('netOv').hidden)refreshFriends()},20000);
+  frPoll=setInterval(()=>{if(!$('netOv').hidden||(!netRole&&!$('menuOv').hidden))refreshFriends()},20000);
 }
 const reqDel=id=>fbDb.collection('requests').doc(id).delete().catch(()=>{});
 function onIncoming(){
@@ -3488,9 +3490,11 @@ async function refreshFriends(){
   const ids=(myProf&&myProf.friends)||[];
   await Promise.all(ids.map(async id=>{try{const d=await fbDb.collection('profiles').doc(id).get();frProfs[id]=d.exists?d.data():{name:'?',gone:true}}catch(_){}}));
   for(const k in frProfs)if(!ids.includes(k))delete frProfs[k];
-  renderFriends();
+  renderFriends();paintFrBdg();
 }
-function paintFrBdg(){const n=frIn.filter(r=>r.type==='fr'&&r.status==='new').length+(pendingCh?1:0),b=$('frBdg');if(!b)return;b.hidden=!n;b.textContent=n}
+function liveFriends(){if(!myProf||!myProf.friends)return[];const me=acct&&acct.uid;return myProf.friends.filter(id=>{const p=frProfs[id];return p&&p.live&&p.live.code&&p.st==='game'&&Date.now()-(+p.seen||0)<ONLINE_MS&&Array.isArray(p.friends)&&p.friends.includes(me)})}
+function paintFrBdg(){const live=liveFriends().length,n=frIn.filter(r=>r.type==='fr'&&r.status==='new').length+(pendingCh?1:0),b=$('frBdg');if(!b)return;b.hidden=!(n||live);b.textContent=n||'\u{1F534}';
+  const lbl=$('friendLbl');if(lbl&&!hostingNow())lbl.textContent=live?'LIVE':'Friends'}
 function frStatus(p){if(!p||p.gone)return['','Account deleted'];const ago=Date.now()-(+p.seen||0);
   if(ago<ONLINE_MS)return p.st==='game'?['game','In a game']:['on','Online'];
   const m=Math.round(ago/60000);return['',m<60?`Seen ${m} min ago`:m<1440?`Seen ${Math.round(m/60)} h ago`:`Seen ${Math.round(m/1440)} d ago`]}
@@ -3560,12 +3564,12 @@ async function challenge(uid){
   renderFriends();
 }
 async function watchGame(code,label){
-  if(netRole||!code)return;audio();frSay('Connecting to '+label+'...');
+  if(netRole||!code)return;audio();const frSay=t=>{frMsgT=t;const m=$('frMsg');if(m)m.textContent=t;netMsg(t)};frSay('Connecting to '+label+'...');
   try{await loadPeer()}catch(_){frSay('Can\'t connect here. Open the game from its website.');return}
   closeNet();const opts=await peerOpts();let peer;try{peer=new Peer(opts)}catch(_){frSay('Can\'t connect here.');return}
   netPeer=peer;specPending=true;gGid=null;let tries=0;
   setTimeout(()=>{if(netPeer===peer&&netRole!=='spec'){specPending=false;frSay('Couldn\'t reach that game. It may have just ended.')}},15000);
-  peer.on('error',e=>{if(netPeer!==peer)return;if(e&&e.type==='peer-unavailable'){if(++tries<3){setTimeout(()=>{if(netPeer===peer&&netRole!=='spec')dial()},1500);return}specPending=false;frSay('That game has ended.');return}});
+  peer.on('error',e=>{if(netPeer!==peer)return;if(e&&e.type==='peer-unavailable'){if(++tries<3){setTimeout(()=>{if(netPeer===peer&&netRole!=='spec')dial()},1500);return}specPending=false;frSay('No live game with that code right now. Check the code: the game has to be going (or hosting) on their screen.');return}});
   peer.on('open',dial);
   function dial(){const conn=peer.connect(PEER_PREFIX+code,{reliable:false,serialization:'json'});netConn=conn;
     conn.on('open',()=>{const hi=()=>{if(netConn!==conn||!conn.open||gGid!==null)return;conn.send({t:'watch',name:acctName()||curUser});setTimeout(hi,800)};hi()});
@@ -5063,7 +5067,7 @@ async function hostGame(reuse){
   netPeer=peer;hostCode='';
   setTimeout(()=>{if(netPeer===peer&&!peer.open&&!netRole){netMsg(NO_NET);$('hostBtn').disabled=false}},9000);
   peer.on('open',()=>{hostCode=code;hostTries=0;rememberCode(code);$('codeBox').hidden=false;$('myCode').textContent=code;
-    $('hostMsg').textContent='Waiting for your friend to join...';netMsg('Send this code to your friend. You can leave the game to text it; it stays open.');paintHosting()});
+    $('hostMsg').textContent='Waiting for your friend to join...';netMsg('Send this code to your friend. Others can tap Watch with the same code to spectate. You can leave the game to text it; it stays open.');paintHosting()});
   peer.on('disconnected',()=>{ // lost the matchmaking server (phone paused the page): get back on with the same code
     if(netPeer!==peer||peer.destroyed)return;$('hostMsg').textContent='Reconnecting...';
     setTimeout(()=>{if(netPeer===peer&&!peer.destroyed&&peer.disconnected)try{peer.reconnect()}catch(_){}},800)});
@@ -5451,6 +5455,8 @@ $('authClose').addEventListener('click',closeAuth);
 $('fsDone').addEventListener('click',()=>{$('fsOv').hidden=true});
 $('fsTog').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||!fsView)return;fsView.mode=b.dataset.m;paintFriendStats()});
 $('specLeave').addEventListener('click',()=>leaveNet('You stopped watching.'));
+$('watchBtn').addEventListener('click',()=>{const code=$('joinCode').value.toUpperCase().replace(/[^A-Z0-9]/g,'').replace(/[0O]/g,'Q').replace(/[1I]/g,'L');
+  if(code.length!==5){netMsg('Type the 5-letter game code first, then tap Watch.');return}$('joinCode').value=code;watchGame(code,'game '+code)});
 $('chYes').addEventListener('click',()=>answerCh(true));$('chNo').addEventListener('click',()=>answerCh(false));
 $('auTog').addEventListener('click',e=>{const b=e.target.closest('button');if(b)auTab(b.dataset.a)});
 $('auForm').addEventListener('submit',auSubmit);
