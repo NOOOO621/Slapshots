@@ -1374,7 +1374,8 @@ const CARDS=[
   {id:'sato',rar:'uncommon',name:'Kenji Sato',num:19,p:'C',pos:'F',style:'Playmaker',boost:{hands:1.07},abil:null,desc:'Sees passing lanes nobody else does.'},
   {id:'baptiste',rar:'uncommon',name:'Andre Baptiste',num:24,p:'RW',pos:'F',style:'Speedster',boost:{spd:1.07},abil:null,desc:'Blows past defenders on the outside.'},
   {id:'novak',rar:'uncommon',name:'Pavel Novak',num:44,p:'LD',pos:'D',style:'Big shot',boost:{shot:1.07},abil:null,desc:'A point shot you can hear from the rafters.'},
-  {id:'oconnell',rar:'uncommon',name:'Liam O\'Connell',num:2,p:'RD',pos:'D',style:'Bruiser',boost:{def:1.06,spd:1.02},abil:null,desc:'Clears the front of the net, one way or another.'},
+  {id:'bouchman',rar:'uncommon',name:'Bouchman',num:2,p:'RD',pos:'D',style:'Two-way D',boost:{def:1.06,shot:1.04},abil:null,desc:'Shuts it down in his own end, then jumps into the rush.'},
+  {id:'oconnell',rar:'uncommon',name:'Liam O\'Connell',num:3,p:'RD',pos:'D',style:'Bruiser',boost:{def:1.06,spd:1.02},abil:null,desc:'Clears the front of the net, one way or another.'},
   {id:'harju',rar:'uncommon',name:'Mikko Harju',num:31,p:'G',pos:'G',style:'Butterfly',boost:{glat:1.04,greact:.97},abil:null,desc:'Seals the ice and reads the play early.'},
   {id:'kimg',rar:'uncommon',name:'Jesse Kim',num:50,p:'G',pos:'G',style:'Athletic',boost:{glat:1.06},abil:null,desc:'Quick side to side. Makes the highlight-reel saves.'}
 ];
@@ -1482,6 +1483,8 @@ let netRole=null,netConn=null,netPeer=null,netEv=[],netMute=false,guestDeck=null
 let pctx=0;
 const slot=[{human:null,input:{x:0,y:0},charging:false,charge:0,switchLock:0},{human:null,input:{x:0,y:0},charging:false,charge:0,switchLock:0}];
 const netOn=()=>netRole==='host';
+var castPeer=null,castCode='',castT=0,gTeamN=3;
+const bc=()=>netRole==='host'||(!!castPeer&&!netRole&&specs.length>0); // send this moment to watchers?
 function saveSlot(o){o.human=human;o.input={x:input.x,y:input.y};o.charging=charging;o.charge=charge;o.switchLock=switchLock}
 function loadSlot(o){human=o.human;input.x=o.input.x;input.y=o.input.y;charging=o.charging;charge=o.charge;switchLock=o.switchLock}
 function withP(t,fn){if(t===pctx)return fn();const a=slot[pctx],b=slot[t],pc=pctx;saveSlot(a);loadSlot(b);pctx=t;try{return fn()}finally{saveSlot(b);loadSlot(a);pctx=pc}}
@@ -1631,7 +1634,7 @@ function tone(f,d,type,v,slide){if(!ac||!soundOn)return;const t=ac.currentTime,o
 function noise(d,v,fc){if(!ac||!soundOn)return;const t=ac.currentTime,n=Math.floor(ac.sampleRate*d),b=ac.createBuffer(1,n,ac.sampleRate),a=b.getChannelData(0);for(let i=0;i<n;i++)a[i]=(Math.random()*2-1)*(1-i/n);const s=ac.createBufferSource();s.buffer=b;const f=ac.createBiquadFilter();f.type='bandpass';f.frequency.value=fc;const g=ac.createGain();g.gain.value=v;s.connect(f).connect(g).connect(ac.destination);s.start(t)}
 // the crowd: a roar that swells and fades
 function cheer(){if(!ac||!soundOn)return;for(let k=0;k<3;k++)setTimeout(()=>noise(1.6-k*.3,.07-k*.015,500+k*450),k*140)}
-function horn(team){if(netRole==='host')netEv.push(['h',team]);if(!ac||!soundOn)return;const t=ac.currentTime,mine=team==null||team===myT||netRole==='spec';duckMusic(mine?8:3.6);
+function horn(team){if(bc())netEv.push(['h',team]);if(!ac||!soundOn)return;const t=ac.currentTime,mine=team==null||team===myT||netRole==='spec';duckMusic(mine?8:3.6);
   const out=ac.createGain(),lp=ac.createBiquadFilter(),ws=ac.createWaveShaper(),dl=ac.createDelay(1),fb=ac.createGain(),wet=ac.createGain();
   const cv=new Float32Array(256);for(let i=0;i<256;i++){const x=i/128-1;cv[i]=Math.tanh(x*2.2)}ws.curve=cv;
   lp.type='lowpass';lp.Q.value=3;lp.frequency.setValueAtTime(380,t);lp.frequency.linearRampToValueAtTime(1500,t+.22);lp.frequency.setValueAtTime(1500,t+2.5);lp.frequency.linearRampToValueAtTime(600,t+3.2);
@@ -1644,7 +1647,7 @@ function horn(team){if(netRole==='host')netEv.push(['h',team]);if(!ac||!soundOn)
   // then the goal song (yours, when your team scores)
   if(mine)playGoalSong(pickGoalSong(),t+3.05);
 }
-function sfx(k){if(netRole==='host')netEv.push(['s',k]);switch(k){
+function sfx(k){if(bc())netEv.push(['s',k]);switch(k){
   case'shot':noise(.09,.5,1800);tone(160,.08,'square',.04,80);break;
   case'pass':noise(.05,.25,2400);break;
   case'poke':tone(520,.05,'triangle',.06,300);break;
@@ -1809,7 +1812,7 @@ function pbp(text,pri,spk,queued){
   pri=pri||1;spk=spk==='col'?'col':'pbp';
   if(pri===1&&time-lastPbp<1.2)return; // don't flood the feed with routine plays
   lastPbp=time;if(pri>=3)lastBig=time;
-  if(netRole==='host'){netEv.push(['p',text,pri,spk]);text=text.replace(/The CPU/g,'Your friend').replace(/the CPU/g,'your friend')}
+  if(bc())netEv.push(['p',text,pri,spk]);if(netRole==='host')text=text.replace(/The CPU/g,'Your friend').replace(/the CPU/g,'your friend');
   const feed=$('pbp');if(feed){const el=document.createElement('div');el.className='pl p'+pri+' '+spk;el.innerHTML='<b class="spk">'+(spk==='col'?'DOUG':'MIKE')+'</b>'+esc(text);feed.prepend(el);while(feed.children.length>3)feed.lastChild.remove()}
   if(!voiceOn||pri<2||!soundOn||!('speechSynthesis' in window))return;
   try{
@@ -1824,7 +1827,7 @@ function clearPbp(){chatQ=[];lastChat=-99;said30=false;lastLull=time;const f=$('
 /* GAME MODE: 3 on 3 (the classic) or 5 on 5 (C, LW, RW, LD, RD + a goalie per team).
    Friend games online stay 3 on 3 so both devices run the same lineup. */
 let MODE5=false;try{MODE5=localStorage.getItem('slapshot-mode')==='5v5'}catch(_){}
-const teamN=()=>netOn()?3:(MODE5?5:3);
+const teamN=()=>netOn()?3:remoteView()?gTeamN:(MODE5?5:3);
 function setMode(five){MODE5=!!five;try{localStorage.setItem('slapshot-mode',MODE5?'5v5':'3v3')}catch(_){}paintModeTog();try{setArena(arenaIdx);renderArenas();paintRoadBtns()}catch(_){}tone(600,.06,'triangle',.05);if(phase==='menu'){setup();faceoff(true);phase='menu'}}
 function paintModeTog(){try{const el=$('modeTog');for(const b of el.querySelectorAll('[data-m]'))b.classList.toggle('on',(b.dataset.m==='5')===MODE5)}catch(_){}}
 function mk(team,i,num,goalie){return{team,i,num,goalie,x:50,y:100,vx:0,vy:0,dvx:0,dvy:0,fx:0,fy:team?1:-1,cd:0,poke:0,hold:0,react:0,deke:0,dekeCd:0,dekeSide:1,pokeT:0,lungeT:0,chk:0,bhWin:0,attr:{spd:1,shot:1,acc:1,hands:1,def:1,accel:1},card:null}}
@@ -2260,7 +2263,7 @@ function useSuper(s){
   pbp(`${N(s)} uses ${S.n}!`,2);reactTalk('super',N(s),S.n);burst(s.x,s.y,'ring',[COL.lamp]);
   return true;
 }
-function superBanner(s,S){const id=s.card&&SUPERS[s.card.id]?s.card.id:S.k;showSupBar(s.team,N(s),S);if(netRole==='host')netEv.push(['sb',s.team,N(s),id])}
+function superBanner(s,S){const id=s.card&&SUPERS[s.card.id]?s.card.id:S.k;showSupBar(s.team,N(s),S);if(bc())netEv.push(['sb',s.team,N(s),id])}
 // rival legends and your AI teammates use their supers when the moment is right
 function aiSuper(s,ctx){const S=superOf(s);if(!S||!(s.sup>=1)||(S.t!==ctx&&S.t!=='any')||Math.random()>(S.t==='any'?.005:.015))return false;return useSuper(s)}
 /* Shot supers (The Office, One-Timer Bomb, 108 MPH Slapper) are AIMED, Brawl Stars style:
@@ -3030,15 +3033,15 @@ function goal(team,net){
   { // call the goal: scorer is the last skater to touch it, assist from whoever passed it to them
     const sc=puck.lastSk&&!puck.lastSk.goalie&&puck.lastSk.team===team?puck.lastSk:null,a=sc&&sc.assist;
     if(sc){sc.g=(sc.g||0)+1;sc.sog=(sc.sog||0)+1}if(a&&a!==sc)a.a=(a.a||0)+1;
-    cellyFx(team,sc);if(netRole==='host')netEv.push(['cel',team,sc?[...roster,...rosterG].indexOf(sc):-1]);
-    if(sc&&sc.g===3){spawnHats();if(netRole==='host')netEv.push(['hat']);
+    cellyFx(team,sc);if(bc())netEv.push(['cel',team,sc?[...roster,...rosterG].indexOf(sc):-1]);
+    if(sc&&sc.g===3){spawnHats();if(bc())netEv.push(['hat']);
       setTimeout(()=>{toast('\u{1F3A9} HAT TRICK! \u{1F3A9}','',2200,team===0?'home':'away');pbp(`HAT TRICK for ${N(sc)}! The hats are raining down onto the ice!`,3);crowdRoar(3)},700)}
     if(sc&&sc.abil==='hot'){sc.hotG=(sc.hotG||0)+1;if(sc.hotG<=3)setTimeout(()=>toast(N(sc).toUpperCase()+' IS HEATING UP x'+sc.hotG,'small',1200),2300)}
     const who=sc?N(sc):team===0?'your team':'the CPU';
     pbp(`${pick1(['GOAL!','HE SCORES!','IT\'S IN!'])} ${who}${top?', top shelf':''}${a?`, from ${N(a)}`:''}! It's ${score[0]}–${score[1]}.`,3);
     goalTalk(team,sc,a,top,time-(sc&&sc.recvT||-9)<.6?'onetimer':puck.kind,puck.ba,isPulled(1-team),sc&&sc.g===3);
     {const nm=sc?N(sc):who,sub=(a?'Assist: '+N(a):'Unassisted')+(top?' \u00b7 Top shelf':'')+' \u00b7 '+score[0]+'\u2013'+score[1];
-     setTimeout(()=>showGoalBar(team,nm,sc?sc.num:'',sub),500);if(netRole==='host')netEv.push(['gb',team,nm,sc?sc.num:'',sub])}
+     setTimeout(()=>showGoalBar(team,nm,sc?sc.num:'',sub),500);if(bc())netEv.push(['gb',team,nm,sc?sc.num:'',sub])}
     if(team===0){
       questEvent('goal');
       if(period===1&&PERIOD-clock<=10)questEvent('early');
@@ -3194,6 +3197,7 @@ function renderStats(){statsInto({c:loadCareer(),mode:stMode,body:'stBody',tog:'
 function newGame(){
   marksPeriod=-1;
   applySkin(skin);
+  gameId=(gameId%1e6)+1;evBuf=[];netEv=[];if(!netRole)startCast();
   audio();clearPbp();score=[0,0];shots=[0,0];gs={poss:[0,0],fo:[0,0],pass:[0,0]};period=1;clock=PERIOD;so=null;soWinner=-1;setup();faceoff();
   pbp(`Welcome to ${ARENAS[arenaIdx].name}. Puck drop is coming up.`,2);greetTalk();if(teamN()===5)setTimeout(()=>toast('5 ON 5','small',1100),300);
   ['menuOv','endOv','boxOv','interOv','pauseOv','soBar','deckOv','roadOv','passOv','shopOv','helpOv','questOv','arenaOv','superOv'].forEach(i=>$(i).hidden=true);updateHud();sfx('whistle');
@@ -3593,6 +3597,7 @@ async function profileUp(extra){
   let live=null;
   if(netRole==='host'&&hostCode&&netConn&&netConn.open)live={code:hostCode,a:n,b:friendName||'Friend'};
   else if(netRole==='guest'&&liveJoin)live={code:liveJoin,a:friendName||'Friend',b:n};
+  else if(!netRole&&castPeer&&castCode&&phase!=='menu')live={code:castCode,a:n,b:'CPU',cpu:1};
   let stats=null;try{stats=careerPublic()}catch(_){}
   try{await fbDb.collection('profiles').doc(acct.uid).set(Object.assign({name:n,lower:lowerName(n),tr:t,tr5:t5,seen:Date.now(),st:inMatch()?'game':'on',live,stats},extra||{}),{merge:true});profErr=''}catch(e){console.warn('profile',e);profErr=(e&&e.code)||'error';renderFriends()}
 }
@@ -4275,7 +4280,7 @@ function roadLabel(r){
   if(r.type==='cards')return[r.n+' player cards','For a random player you own'];
   if(r.type==='gems')return[r.n+' gems','Rare! Spend in the shop'];
   if(r.type==='emote')return['New emote','One you don\'t have yet'];
-  if(r.type==='unc')return['New uncommon player','A player you don\'t have yet'];
+  if(r.type==='unc')return['\u{1F3B2} Random player','A random uncommon you don\'t have yet'];
   return[DROP_NAMES[r.min],r.min>=4?'Guaranteed new legend':r.min>=2?'Could hold a new emote':'Gold, cards and more'];
 }
 const roadReady=()=>[0,1].reduce((n,m)=>n+ROADof(m).filter(r=>trOf(m)>=r.at&&!claimedOf(m).includes(r.at)).length,0);
@@ -4490,6 +4495,7 @@ function frame(t){
   else if(phase!=='paused'&&phase!=='inter'&&phase!=='end'&&phase!=='menu')update(dt*GAME_SPEED);
   else{time+=dt}
   if(netRole==='host')hostTick();
+  else if(castPeer)castTick();
   if(netRole!=='guest'&&phase!=='paused')tickChat();
   if(netRole||!$('netBadge').hidden)paintBadge();
   if(!posAsked&&phase==='menu'&&curUser&&owned.includes('shark')&&!sharkPos()&&!$('menuOv').hidden&&$('profOv').hidden&&$('dropOv').hidden&&$('unlockOv').hidden){posAsked=true;setTimeout(openPos,300)}
@@ -4552,7 +4558,7 @@ function paintMoves(has){
   for(const[k,n]of[['kmv4',3]]){const el=$(k);if(el&&el.hidden===movesOpen(n))el.hidden=!movesOpen(n)}
 }
 function toast(text,cls,ms,team){
-  if(netRole==='host'){if(!netMute)netEv.push(['t',text,cls||'',ms||1000,team||'']);text=text.replace(/^CPU /,'FRIEND ')}
+  if(bc()&&!netMute)netEv.push(['t',text,cls||'',ms||1000,team||'']);if(netRole==='host')text=text.replace(/^CPU /,'FRIEND ');
   const el=$('toast');el.textContent=text;el.className='on '+(cls||'')+' '+(team||'');
   clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.className='',ms||1000);
 }
@@ -4686,7 +4692,7 @@ function burst(x,y,kind,cols){
   else if(kind==='spark')for(let i=0;i<16;i++){const a=rnd(0,Math.PI*2),v=rnd(10,30);fx.push({k:'s',x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,l:rnd(.25,.45),col:'#ffd34d'})}
   else fx.push({k:'r',x,y,l:kind==='wave'?.6:.45,L:kind==='wave'?.6:.45,col:cols&&cols[0]||'#fff',R:kind==='save'?4.5:kind==='wave'?10:6});
   if(fx.length>260)fx.splice(0,fx.length-260);
-  if(netRole==='host')netEv.push(['fx',+x.toFixed(1),+y.toFixed(1),kind,cols||[]]);
+  if(bc())netEv.push(['fx',+x.toFixed(1),+y.toFixed(1),kind,cols||[]]);
 }
 function drawFx(c){
   const now=performance.now()/1000,dt=Math.min(.05,Math.max(0,now-(fxT||now)));fxT=now;if(!fx.length)return;
@@ -5311,7 +5317,7 @@ function snapshot(){
   const ents=[...roster,...rosterG],now=performance.now(),r1=v=>Math.round((v||0)*10)/10,r2=v=>(v>0?Math.round(v*100)/100:0),r0=v=>Math.round(v||0);
   for(const ev of netEv.splice(0))evBuf.push({seq:++evSeq,at:now,ev});
   evBuf=evBuf.filter(x=>now-x.at<600);
-  const meta=snapN++%20===0?{a:arenaIdx,n:curUser,fn:friendName,e:ents.map(s=>[s.num,s.card?s.card.name:0,s.card&&s.card.id||0])}:0;
+  const meta=snapN++%20===0?{a:arenaIdx,n:curUser,fn:netRole?friendName:'CPU',m:teamN(),e:ents.map(s=>[s.num,s.card?s.card.name:0,s.card&&s.card.id||0])}:0;
   return{t:'s',ts:Math.round(now),pt:guestTs,ab:lastBtnSeq,g:gameId,meta,rt:Math.round(hostRtt),
     end:phase==='end'?[score,shots,period]:0,
     e:ents.map(s=>{const on=all.includes(s);if(!on)return[0,0,0,0,0,0,0,0,0,0,1,0]; // on the bench: nothing to draw
@@ -5325,13 +5331,45 @@ function snapshot(){
     ch:slot[1].charging?r2(slot[1].charge):-1,ev:evBuf.map(x=>[x.seq,...x.ev])};
 }
 var specs=[],specPending=false,specNames=['',''],liveJoin='';
-function specMeta(){return{a:arenaIdx,n:curUser,fn:friendName,e:[...roster,...rosterG].map(s=>[s.num,s.card?s.card.name:0,s.card&&s.card.id||0])}}
+function specMeta(){return{a:arenaIdx,n:curUser,fn:netRole?friendName:'CPU',m:teamN(),e:[...roster,...rosterG].map(s=>[s.num,s.card?s.card.name:0,s.card&&s.card.id||0])}}
 function addSpec(conn,m){
   if(specs.some(x=>x.conn===conn))return;
-  if(specs.length>=4||!netRole){try{conn.send({t:'bye'});conn.close()}catch(_){}return}
+  if(specs.length>=4||(!netRole&&!castPeer)){try{conn.send({t:'bye'});conn.close()}catch(_){}return}
   specs.push({conn,name:cleanName(m&&m.name)||'A friend'});
   conn.on('close',()=>{specs=specs.filter(x=>x.conn!==conn)});conn.on('error',()=>{specs=specs.filter(x=>x.conn!==conn)});
   toast('\u{1F441} '+String(specs[specs.length-1].name).toUpperCase()+' IS WATCHING','small',1600);
+}
+/* Watching a CPU game: a signed-in player with friends opens a watch-only link (its own code) when a game
+   vs the CPU starts. Friends see LIVE and tap Watch, exactly like a friend game. Nothing is sent until
+   someone is watching, and the link closes at the menu or when a friend game starts. */
+async function startCast(){
+  if(castPeer||netRole||!acct||!fbDb||!(myProf&&myProf.friends&&myProf.friends.length))return;
+  try{await loadPeer()}catch(_){return}
+  if(castPeer||netRole||phase==='menu')return;
+  const code=makeCode();let peer;try{peer=new Peer(PEER_PREFIX+code,await peerOpts())}catch(_){return}
+  if(castPeer||netRole||phase==='menu'){try{peer.destroy()}catch(_){}return}
+  castPeer=peer;
+  peer.on('open',()=>{if(castPeer!==peer)return;castCode=code;try{profileUp()}catch(_){}});
+  peer.on('disconnected',()=>{if(castPeer!==peer||peer.destroyed)return;setTimeout(()=>{try{if(castPeer===peer&&peer.disconnected)peer.reconnect()}catch(_){}},800)});
+  peer.on('error',e=>{if(castPeer!==peer)return;if(e&&e.type==='unavailable-id'){stopCast(true);setTimeout(startCast,500)}});
+  peer.on('connection',conn=>{
+    conn.on('data',m=>{if(castPeer!==peer)return;if(m&&m.t==='watch'){const had=specs.length;addSpec(conn,m);if(!had&&specs.length){netEv=[];evBuf=[]}}else if(m&&m.t==='bye'){specs=specs.filter(x=>x.conn!==conn);try{conn.close()}catch(_){}}});
+    setTimeout(()=>{if(!specs.some(x=>x.conn===conn))try{conn.close()}catch(_){}},8000)});
+}
+function stopCast(quiet){
+  const peer=castPeer;castPeer=null;const had=!!castCode;castCode='';
+  for(const x of specs)try{x.conn.send({t:'bye'});x.conn.send({t:'bye'});setTimeout(()=>{try{x.conn.close()}catch(_){}},200)}catch(_){}
+  if(!netRole)specs=[];
+  setTimeout(()=>{try{peer&&peer.destroy()}catch(_){}},300);
+  if(had&&!quiet)setTimeout(()=>{try{profileUp()}catch(_){}},50);
+}
+function castTick(){
+  if(netRole||phase==='menu'){stopCast();return}
+  if(specs.length)specs=specs.filter(x=>x.conn.open!==false);
+  if(!specs.length){netEv=[];return}
+  const now=performance.now();if(now-castT<SNAP_MS*2-1)return;castT=now; // ~15 a second, same as friend-game watchers
+  const sn=snapshot();sn.meta=specMeta();
+  for(const x of specs){const d2=x.conn.dataChannel;if(x.conn.open&&!(d2&&d2.bufferedAmount>1500))try{x.conn.send(sn)}catch(_){}}
 }
 function hostTick(){
   if(!netConn||!netConn.open)return;
@@ -5342,10 +5380,10 @@ function hostTick(){
   // if the last snapshot hasn't even left yet (slow relay link), skip this one: queuing them up is what
   // makes a friend game fall a second behind. A fresh snapshot next time is always better than a stale one.
   const dc=netConn.dataChannel;if(dc&&dc.bufferedAmount>900){snapN++;snapSkips++;if(snapMs<SNAP_MS){snapMs=SNAP_MS;snapEval=now}return}
-  const n=snapN,sn=snapshot();netSend(sn);
+  const pre=dc?dc.bufferedAmount:0,n=snapN,sn=snapshot();netSend(sn); // pre: read BEFORE sending, or our own fresh snapshot counts as backlog
   // spectators get every other snapshot, and only when the game link has room: watching never slows the game
   if(specs.length)specs=specs.filter(x=>x.conn.open!==false);
-  if(specs.length&&n%(snapMs<SNAP_MS?4:2)===0&&!(dc&&dc.bufferedAmount>300)){sn.meta=sn.meta||specMeta();for(const x of specs){const d2=x.conn.dataChannel;if(x.conn.open&&!(d2&&d2.bufferedAmount>1500))try{x.conn.send(sn)}catch(_){}}}
+  if(specs.length&&n%(snapMs<SNAP_MS?4:2)===0&&pre<=300){sn.meta=sn.meta||specMeta();for(const x of specs){const d2=x.conn.dataChannel;if(x.conn.open&&!(d2&&d2.bufferedAmount>1500))try{x.conn.send(sn)}catch(_){}}}
 }
 function netEnd(){
   phase='end';$('soBar').hidden=true;
@@ -5356,10 +5394,10 @@ function netEnd(){
 }
 function showNetEnd(sc,sh,pe){
   const mine=sc[myT],theirs=sc[1-myT],how=pe===3?'SO':pe===2?'OT':'';
-  if(netRole==='spec'){$('endKicker').textContent='Friend game'+(how?' / '+how:'');$('endTitle').textContent=String(specNames[sc[0]>sc[1]?0:1]||'').toUpperCase()+' WINS';
+  if(netRole==='spec'){const vsCpu=specNames[1]==='CPU';$('endKicker').textContent=(vsCpu?specNames[0]+' vs the CPU':'Friend game')+(how?' / '+how:'');$('endTitle').textContent=String(specNames[sc[0]>sc[1]?0:1]||'').toUpperCase()+' WINS';
     $('eS0').textContent=sc[0];$('eS1').textContent=sc[1];$('eShots').textContent=sh[0]+' \u2013 '+sh[1];
     $('endRewards').hidden=true;$('dropBtn').hidden=true;$('passBtn2').hidden=true;$('roadBtn2').hidden=true;$('unlockMsg').hidden=true;$('boxBtn').hidden=true;$('stars').innerHTML='';
-    $('againBtn').hidden=true;$('netWait').hidden=false;$('netWait').textContent='Watching. If they play a rematch, it starts here.';$('menuBtn').textContent='Stop watching';$('endOv').hidden=false;return}
+    $('againBtn').hidden=true;$('netWait').hidden=false;$('netWait').textContent=vsCpu?'Watching. If they play again, it starts here.':'Watching. If they play a rematch, it starts here.';$('menuBtn').textContent='Stop watching';$('endOv').hidden=false;return}
   $('endKicker').textContent='Friend game'+(how?' / '+how:'');
   $('endTitle').textContent=mine>theirs?'YOU WIN':'FRIEND WINS';
   $('eS0').textContent=mine;$('eS1').textContent=theirs;$('eShots').textContent=sh[myT]+' – '+sh[1-myT];
@@ -5429,7 +5467,7 @@ function startGuestGame(m){
   if(specPending||netRole==='spec'){specPending=false;netRole='spec';myT=0;flipView=false;specNames=[m.meta.n||'Host',m.meta.fn||'Friend'];(document.body&&document.body.classList.add('spectating'));$('specBar').hidden=false;$('specWho').textContent=specNames[0]+' vs '+specNames[1]}
   else{netRole='guest';myT=1;flipView=true}
   gGid=m.g;snapBuf=[];endShownGid=null;
-  arenaIdx=clamp(m.meta.a|0,0,ARENAS.length-1);resize(); // look of the host's arena, not saved
+  gTeamN=m.meta.m===5?5:3;arenaIdx=clamp(m.meta.a|0,0,ARENAS.length-1);resize(); // look of the host's arena, not saved
   hideAllOv();setBoard();clearPbp();so=null;score=[0,0];shots=[0,0];period=1;clock=PERIOD;setup();faceoff(true);phase='faceoff';camY=100;
   for(const s of[...roster,...rosterG]){s.tx=undefined;s.pred=null}puck.tx=undefined;if(netRole==='guest')guestOwnAttrs();
   try{profileUp()}catch(_){}
@@ -5659,7 +5697,7 @@ $('profList').addEventListener('click',e=>{
 });
 function showEmote(team,id){
   const em=emoteById(id);if(!em)return;
-  if(netRole==='host')netEv.push(['em',team,id]);
+  if(bc())netEv.push(['em',team,id]);
   const mine=team===myT,el=$(mine?'emMe':'emThem');
   const who=mine?(curUser||'You'):(netRole?(friendName||'Friend'):'CPU');
   el.innerHTML='';const ic=document.createElement('span');ic.className='ic';ic.textContent=em.ic;
