@@ -1369,7 +1369,7 @@ const CARDS=[
   {id:'fischer',rar:'uncommon',name:'Noah Fischer',num:5,p:'RD',pos:'D',style:'Shutdown',boost:{def:1.08},abil:null,desc:'Quiet, smart, and always in the right spot.'},
   {id:'lund',rar:'uncommon',name:'Aaron Lund',num:33,p:'G',pos:'G',style:'Positional',boost:{greact:.95},abil:null,desc:'A steady goalie who is always square to the shooter.'},
   {id:'okoye',rar:'uncommon',name:'Victor Okoye',num:13,p:'C',pos:'F',style:'Two-way',boost:{def:1.04,hands:1.04},abil:null,desc:'Back-checks as hard as he attacks.'},
-  {id:'lindqvist',rar:'uncommon',name:'Erik Lindqvist',num:92,p:'RW',pos:'F',style:'Sniper',boost:{shot:1.05,acc:1.06},abil:null,desc:'Picks corners from anywhere in the zone.'},
+  {id:'elindqvist',rar:'uncommon',name:'Erik Lindqvist',num:92,p:'RW',pos:'F',style:'Sniper',boost:{shot:1.05,acc:1.06},abil:null,desc:'Picks corners from anywhere in the zone.'},
   {id:'tremblay',rar:'uncommon',name:'Luc Tremblay',num:27,p:'LW',pos:'F',style:'Grinder',boost:{def:1.05,accel:1.04},abil:null,desc:'Wins every battle along the boards.'},
   {id:'sato',rar:'uncommon',name:'Kenji Sato',num:19,p:'C',pos:'F',style:'Playmaker',boost:{hands:1.07},abil:null,desc:'Sees passing lanes nobody else does.'},
   {id:'baptiste',rar:'uncommon',name:'Andre Baptiste',num:24,p:'RW',pos:'F',style:'Speedster',boost:{spd:1.07},abil:null,desc:'Blows past defenders on the outside.'},
@@ -3266,7 +3266,7 @@ const ls={get:k=>{try{return localStorage.getItem(k)}catch(_){return null}},set:
 function profileList(){try{const a=JSON.parse(ls.get('slapshot-profiles')||'[]');return Array.isArray(a)?a.filter(x=>typeof x==='string'):[]}catch(_){return[]}}
 const K=k=>PKEY(curUser,k);
 function saveProgress(){if(!curUser)return;try{localStorage.setItem(K('at'),String(Date.now()));cloudDirty();localStorage.setItem(K('trophies'),String(trophies));localStorage.setItem(K('arena'),String(arenaIdx));
-  localStorage.setItem(K('cards'),JSON.stringify({owned,deck,decks,deckIdx,deckNames,lastDropDay,gold,prog,pucks,passClaimed,bonusClaimed,passMonth,questsDay,quests,emotes,roadClaimed,roadC3,roadC5,trophies5,shopDay,shopBought,gems,skins,skin,featured,bundlesOnce}))}catch(_){}}
+  localStorage.setItem(K('cards'),JSON.stringify({lqFix:1,owned,deck,decks,deckIdx,deckNames,lastDropDay,gold,prog,pucks,passClaimed,bonusClaimed,passMonth,questsDay,quests,emotes,roadClaimed,roadC3,roadC5,trophies5,shopDay,shopBought,gems,skins,skin,featured,bundlesOnce}))}catch(_){}}
 /* ---------- emotes ----------
    Everyone starts with the first 3. The rest come from Epic (50%), Mythic (75%) and Legendary (always)
    star drops. Tap the bubble button on the rink (or T on a keyboard) and pick one; it pops up for both
@@ -3347,9 +3347,23 @@ function resetProgress(){ // a brand-new player's starting point
   prog={bell:{copies:10,lv:{}},charlotte:{copies:0,lv:{}}};pucks=0;passClaimed=[];bonusClaimed=0;passMonth='';questsDay='';quests=[];emotes=START_EMOTES.slice();roadClaimed=[];roadC3=[];roadC5=[];trophies5=0;shopDay='';shopBought=[];gems=0;skins=['classic'];skin='classic';featured=null;bundlesOnce=[];
 }
 let charlotteNew=false;
+/* Erik Lindqvist (uncommon RW) once shared the id 'lindqvist' with Mika Lindqvist (legend G), so owning one
+   showed both and tapping Erik opened Mika. Erik now has his own id. Older saves that own 'lindqvist' keep
+   Mika and also get Erik (we can't tell which one was earned); his card progress and forward slots move to Erik. */
+function fixLindqvist(c){
+  c.lqFix=1;if(!Array.isArray(c.owned)||!c.owned.includes('lindqvist'))return;
+  if(!c.owned.includes('elindqvist'))c.owned.push('elindqvist');
+  const fw=d=>{if(d&&typeof d==='object')for(const k of['F1','F2'])if(d[k]==='lindqvist')d[k]='elindqvist'};
+  fw(c.deck);if(Array.isArray(c.decks))c.decks.forEach(fw);
+  const p=c.prog&&c.prog.lindqvist;
+  if(p&&!c.prog.elindqvist){const gk=['greact','glat','gctl'],lv=p.lv||{},sk={},gl={};for(const k in lv)(gk.includes(k)?gl:sk)[k]=lv[k];
+    c.prog.elindqvist={copies:+p.copies||0,lv:sk};c.prog.lindqvist=Object.assign({},p,{lv:gl})}
+  if(c.featured==='lindqvist'&&c.deck&&c.deck.G!=='lindqvist')c.featured='elindqvist';
+}
 function loadProgress(){resetProgress();if(!curUser)return;try{
   trophies=Math.max(0,parseInt(localStorage.getItem(K('trophies'))||'0',10)||0);arenaIdx=parseInt(localStorage.getItem(K('arena'))||'0',10)||0;
   const c=JSON.parse(localStorage.getItem(K('cards'))||'null');
+  if(c&&!c.lqFix)fixLindqvist(c);
   if(c){
     owned=(c.owned||[]).filter(cardById);
     const fresh=!c.prog; // save from before the starter existed
@@ -3724,10 +3738,15 @@ async function watchGame(code,label){
   closeNet();const opts=await peerOpts();let peer;try{peer=new Peer(opts)}catch(_){frSay('Can\'t connect here.');return}
   netPeer=peer;specPending=true;gGid=null;let tries=0;
   let linked=false;const who=String(label).split(' vs ')[0];
-  setTimeout(()=>{if(netPeer===peer&&netRole!=='spec'&&!linked){specPending=false;frSay('Couldn\'t reach that game. It may have just ended, or their internet is blocking it.')}},15000);
+  setTimeout(()=>{if(netPeer===peer&&!peer.open&&netRole!=='spec'){specPending=false;frSay('Can\'t reach the game server. Check your internet and tap Watch again.')}},12000);
   peer.on('error',e=>{if(netPeer!==peer)return;if(e&&e.type==='peer-unavailable'){if(++tries<3){setTimeout(()=>{if(netPeer===peer&&netRole!=='spec')dial()},1500);return}specPending=false;frSay('No live game with that code right now. Check the code: the game has to be going (or hosting) on their screen.');return}});
   peer.on('open',dial);
   function dial(){const conn=peer.connect(PEER_PREFIX+code,{reliable:false,serialization:'json'});netConn=conn;
+    const t0=Date.now(),wait=()=>{if(netPeer!==peer||netConn!==conn||conn.open||netRole==='spec')return;const w=(Date.now()-t0)/1000;
+      if(w>30){specPending=false;try{conn.close()}catch(_){}netConn=null;frSay('Couldn\'t link to '+who+'\'s game. This happens on some school wifi and mobile networks. Try again, or try both on the same wifi.');return}
+      if(w>6)frSay('Still linking to '+who+'\'s game... going through a relay server, this can take up to 20 seconds.');
+      setTimeout(wait,1000)};setTimeout(wait,1000);
+    conn.on('error',()=>{if(netConn===conn&&!conn.open&&netPeer===peer&&netRole!=='spec'&&++tries<4)setTimeout(()=>{if(netPeer===peer&&netConn===conn&&netRole!=='spec')dial()},1500)});
     conn.on('open',()=>{linked=true;frSay('Found '+who+'\'s game. Loading it...');
       setTimeout(()=>{if(netPeer===peer&&netConn===conn&&netRole!=='spec')frSay('Found '+who+'\'s game, but it isn\'t sending yet. Their game has to be open and on screen (not in another tab or a locked phone). Still trying...')},6000);
       setTimeout(()=>{if(netPeer===peer&&netConn===conn&&netRole!=='spec'){specPending=false;try{conn.close()}catch(_){}frSay(who+'\'s game never started sending. Ask them to open the game on screen, then tap Watch again.')}},30000);
@@ -5268,7 +5287,7 @@ async function hostGame(reuse){
   peer.on('connection',conn=>{
     // spectators say "watch" first; anyone else while a game is on is turned away (one opponent at a time)
     conn.on('data',m=>{if(m&&m.t==='bye'&&conn!==netConn){specs=specs.filter(x=>x.conn!==conn);try{conn.close()}catch(_){}return}if(m&&m.t==='watch'){if(conn===netConn&&!netRole){netConn=null;$('hostMsg').textContent='Waiting for your friend to join...'}addSpec(conn,m);return}if(conn===netConn)hostData(m)});
-    if(netConn&&netConn.open){setTimeout(()=>{if(!specs.some(x=>x.conn===conn))try{conn.close()}catch(_){}},5000);return}
+    if(netConn&&netConn.open){setTimeout(()=>{if(!specs.some(x=>x.conn===conn))try{conn.close()}catch(_){}},45000);return}
     netConn=conn;
     $('hostMsg').textContent='Your friend found the game. Linking your phones...';
     conn.on('open',()=>{rememberCode('');$('hostMsg').textContent='Linked! Starting...'});
@@ -5363,7 +5382,7 @@ async function openCast(){
   peer.on('error',e=>{if(castPeer!==peer)return;if(!castCode||(e&&e.type==='unavailable-id'))stopCast(true)}); // the game loop opens a fresh one
   peer.on('connection',conn=>{
     conn.on('data',m=>{if(castPeer!==peer)return;if(m&&m.t==='watch'){const had=specs.length;addSpec(conn,m);if(!had&&specs.length){netEv=[];evBuf=[]}}else if(m&&m.t==='bye'){specs=specs.filter(x=>x.conn!==conn);try{conn.close()}catch(_){}}});
-    setTimeout(()=>{if(!specs.some(x=>x.conn===conn))try{conn.close()}catch(_){}},8000)});
+    setTimeout(()=>{if(!specs.some(x=>x.conn===conn))try{conn.close()}catch(_){}},45000)}); // relay links can take ~20 s to open
 }
 function stopCast(quiet){
   const peer=castPeer;castPeer=null;const had=!!castCode;castCode='';
