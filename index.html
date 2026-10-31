@@ -207,6 +207,8 @@ button:focus-visible{outline:2px solid var(--lamp);outline-offset:2px}
 .legend.on{box-shadow:0 0 0 2px var(--lamp) inset}
 .legend .eq{font-size:12px;font-weight:700;letter-spacing:.12em;color:var(--lamp-ink);background:var(--lamp);border-radius:4px;padding:1px 5px;margin-left:6px;vertical-align:2px}
 .slots{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.modeDeck{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:2px 0 8px}.modeDeck button{font:inherit;font-size:15px;font-weight:800;letter-spacing:.06em;padding:10px 6px;border-radius:999px;border:1px solid var(--edge);background:var(--panel-2);color:var(--muted,#9fb0c8);cursor:pointer}.modeDeck button.on{background:#fff;color:#0b1017;border-color:#fff}
+#slots.s5{grid-template-columns:repeat(3,minmax(0,1fr))}.slotW{display:grid;gap:3px;min-width:0}.slotCap{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#9fb0c8;text-align:center}
 .slot{padding:8px 4px;border-radius:9px;background:var(--panel-2);border:1px dashed var(--edge);text-align:center;min-width:0}
 .slot.full{border:1px solid var(--lamp)}
 .slot .sl{display:block;font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--muted)}
@@ -717,7 +719,14 @@ html{touch-action:manipulation}
 .stRec span.w{background:rgba(53,208,127,.18);border-color:#2fa96a;color:#7ff0b4}.stRec span.l{background:rgba(229,57,74,.15);border-color:#a8323f;color:#ff9aa5}.stRec span.o{color:var(--lamp)}
 .stEmpty{color:var(--muted);text-align:center;padding:18px 6px;line-height:1.4}
 .stScroll{overflow-x:auto;margin:0 -2px}
-.ti.stats{background:linear-gradient(#7fd3ff,#2f8fd6);--ac:#4fb6ff}
+.ti.stats{background:linear-gradient(#7fd3ff,#2f8fd6);--ac:#4fb6ff}.ti.lb{background:linear-gradient(#ffe27a,#e8a200);--ac:#ffc533}
+.lbList{display:grid;gap:6px;margin:10px 0}.lbRow{display:grid;grid-template-columns:44px minmax(0,1fr) auto;align-items:center;gap:8px;padding:9px 12px;border-radius:10px;background:var(--panel-2);border:1px solid var(--edge)}
+.lbRow .rk{font-family:var(--f-display);font-size:24px;line-height:1;color:#9fb0c8;text-align:center}.lbRow.top1 .rk{color:#ffc533}.lbRow.top2 .rk{color:#d6dde8}.lbRow.top3 .rk{color:#e0965a}
+.lbRow .nm{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700}.lbRow .nm small{display:block;font-weight:500;font-size:12px;color:#9fb0c8}
+.lbRow .tv{font-family:var(--f-display);font-size:24px;line-height:1;color:var(--lamp);font-variant-numeric:tabular-nums}.lbRow.me{border-color:#ffc533;background:rgba(255,197,51,.12)}
+.lbNote{font-size:13px;color:#9fb0c8;margin:6px 0 0}
+.lbLive{color:#ff5a67;font-weight:800;letter-spacing:.06em}.lbRow .nm .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;vertical-align:1px;background:#5b6b80}.lbRow .nm .dot.on{background:#35d07f}.lbRow .nm .dot.game{background:#ffb627}
+#earnAmt.neg{color:#ff6b78}
 .supRow{display:flex!important;gap:6px;align-items:stretch;min-width:0;border:0!important;background:none!important;box-shadow:none!important;padding:0!important;margin:0!important;border-radius:0!important}
 .supRow .supInfo{overflow:hidden;justify-content:flex-start}
 @media (max-width:400px){.supRow .supInfo span{display:none}}.supRow .supInfo{flex:1;min-width:0;margin:0}
@@ -795,6 +804,7 @@ body.spectating #pad,body.spectating .keys,body.spectating #pullBtn,body.spectat
 .bundle .buy svg{width:20px;height:20px;flex:none}
 .bundle .buy:disabled{background:#2a3649;box-shadow:none;color:var(--muted);text-shadow:none;cursor:default}
 #netOv .joinRow{grid-template-columns:minmax(0,1fr) auto auto}#netOv .joinRow .frW{padding:0 12px}
+.lbMini{width:auto;padding:0 9px;display:flex;align-items:center;gap:5px;font-size:13px;letter-spacing:.06em;border-color:rgba(255,197,51,.6)!important;color:#ffd35c}.lbMini b{font-size:17px}
 .ownerMini{font-size:20px;border-color:rgba(255,90,103,.55)!important}
 #ownerOv{z-index:45}.ownerCard{gap:14px;grid-template-columns:minmax(0,1fr)}.ownerCard>*,.ownerHead>div{min-width:0}
 .ownerHead .result{font-size:clamp(26px,9vw,40px)!important;overflow-wrap:anywhere}
@@ -885,7 +895,7 @@ body.spectating #pad,body.spectating .keys,body.spectating #pullBtn,body.spectat
           <div class="chip gd"><svg class="coin" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><text x="12" y="16.5" text-anchor="middle">G</text></svg><b id="goldCount">0</b></div>
           <div class="chip gm"><svg class="gem" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12l4 6-10 12L2 9z" fill="#35d07f" stroke="#0d6b3a" stroke-width="1.5" stroke-linejoin="round"/><path d="M2 9h20M8 3l4 6 4-6M12 9 7 9l5 12 5-12" fill="none" stroke="#bff5d8" stroke-width="1" opacity=".8"/></svg><b id="gemCount">0</b></div>
         </div>
-        <div class="supRow"><button class="supInfo" id="supInfoBtn">⚡ <em class="supL">WHO HAS WHICH SUPER?</em><em class="supS">SUPERS GUIDE</em> <span>▶ watch</span></button><button class="helpMini ownerMini" id="ownerBtn" aria-label="About the owner" title="About the owner">🦈</button><button class="helpMini" id="helpBtn" aria-label="Help">?</button></div>
+        <div class="supRow"><button class="supInfo" id="supInfoBtn">⚡ <em class="supL">WHO HAS WHICH SUPER?</em><em class="supS">SUPERS GUIDE</em> <span>▶ watch</span></button><button class="helpMini lbMini" id="lbBtn" aria-label="Leaderboard" title="Leaderboard"><b>🏆</b><span>RANKS</span></button><button class="helpMini ownerMini" id="ownerBtn" aria-label="About the owner" title="About the owner">🦈</button><button class="helpMini" id="helpBtn" aria-label="Help">?</button></div>
         <h1 class="logo">SLAPSHOT <b>3V3</b></h1>
         <div class="stageRow">
           <div class="rail">
@@ -1102,7 +1112,7 @@ body.spectating #pad,body.spectating .keys,body.spectating #pullBtn,body.spectat
       <div class="card passCard">
         <div class="result" style="font-size:44px">TROPHY ROAD</div>
         <div class="modeTog" id="roadTog"><button data-r="3">3 ON 3 ROAD</button><button data-r="5">5 ON 5 ROAD</button></div>
-        <p>Each mode has its own road and its own trophies. Every win is 30 trophies, and there's a prize every 100. New arenas open along the way.</p>
+        <p>Each mode has its own road and its own trophies. Every win is 30 trophies. A loss costs 15 (10 in overtime or a shootout). There's a prize every 100, and new arenas open along the way. Arenas and prizes you've reached stay yours even if you drop.</p>
         <div class="copies"><span id="roadNextLbl">NEXT PRIZE</span><span class="bar"><i id="roadBar" style="width:0%"></i></span><b id="roadTr">0</b></div>
         <div class="ptrack" id="roadTrack"></div>
         <button class="go" id="roadDone">DONE</button>
@@ -1169,6 +1179,7 @@ body.spectating #pad,body.spectating .keys,body.spectating #pullBtn,body.spectat
       <div class="card deckCard">
         <div class="shead"><div class="result">CARDS</div><span class="eyebrow" id="ownCount">0 / 16</span></div>
         <p>Your deck takes the ice. Every legend brings a <b class="gold">signature ability</b> that changes the game. Tap a card to see it, upgrade it or put it in your deck.</p>
+        <div class="modeDeck" id="modeDeck" role="group" aria-label="Which mode's decks"></div>
         <div class="eyebrow">Your decks · tap one to use it</div>
         <div class="deckTabs" id="deckTabs"></div>
         <div class="deckTools"><input id="deckName" maxlength="14" aria-label="Deck name" autocomplete="off"><select id="deckCopy" aria-label="Copy another deck"></select><button class="ghost" id="deckClear">Clear</button></div>
@@ -1191,7 +1202,7 @@ body.spectating #pad,body.spectating .keys,body.spectating #pullBtn,body.spectat
     <div class="ov sheet" id="helpOv" hidden>
       <div class="card deckCard">
         <div class="shead"><div class="result">HOW TO PLAY</div></div>
-        <p>3-minute games, 1-minute sudden-death overtime, then a shootout. Every win earns 30 trophies, and trophies unlock tougher arenas. Your first win each day earns a card pack: gold, player cards for upgrades, or a new legend.</p>
+        <p>3-minute games, 1-minute sudden-death overtime, then a shootout. Every win earns 30 trophies, a loss costs 15 (10 in overtime or a shootout), and trophies unlock tougher arenas. Your first win each day earns a card pack: gold, player cards for upgrades, or a new legend.</p>
         <ul class="how">
           <li><b>FACEOFF</b>: tap any button the instant the puck drops. Too early and you lose it. Aim the pad to choose where you draw it.</li>
           <li><b>PAD</b> skate. You always control the skater with the gold ring. On a computer: WASD or arrows, Space shoots, Shift dekes, E passes, Esc pauses.</li>
@@ -1228,6 +1239,15 @@ body.spectating #pad,body.spectating .keys,body.spectating #pullBtn,body.spectat
         </div>
         <div id="superList"></div>
         <button class="go" id="superDone">DONE</button>
+      </div>
+    </div>
+
+    <div class="ov sheet" id="lbOv" hidden>
+      <div class="card deckCard">
+        <div class="shead"><div class="result">RANKS</div><span class="eyebrow" id="lbSub">Most trophies</span></div>
+        <div class="stTog" id="lbTog" role="group" aria-label="Which leaderboard"><button data-m="trT" aria-pressed="true">OVERALL</button><button data-m="tr" aria-pressed="false">3 ON 3</button><button data-m="tr5" aria-pressed="false">5 ON 5</button></div>
+        <div id="lbBody"></div>
+        <button class="go" id="lbDone">DONE</button>
       </div>
     </div>
 
@@ -1319,13 +1339,42 @@ function arenaD(i){const L=CPU_LV[i];return{
   // Arena 1 is the learning rink: a slow, leaky CPU goalie, and sloppy skaters who ice it, miss passes and fumble catches
   ...(i===0?{greact:.15,glat:13,gctl:.45}:{}),
   slop:[1,.45,0,0,0,0,0,0][i]}} // how sloppy the CPU is: Arena 1 very, Arena 2 a bit, then clean
-let arenaIdx=0,trophies=0,trophies5=0,roadC3=[],roadC5=[];
+/* CPU skill climbs with YOUR trophies (in the mode you're playing), smoothly, not in arena steps.
+   Skill e: 0 at 0 trophies, 7 (the last arena's level) at 1300, then keeps rising to 12 by about 2550.
+   The arena you pick is a floor: an easy arena can't make a high-trophy CPU easy again.
+   Everything scales with e: speed/hands/defence/acceleration, shot power and accuracy, pass speed and
+   accuracy, how often they shoot and deke, faceoffs, poke checks, the goalie, and sloppiness (gone by ~350). */
+const CPU_E_MAX=12;
+function cpuSkill(){const tr=MODE5?trophies5:trophies,ti=tr<=1300?tr/1300*7:7+Math.min(CPU_E_MAX-7,(tr-1300)/250);return Math.min(CPU_E_MAX,Math.max(arenaIdx,ti))}
+const lerpA=(a,e)=>{e=Math.max(0,e);const i=Math.floor(e);if(i>=a.length-1)return a[a.length-1];const f=e-i;return a[i]+(a[i+1]-a[i])*f};
+function cpuD(e){
+  const top=ARENAS.length-1,x=Math.max(0,e-top),L=lerpA(CPU_LV,Math.min(e,top))+x*.5,em=Math.min(e,top); // past the last arena: speed barely rises, smarts do
+  const d={lvl:L,greact:.11*Math.pow(.94,L),glat:15.5*(1+.06*L),gctl:Math.min(.95,.65*(1+.06*L)),
+    shoot:lerpA([.65,1,1.1,1.2,1.3,1.35,1.4,1.45],em)+x*.05,fo:Math.max(.09,lerpA([.4,.28,.24,.2,.17,.16,.15,.14],em)-x*.01),
+    pokeMul:lerpA([.55,.9,1,1.1,1.2,1.25,1.3,1.35],em)+x*.04,slop:lerpA([1,.45,0,0,0,0,0,0],em),
+    shotA:1+.022*L,accA:1+.05*L,           // CPU shot power / accuracy attributes
+    aim:Math.max(.5,1-.045*e),             // tighter shot placement
+    passSp:Math.min(1.35,1+.03*e),         // crisper passes (harder to pick off)
+    passIQ:Math.min(1.6,1+.06*e),          // looks for the pass more when pressured
+    e};
+  const w=Math.max(0,1-e);if(w>0){d.greact+=(.15-d.greact)*w;d.glat+=(13-d.glat)*w;d.gctl+=(.45-d.gctl)*w} // Arena 1 learning-rink goalie fades out
+  return d}
+const cpuLvTxt=e=>Math.round(cpuD(e).lvl);
+let arenaIdx=0,trophies=0,trophies5=0,roadC3=[],roadC5=[],trPk3=0,trPk5=0; // trPk = best ever: arenas and road prizes go by it, so a loss never takes them back
 const curTr=()=>MODE5?trophies5:trophies; // each mode climbs its own road
+const curPk=()=>MODE5?Math.max(trPk5,trophies5):Math.max(trPk3,trophies);
+const TR_LOSS=15,TR_OTL=10; // a loss in regulation costs 15, an overtime or shootout loss 10
 // g* = goalie: react (s before tracking a shot), lat (lateral speed), ctl (rebound control). fo = CPU faceoff reaction (s)
 const MY_GOALIE={greact:.11,glat:15.5,gctl:.65};
 let myGoalie=MY_GOALIE;
 let cpuGoalie=null;
-const gStats=g=>g.team?(netOn()&&guestDeck?guestDeck.g:(cpuGoalie||D)):myGoalie;
+const gStats0=g=>g.team?(netOn()&&guestDeck?guestDeck.g:(cpuGoalie||D)):myGoalie;
+/* Shootouts vs the CPU are easier: their goalie reacts later and moves slower side to side when you shoot,
+   and your goalie is a step sharper when they shoot. Friend games stay even. */
+const SO_EASY={cpu:{greact:2,glat:.6,gctl:.6,reach:.62,poke:.08},me:{greact:.85,glat:1.12,gctl:1,reach:1.06,poke:.38}};
+const soEasy=g=>(phase==='so'||phase==='soWait')&&!netRole?(g.team?SO_EASY.cpu:SO_EASY.me):null;
+const gStats=g=>{const S=gStats0(g);if((phase!=='so'&&phase!=='soWait')||netRole)return S;const f=g.team?SO_EASY.cpu:SO_EASY.me;
+  return Object.assign({},S,{greact:S.greact*f.greact,glat:S.glat*f.glat,gctl:S.gctl*f.gctl})};
 
 /* ---------- legend cards ----------
    Fictional legends from the daily pack. Equip them in your deck: slot F1 = your centre,
@@ -1392,11 +1441,25 @@ const abilOf=s=>s&&s.abil;
 const clutchOn=s=>(s.supT>0&&s.supK==='vance')||(s.abil==='clutch'&&(phase==='so'||period>=2||(period===1&&clock<30)));
 // a short gold label over a legend when their ability kicks in
 function abFx(s,txt){if(!s||!s.card)return;if(s.abFxTxt===txt&&time-s.abFxT<3)return;s.abFxT=time;s.abFxTxt=txt}
-const SLOTS=[{k:'F1',pos:'F',label:'Centre'},{k:'F2',pos:'F',label:'Wing'},{k:'D',pos:'D',label:'Defence'},{k:'G',pos:'G',label:'Goalie'}];
+const SLOTS3=[{k:'F1',pos:'F',label:'Centre'},{k:'F2',pos:'F',label:'Wing'},{k:'D',pos:'D',label:'Defence'},{k:'G',pos:'G',label:'Goalie'}];
+/* 5 on 5 has its own decks: 3 forwards, 2 defence, 1 goalie. Keys line up with the skaters on the ice:
+   i0 = C (F1), i1 = RW (F2), i2 = LD (D), i3 = LW (F3), i4 = RD (D2). */
+const SLOTS5=[{k:'F3',pos:'F',label:'Left wing',sp:'LW'},{k:'F1',pos:'F',label:'Centre',sp:'C'},{k:'F2',pos:'F',label:'Right wing',sp:'RW'},{k:'D',pos:'D',label:'Left D',sp:'LD'},{k:'D2',pos:'D',label:'Right D',sp:'RD'},{k:'G',pos:'G',label:'Goalie',sp:'G'}];
+let SLOTS=SLOTS3;
+const KEYS3=['F1','F2','D','G'],KEYS5=['F1','F2','D','F3','D2','G'],SK_KEYS={3:['F1','F2','D'],5:['F1','F2','D','F3','D2']};
+const empty5=()=>({F1:null,F2:null,D:null,F3:null,D2:null,G:null});
 const DECKS_N=5,DECK_DEF_NAMES=['DECK 1','DECK 2','DECK 3','DECK 4','DECK 5'];
 const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+let deckView=3,deckOther=null; // the globals below hold the decks of the mode on screen; deckOther holds the other mode's
 let owned=['bell'],deck={F1:null,F2:null,D:'bell',G:null},decks=[deck],deckIdx=0,deckNames=[],lastDropDay='',dropPending=false,gold=100;
 const cardById=id=>CARDS.find(c=>c.id===id);
+function viewDecks(m){if(m!==5)m=3;if(m===deckView||!deckOther)return;const cur={deck,decks,deckIdx,deckNames};({deck,decks,deckIdx,deckNames}=deckOther);deckOther=cur;deckView=m;SLOTS=m===5?SLOTS5:SLOTS3}
+const deckOf=n=>(n===5?5:3)===deckView?deck:deckOther?deckOther.deck:deck;
+const setOf=n=>(n===5?5:3)===deckView?{deck,decks,deckIdx,deckNames}:deckOther;
+// the slot a card goes to: its own position if that's free (LW -> left wing, RD -> right D...), else any free one of its kind
+function bestSlot(d,c,slots){const fits=slots.filter(s=>s.pos===c.pos),p=typeof posOf==='function'?posOf(c):c.p;return fits.find(s=>!d[s.k]&&s.sp&&s.sp===p)||fits.find(s=>!d[s.k])||fits[0]}
+function fresh5(from){const d5=[];for(let i=0;i<DECKS_N;i++){const d=empty5();if(i===0&&from){for(const k of KEYS3){const c=cardById(from[k]);if(c){const sl=bestSlot(d,c,SLOTS5);if(sl&&!d[sl.k])d[sl.k]=c.id}}}else d.D=owned.includes('bell')?'bell':null;d5.push(d)}
+  return{deck:d5[0],decks:d5,deckIdx:0,deckNames:DECK_DEF_NAMES.slice()}}
 /* Upgrades: each attribute has 5 levels. One level = 10 player cards of that player + gold. +6% per level. */
 // upgradeable skater attributes. DEKING = faster deke recharge, bigger side-step, cleaner pass catching.
 // ACCELERATION = how quickly you reach top speed. Shot power/accuracy come only from a legend's built-in boost.
@@ -1415,7 +1478,7 @@ function maxedAttr(c){const b=c?c.boost:{},m=1+PER_LV*MAX_LV,a={};
 function maxedGoalie(c){const b=c?c.boost:{};
   return{greact:MY_GOALIE.greact*(b.greact||1)*Math.pow(1-PER_LV,MAX_LV),glat:MY_GOALIE.glat*(b.glat||1)*(1+PER_LV*MAX_LV),gctl:Math.min(.95,MY_GOALIE.gctl*(b.gctl||1)*(1+PER_LV*MAX_LV))}}
 // what kind of card sits in each of your slots: 'legend', 'uncommon' or null (starter / empty)
-function deckMix(){const m={};for(const sl of['F1','F2','D','G']){const r=rarOf(cardById(deck[sl]));m[sl]=r==='legend'||r==='special'||r==='ultra'?'legend':r==='uncommon'?'uncommon':null}return m}
+function deckMix(n){n=n||teamN();const dk=deckOf(n),m={};for(const sl of(n===5?KEYS5:KEYS3)){const r=rarOf(cardById(dk[sl]));m[sl]=r==='legend'||r==='special'||r==='ultra'?'legend':r==='uncommon'?'uncommon':null}return m}
 function applyDeck(){
   try{applySharkKit()}catch(_){}
   // friend games: each player brings their own upgrades and legends (nothing is boosted)
@@ -1425,7 +1488,7 @@ function applyDeck(){
     const gp=netOn()&&guestDeck?guestDeck.sk[s.i]:null; // online friend brings their own deck
     if(gp){const gc=guestDeck.ids?cardById(guestDeck.ids[s.i]):null;
       s.attr=Object.assign({spd:1,shot:1,acc:1,hands:1,def:1,accel:1},gp.attr);if(gp.kit&&SHARK_KITS[gp.kit]){s.kit=gp.kit;s.abilOverride=SHARK_KITS[gp.kit].abil.id}s.card=gc||{id:'net'+s.i,name:gp.name};s.num=gp.num;s.abil=s.abilOverride||(gc&&gc.abil?gc.abil.id:null);s.abilOverride=null}
-    else{s.attr={spd:cpuA,shot:1,acc:1,hands:cpuA,def:cpuA,accel:cpuA};s.card=null;s.abil=null}}
+    else{s.attr={spd:cpuA,shot:D.shotA||1,acc:D.accA||1,hands:cpuA,def:cpuA,accel:cpuA};s.card=null;s.abil=null}}
   {const g1=goalies.find(g=>g.team===1);if(g1){const gc=netOn()&&guestDeck&&guestDeck.gid?cardById(guestDeck.gid):null;
     g1.card=gc||(netOn()&&guestDeck&&guestDeck.gname?{id:'netg',name:guestDeck.gname}:null);g1.abil=gc&&gc.abil?gc.abil.id:null}}
   cpuGoalie=null;
@@ -1433,22 +1496,22 @@ function applyDeck(){
      Your centre is a legend -> their centre is a legend. Your D is uncommon -> their D is uncommon. Your starter / empty slot -> a plain CPU player.
      (Gemmelynn counts as a legend for this; the CPU never gets her.) */
   if(!netOn()){
-    const mix=deckMix(),used=new Set(Object.values(deck).filter(Boolean).concat('charlotte'));
+    const dk=deckOf(teamN()),mix=deckMix(teamN()),used=new Set(Object.values(dk).filter(Boolean).concat('charlotte'));
     const draw=(pos,r)=>{const c=CARDS.filter(x=>rarOf(x)===r&&x.pos===pos&&!used.has(x.id)).sort(()=>Math.random()-.5)[0];if(c)used.add(c.id);return c};
-    [['F1',0],['F2',1],['D',2]].forEach(([sl,i])=>{const k=skaters.find(x=>x.team===1&&x.i===i),r=mix[sl];if(!k||!r)return;
-      const c=draw(sl==='D'?'D':'F',r)||draw(sl==='D'?'F':'D',r);if(!c)return;
+    SK_KEYS[teamN()===5?5:3].map((k,i)=>[k,i]).forEach(([sl,i])=>{const k=skaters.find(x=>x.team===1&&x.i===i),r=mix[sl];if(!k||!r)return;
+      const dp=sl[0]==='D';const c=draw(dp?'D':'F',r)||draw(dp?'F':'D',r);if(!c)return;
       k.card=c;k.num=c.num;k.abil=c.abil?c.abil.id:null;for(const a in k.attr)k.attr[a]*=(c.boost[a]||1)});
     const g1=goalies.find(g=>g.team===1);
     if(g1&&mix.G){const c=draw('G',mix.G);if(c){g1.card=c;g1.num=c.num;g1.abil=c.abil?c.abil.id:null;
       cpuGoalie=Object.assign({},D,{greact:D.greact*(c.boost.greact||1),glat:D.glat*(c.boost.glat||1),gctl:Math.min(.95,D.gctl*(c.boost.gctl||1))})}}
   }
-  const mine=skaters.filter(s=>s.team===0),slotOf=['F1','F2','D'];
+  const n=teamN()===5?5:3,dk=deckOf(n),mine=skaters.filter(s=>s.team===0),slotOf=SK_KEYS[n];
   for(const s of mine){
-    const c=s.i<3?cardById(deck[slotOf[s.i]]):null;s.card=c||null;s.abil=c&&c.abil?c.abil.id:null;
-    s.attr={spd:1,shot:1,acc:1,hands:1,def:1,accel:1};if(s.i>=3){const a=1+PER_LV*(D.lvl||0);s.attr={spd:a,shot:1,acc:1,hands:a,def:a,accel:a}}
+    const c=s.i<slotOf.length?cardById(dk[slotOf[s.i]]):null;s.card=c||null;s.abil=c&&c.abil?c.abil.id:null;
+    s.attr={spd:1,shot:1,acc:1,hands:1,def:1,accel:1};if(s.i>=3&&!c){const a=1+PER_LV*(D.lvl||0);s.attr={spd:a,shot:1,acc:1,hands:a,def:a,accel:a}}
     if(c){for(const k in s.attr)s.attr[k]=(c.boost[k]||1)*(1+PER_LV*lvOf(c.id,k));s.num=c.num}
   }
-  const gc=cardById(deck.G);myGoalie=Object.assign({},MY_GOALIE);
+  const gc=cardById(dk.G);myGoalie=Object.assign({},MY_GOALIE);
   if(gc){
     myGoalie.greact=MY_GOALIE.greact*(gc.boost.greact||1)*Math.pow(1-PER_LV,lvOf(gc.id,'greact'));
     myGoalie.glat=MY_GOALIE.glat*(gc.boost.glat||1)*(1+PER_LV*lvOf(gc.id,'glat'));
@@ -1828,7 +1891,7 @@ function clearPbp(){chatQ=[];lastChat=-99;said30=false;lastLull=time;const f=$('
    Friend games online stay 3 on 3 so both devices run the same lineup. */
 let MODE5=false;try{MODE5=localStorage.getItem('slapshot-mode')==='5v5'}catch(_){}
 const teamN=()=>netOn()?3:remoteView()?gTeamN:(MODE5?5:3);
-function setMode(five){MODE5=!!five;try{localStorage.setItem('slapshot-mode',MODE5?'5v5':'3v3')}catch(_){}paintModeTog();try{setArena(arenaIdx);renderArenas();paintRoadBtns()}catch(_){}tone(600,.06,'triangle',.05);if(phase==='menu'){setup();faceoff(true);phase='menu'}}
+function setMode(five){MODE5=!!five;viewDecks(MODE5?5:3);try{applyDeck()}catch(_){}try{if(!$('deckOv').hidden){selCard=null;renderDeck()}}catch(_){}try{localStorage.setItem('slapshot-mode',MODE5?'5v5':'3v3')}catch(_){}paintModeTog();try{setArena(arenaIdx);renderArenas();paintRoadBtns()}catch(_){}tone(600,.06,'triangle',.05);if(phase==='menu'){setup();faceoff(true);phase='menu'}}
 function paintModeTog(){try{const el=$('modeTog');for(const b of el.querySelectorAll('[data-m]'))b.classList.toggle('on',(b.dataset.m==='5')===MODE5)}catch(_){}}
 function mk(team,i,num,goalie){return{team,i,num,goalie,x:50,y:100,vx:0,vy:0,dvx:0,dvy:0,fx:0,fy:team?1:-1,cd:0,poke:0,hold:0,react:0,deke:0,dekeCd:0,dekeSide:1,pokeT:0,lungeT:0,chk:0,bhWin:0,attr:{spd:1,shot:1,acc:1,hands:1,def:1,accel:1},card:null}}
 function setup(){
@@ -1927,8 +1990,8 @@ function shoot(s,power,aimHint,high){
   const aimed=s.aimShot!=null;if(aimed){ax=50+s.aimShot*(NH-.6);s.aimShot=null}
   const ns=s.nextShot||null;s.nextShot=null; // (was reset to 0, and a 0 here meant every later shot had zero speed)
   if(ns==='fake'){high=true;const g=goalieOf(1-s.team);if(g){g.fly=.8;abFx(g,'BIT ON THE FAKE')}}
-  const aimMul=(s.abil==='snipe'?.55:1)*(clutchOn(s)?.75:1)*(ns==='laser'||ns==='seek'||ns==='office'?.05:ns==='quick'||ns==='fake'?.4:1)*(s.supT>0&&s.supK==='charlotte'?.6:1)*(aimed?.25:1);
-  ax+=rnd(-1,1)*(1.4/s.attr.acc)*(1.15-power*.55)*(high?1.2:1)*aimMul;
+  const aimMul=(s.abil==='snipe'?.55:1)*(clutchOn(s)?.75:1)*(ns==='laser'||ns==='seek'||ns==='office'?.05:ns==='quick'||ns==='fake'?.4:1)*(s.supT>0&&s.supK==='charlotte'?.6:1)*(aimed?.25:1)*(phase==='so'&&!netRole&&s.team===0?.45:1); // shootout vs the CPU: your shots find the corner
+  ax+=rnd(-1,1)*(1.4/s.attr.acc)*(1.15-power*.55)*(high?1.2:1)*aimMul*(s.team===1&&!netRole&&D.aim?D.aim:1); // better CPU = better placement
   const ty=atkY(s.team)+(s.team?2:-2);
   let spMul=typeof ns==='number'&&ns>0?ns:ns==='meteor'?1.35:ns==='office'?1.5:ns==='quick'?1.25:1;if(ns)abFx(s,superOf(s)?superOf(s).n:'SUPER');
   if(supAct(s,'holm'))spMul*=1.1;if(supAct(s,'charlotte'))spMul*=1.15;if(supAct(s,'strand'))spMul*=1.15;
@@ -1976,7 +2039,7 @@ function pass(s,hx,hy,ai,saucer){
     if(sc>bs){bs=sc;best=m}
   }
   if(!best)return false;
-  const d0=dist(best,puck);let sp=clamp(38+d0*.7,45,85);
+  const d0=dist(best,puck);let sp=clamp(38+d0*.7,45,85);if(s.team===1&&!netRole&&D.passSp)sp*=D.passSp; // better CPU = crisper passes
   if(s.abil==='vision')sp*=1.25;if(s.abil==='qb')sp*=1.3;if(s.abil==='faceoff')sp*=1.2;
   const np=s.nextPass;s.nextPass=0;if(np){sp*=np==='home'?1.35:1.3;saucer=true}
   const teamTape=!np&&skaters.some(k=>k.team===s.team&&supAct(k,'mori'));if(teamTape)sp*=1.3;
@@ -2061,7 +2124,7 @@ function humanDeke(){if(human&&human.goalie)return;
   const s=human,proj=input.x*-s.fy+input.y*s.fx;
   doDeke(s,Math.abs(proj)>.3?Math.sign(proj):-s.dekeSide);
 }
-const spinUnlocked=()=>trophies>=ARENAS[2].need;
+const spinUnlocked=()=>Math.max(trophies,trPk3)>=ARENAS[2].need;
 /* Signature moves, one per arena (yours only):
    Arena 2 SAUCER PASS  hold PASS, let go: the pass floats over the other team's sticks
    Arena 3 SPIN-O-RAMA  tap DEKE again mid-deke
@@ -2398,7 +2461,8 @@ function aiCarry(s,dt){
       if(g&&dNet<26&&!g.fly&&Math.random()<.2*P.dangly){s.fakeT=rnd(.22,.32);g.fly=.6;pbp(pick1([`Shot fake by ${N(s)}...`,`${N(s)} fakes the shot...`,`${N(s)} looks to shoot... holds it...`]),1);return}
       shoot(s,rnd(.45,1),null,Math.random()<.4);return}
   }
-  if(pd<7&&Math.random()<dt*1.4*P.passy&&pass(s,null,null,true))return;
+  const piq=t&&!netRole&&D.passIQ?D.passIQ:1;
+  if(pd<7&&Math.random()<dt*1.4*P.passy*piq&&pass(s,null,null,true))return;
   if(dNet>70&&Math.random()<dt*.35*P.passy&&pass(s,null,null,true))return;
   if(opp&&pd<6.5&&s.dekeCd<=0&&Math.random()<dt*2*(t?D.shoot:1)*P.dangly){
     doDeke(s,((s.x-opp.x)*-s.fy+(s.y-opp.y)*s.fx)>0?1:-1);
@@ -2725,7 +2789,7 @@ function goalieThink(dt){
       // poke check a carrier who walks into the crease
       const o=puck.owner;
       if(o&&!o.goalie&&o.team!==g.team&&g.gpoke<=0&&dist(o,g)<5.2&&(o.y-gl)*out>0&&o.deke<=0){
-        g.gpoke=1.2;g.pokeT=.25;if(Math.random()<.38){knockLoose(o,g,false);toast('POKE CHECK','small',650)}}
+        g.gpoke=1.2;g.pokeT=.25;if(Math.random()<(soEasy(g)?soEasy(g).poke:.38)){knockLoose(o,g,false);toast('POKE CHECK','small',650)}}
     }
     let sp=S.glat*(g.fly>0?.45:1)*(time<slowUntil&&g.team!==slowTeam?.8:1);
     if(breakaway&&breakaway.s.team!==g.team&&breakaway.s.deke>0&&dist(g,breakaway.s)<12)sp*=.1; // bites on the deke
@@ -2926,6 +2990,7 @@ function puckContacts(){
     let gr=puck.high?(g.fly>0?1.0:moving?1.15:1.6):(g.fly>0?2.05:1.65);
     if(g.abil==='brick')gr+=.3;
     if(g.abil==='butterfly')gr+=puck.high?-.15:.55;
+    {const e=soEasy(g);if(e)gr*=e.reach} // shootouts vs the CPU: their goalie covers less net
     const d=dist(g,puck),rr=gr+PR;if(d>=rr||d===0)continue;
     const nx=(puck.x-g.x)/d,ny=(puck.y-g.y)/d;puck.x=g.x+nx*rr;puck.y=g.y+ny*rr;
     const S=gStats(g),out=g.team?1:-1,sp=hyp(puck.vx,puck.vy),wasShot=puck.shot&&puck.lastTeam!==g.team,wasHigh=puck.high;
@@ -3102,14 +3167,15 @@ function endGame(){
   $('eS0').textContent=score[0];$('eS1').textContent=score[1];$('eShots').textContent=shots[0]+' – '+shots[1];
   // every finished game is worth 30 trophies; check for a newly opened arena
   // trophies only for a win
-  const earned=win?TROPHIES_PER_GAME:0;
+  const before0=curTr(),earned0=win?TROPHIES_PER_GAME:how?-TR_OTL:-TR_LOSS;
   if(win)questEvent('win');
   if(win&&score[1]===0)questEvent('shutout');
   if(score[0]-(period===3&&soWinner===0?1:0)>=3)questEvent('hattrick');
   const pk=score[0]*PUCKS_PER_GOAL;pucks+=pk;$('ePucks').textContent='+'+pk;
-  const before=unlockedCount();if(MODE5)trophies5+=earned;else trophies+=earned;saveProgress();const after=unlockedCount();
-  $('earnAmt').textContent='+'+earned;
-  {const md=MODE5?' (5 on 5)':' (3 on 3)';$('earnTotal').textContent=win?curTr()+' total'+md:'Trophies are for wins · '+curTr()+' total'+md}
+  const before=unlockedCount();if(MODE5){trophies5=Math.max(0,trophies5+earned0);trPk5=Math.max(trPk5,trophies5)}else{trophies=Math.max(0,trophies+earned0);trPk3=Math.max(trPk3,trophies)}
+  const earned=curTr()-before0;saveProgress();const after=unlockedCount();try{profileUp()}catch(_){} // leaderboard sees it right away
+  $('earnAmt').textContent=(earned>=0?'+':'\u2212')+Math.abs(earned);$('earnAmt').classList.toggle('neg',earned<0);
+  {const md=MODE5?' (5 on 5)':' (3 on 3)';$('earnTotal').textContent=win?curTr()+' total'+md:(how?'OT/shootout loss':'Loss')+' \u00b7 '+curTr()+' total'+md}
   const um=$('unlockMsg');
   if(after>before){const a=ARENAS[after-1];um.textContent='NEW ARENA UNLOCKED: '+a.name.toUpperCase()+(MOVES[after]?' · NEW MOVE: '+MOVES[after].n+' ('+MOVES[after].how+')':'');um.hidden=false;setArena(after-1);$('againBtn').textContent='PLAY '+a.name.toUpperCase()}
   else{um.hidden=true;$('againBtn').textContent='PLAY AGAIN'}
@@ -3197,7 +3263,7 @@ function renderStats(){statsInto({c:loadCareer(),mode:stMode,body:'stBody',tog:'
 function newGame(){
   marksPeriod=-1;
   applySkin(skin);
-  gameId=(gameId%1e6)+1;evBuf=[];netEv=[];if(!netRole)startCast();
+  gameId=(gameId%1e6)+1;evBuf=[];netEv=[];if(!netRole){startCast();D=cpuD(cpuSkill())}
   audio();clearPbp();score=[0,0];shots=[0,0];gs={poss:[0,0],fo:[0,0],pass:[0,0]};period=1;clock=PERIOD;so=null;soWinner=-1;setup();faceoff();
   pbp(`Welcome to ${ARENAS[arenaIdx].name}. Puck drop is coming up.`,2);greetTalk();if(teamN()===5)setTimeout(()=>toast('5 ON 5','small',1100),300);
   ['menuOv','endOv','boxOv','interOv','pauseOv','soBar','deckOv','roadOv','passOv','shopOv','helpOv','questOv','arenaOv','superOv'].forEach(i=>$(i).hidden=true);updateHud();sfx('whistle');
@@ -3256,7 +3322,7 @@ function renderSO(){
 }
 
 /* ---------- arenas & trophies (saved on this device) ---------- */
-const unlockedCount=()=>ARENAS.filter(a=>curTr()>=a.need).length;
+const unlockedCount=()=>ARENAS.filter(a=>curPk()>=a.need).length;
 /* ---------- player profiles (this device) ----------
    Each username has its own save: trophies, arena, legends, upgrades, gold, pucks, pass, quests.
    Settings (sound, announcer, roles) stay shared by everyone on the device. */
@@ -3266,7 +3332,7 @@ const ls={get:k=>{try{return localStorage.getItem(k)}catch(_){return null}},set:
 function profileList(){try{const a=JSON.parse(ls.get('slapshot-profiles')||'[]');return Array.isArray(a)?a.filter(x=>typeof x==='string'):[]}catch(_){return[]}}
 const K=k=>PKEY(curUser,k);
 function saveProgress(){if(!curUser)return;try{localStorage.setItem(K('at'),String(Date.now()));cloudDirty();localStorage.setItem(K('trophies'),String(trophies));localStorage.setItem(K('arena'),String(arenaIdx));
-  localStorage.setItem(K('cards'),JSON.stringify({lqFix:1,owned,deck,decks,deckIdx,deckNames,lastDropDay,gold,prog,pucks,passClaimed,bonusClaimed,passMonth,questsDay,quests,emotes,roadClaimed,roadC3,roadC5,trophies5,shopDay,shopBought,gems,skins,skin,featured,bundlesOnce}))}catch(_){}}
+  const s3=setOf(3),s5=setOf(5)||fresh5(s3.deck);localStorage.setItem(K('cards'),JSON.stringify({lqFix:1,trPk3:Math.max(trPk3,trophies),trPk5:Math.max(trPk5,trophies5),owned,deck:s3.deck,decks:s3.decks,deckIdx:s3.deckIdx,deckNames:s3.deckNames,deck5:s5.deck,decks5:s5.decks,deckIdx5:s5.deckIdx,deckNames5:s5.deckNames,lastDropDay,gold,prog,pucks,passClaimed,bonusClaimed,passMonth,questsDay,quests,emotes,roadClaimed,roadC3,roadC5,trophies5,shopDay,shopBought,gems,skins,skin,featured,bundlesOnce}))}catch(_){}}
 /* ---------- emotes ----------
    Everyone starts with the first 3. The rest come from Epic (50%), Mythic (75%) and Legendary (always)
    star drops. Tap the bubble button on the rink (or T on a keyboard) and pick one; it pops up for both
@@ -3342,11 +3408,13 @@ const START_EMOTES=['gg','nice','oops'];
 const emoteById=id=>EMOTES.find(e=>e.id===id);
 let emotes=START_EMOTES.slice(),emCool=0,emTimers={};
 function resetProgress(){ // a brand-new player's starting point
+  deckView=3;SLOTS=SLOTS3;deckOther=null;trPk3=0;trPk5=0;
   trophies=0;arenaIdx=0;owned=['bell','charlotte'];deck={F1:'charlotte',F2:null,D:'bell',G:null};
   decks=[deck];for(let i=1;i<DECKS_N;i++)decks.push({F1:null,F2:null,D:'bell',G:null});deckIdx=0;deckNames=DECK_DEF_NAMES.slice();lastDropDay='';dropPending=false;gold=100;
   prog={bell:{copies:10,lv:{}},charlotte:{copies:0,lv:{}}};pucks=0;passClaimed=[];bonusClaimed=0;passMonth='';questsDay='';quests=[];emotes=START_EMOTES.slice();roadClaimed=[];roadC3=[];roadC5=[];trophies5=0;shopDay='';shopBought=[];gems=0;skins=['classic'];skin='classic';featured=null;bundlesOnce=[];
 }
 let charlotteNew=false;
+{const base=loadProgress;loadProgress=function(){base();if(!deckOther)deckOther=fresh5(deck);viewDecks(MODE5?5:3)}}
 /* Erik Lindqvist (uncommon RW) once shared the id 'lindqvist' with Mika Lindqvist (legend G), so owning one
    showed both and tapping Erik opened Mika. Erik now has his own id. Older saves that own 'lindqvist' keep
    Mika and also get Erik (we can't tell which one was earned); his card progress and forward slots move to Erik. */
@@ -3376,12 +3444,16 @@ function loadProgress(){resetProgress();if(!curUser)return;try{
     {const di=Number.isInteger(c.deckIdx)&&c.deckIdx>=0&&c.deckIdx<DECKS_N?c.deckIdx:0,ok=id=>id&&owned.includes(id)?id:null;
      decks=[];for(let i=0;i<DECKS_N;i++){const d=Array.isArray(c.decks)&&c.decks[i]||{F1:null,F2:null,D:'bell',G:null};decks.push(i===di?deck:{F1:ok(d.F1),F2:ok(d.F2),D:ok(d.D),G:ok(d.G)})}
      deckIdx=di;if(Array.isArray(c.deckNames))deckNames=DECK_DEF_NAMES.map((n,i)=>typeof c.deckNames[i]==='string'&&c.deckNames[i].trim()?c.deckNames[i].slice(0,14):n)}
+    // 5 on 5 decks (first time: deck 1 starts as a copy of your 3 on 3 deck)
+    if(Array.isArray(c.decks5)){const di=Number.isInteger(c.deckIdx5)&&c.deckIdx5>=0&&c.deckIdx5<DECKS_N?c.deckIdx5:0,ok=id=>id&&owned.includes(id)?id:null,d5=[];
+      for(let i=0;i<DECKS_N;i++){const d=c.decks5[i]||{},o=empty5();for(const k of KEYS5)o[k]=ok(d[k]);d5.push(o)}
+      deckOther={deck:d5[di],decks:d5,deckIdx:di,deckNames:DECK_DEF_NAMES.map((n,i)=>Array.isArray(c.deckNames5)&&typeof c.deckNames5[i]==='string'&&c.deckNames5[i].trim()?c.deckNames5[i].slice(0,14):n)}}
     lastDropDay=c.lastDropDay||'';gold=Math.max(0,+c.gold||0)+(fresh?100:0);
     if(c.questsDay&&Array.isArray(c.quests)){questsDay=c.questsDay;quests=c.quests.filter(q=>questById(q.id))}
     if(c.shopDay&&Array.isArray(c.shopBought)){shopDay=c.shopDay;shopBought=c.shopBought}
     gems=Math.max(0,+c.gems||0);bundlesOnce=Array.isArray(c.bundlesOnce)?c.bundlesOnce.filter(x=>typeof x==='string'):[];if(Array.isArray(c.skins))skins=[...new Set(['classic',...c.skins.filter(skinById)])];skin=skinById(c.skin)&&skins.includes(c.skin)?c.skin:'classic';featured=owned.includes(c.featured)?c.featured:null;
     if(Array.isArray(c.roadClaimed))roadClaimed=c.roadClaimed.filter(n=>Number.isFinite(n));
-    trophies5=Math.max(0,+c.trophies5||0);if(Array.isArray(c.roadC3))roadC3=c.roadC3.filter(n=>Number.isFinite(n));if(Array.isArray(c.roadC5))roadC5=c.roadC5.filter(n=>Number.isFinite(n));
+    trophies5=Math.max(0,+c.trophies5||0);trPk5=Math.max(trophies5,+c.trPk5||0);trPk3=Math.max(trophies,+c.trPk3||0);if(Array.isArray(c.roadC3))roadC3=c.roadC3.filter(n=>Number.isFinite(n));if(Array.isArray(c.roadC5))roadC5=c.roadC5.filter(n=>Number.isFinite(n));
     if(Array.isArray(c.emotes))emotes=[...new Set([...START_EMOTES,...c.emotes.filter(emoteById)])];
     pucks=Math.max(0,+c.pucks||0);passClaimed=Array.isArray(c.passClaimed)?c.passClaimed:[];bonusClaimed=+c.bonusClaimed||0;passMonth=typeof c.passMonth==='string'?c.passMonth:'';
     if(c.prog){prog=c.prog;
@@ -3613,7 +3685,7 @@ async function profileUp(extra){
   else if(netRole==='guest'&&liveJoin)live={code:liveJoin,a:friendName||'Friend',b:n};
   else if(!netRole&&castPeer&&castCode&&phase!=='menu')live={code:castCode,a:n,b:'CPU',cpu:1};
   let stats=null;try{stats=careerPublic()}catch(_){}
-  try{await fbDb.collection('profiles').doc(acct.uid).set(Object.assign({name:n,lower:lowerName(n),tr:t,tr5:t5,seen:Date.now(),st:inMatch()?'game':'on',live,stats,cv:2},extra||{}),{merge:true});profErr=''}catch(e){console.warn('profile',e);profErr=(e&&e.code)||'error';renderFriends()}
+  try{await fbDb.collection('profiles').doc(acct.uid).set(Object.assign({name:n,lower:lowerName(n),tr:t,tr5:t5,seen:Date.now(),st:inMatch()?'game':'on',live,stats,cv:2,trT:t+t5},extra||{}),{merge:true});profErr=''}catch(e){console.warn('profile',e);profErr=(e&&e.code)||'error';renderFriends()}
 }
 async function claimName(name){
   for(let i=0;i<40;i++){const n=i?cleanName(name.slice(0,13)+' '+(i+1)):name,ref=fbDb.collection('usernames').doc(lowerName(n));
@@ -3983,7 +4055,7 @@ function openStar(){
   if(rw.copies){const c=cardById(rw.copiesOf);progOf(c.id).copies+=rw.copies;
     html+=`<div class="reward" style="margin-top:10px;color:var(--text)">+${rw.copies} ${c.name.toUpperCase()} CARDS</div><p style="margin-top:6px">${progOf(c.id).copies} cards. 10 upgrades one attribute.</p>`}
   if(rw.card){
-    const c=rw.card;owned.push(c.id);progOf(c.id);const slot=SLOTS.find(s=>s.pos===c.pos&&!deck[s.k]);if(slot)deck[slot.k]=c.id;
+    const c=rw.card;owned.push(c.id);progOf(c.id);const slot=bestSlot(deck,c,SLOTS);if(slot&&!deck[slot.k])deck[slot.k]=c.id;
     pendingUnlock=c;html+=`<div class="reward" style="margin:12px 0 10px;color:${RAR_COL[rarOf(c)]||'#ffc629'}">${rarOf(c)==='uncommon'?'A NEW PLAYER WANTS TO SIGN!':c.ultra?'\u{1F988} AN ULTRA LEGEND!':'A NEW LEGEND!'}</div><button class="go ulGo" id="ulGo" style="--rc:${RAR_COL[rarOf(c)]||'#ffc629'}">\u{1F513} MEET YOUR NEW PLAYER</button><div hidden>${legendHTML(c,false)}</div><p style="margin-top:8px">${slot?'Added to your deck.':'Open your deck to equip.'}</p>`;
     horn();
   }else tone(880,.25,'triangle',.06,1320);
@@ -4124,11 +4196,11 @@ function tileHTML(c,opts){
 let cardFilt='all';
 function switchDeck(i){if(i===deckIdx||i<0||i>=DECKS_N)return;deckIdx=i;deck=decks[i];selCard=null;saveProgress();applyDeck();renderDeck();renderArenas();tone(620,.06,'triangle',.05);
   toast((deckNames[i]||DECK_DEF_NAMES[i]).toUpperCase()+' SELECTED','small',800)}
-function copyDeckFrom(j){const src=decks[j];if(!src||j===deckIdx)return;Object.assign(deck,{F1:src.F1,F2:src.F2,D:src.D,G:src.G});saveProgress();applyDeck();renderDeck();renderArenas();toast('COPIED','small',700)}
+function copyDeckFrom(j){const src=decks[j];if(!src||j===deckIdx)return;for(const sl of SLOTS)deck[sl.k]=src[sl.k]||null;saveProgress();applyDeck();renderDeck();renderArenas();toast('COPIED','small',700)}
 function clearDeck(){Object.assign(deck,{F1:null,F2:null,D:'bell',G:null});saveProgress();applyDeck();renderDeck();renderArenas()}
 const RAR_DOT={ultra:'#35e0ff',legend:'#ffc629',special:'#ff5fa8',uncommon:'#2fbf63',starter:'#a9b6c8'};
 function renderDeckTabs(){
-  $('deckTabs').innerHTML=decks.map((d,i)=>{const dots=['F1','F2','D','G'].map(k=>{const c=cardById(d[k]);return`<i style="background:${c?RAR_DOT[rarOf(c)]:'rgba(255,255,255,.18)'}"></i>`}).join('');
+  $('deckTabs').innerHTML=decks.map((d,i)=>{const dots=SLOTS.map(x=>x.k).map(k=>{const c=cardById(d[k]);return`<i style="background:${c?RAR_DOT[rarOf(c)]:'rgba(255,255,255,.18)'}"></i>`}).join('');
     return`<button class="dtab${i===deckIdx?' on':''}" data-deck="${i}"><b>${i+1}</b><span class="dnm">${esc(deckNames[i]||DECK_DEF_NAMES[i])}</span><span class="ddots">${dots}</span></button>`}).join('');
   const ni=$('deckName');if(document.activeElement!==ni)ni.value=deckNames[deckIdx]||DECK_DEF_NAMES[deckIdx];
   $('deckCopy').innerHTML='<option value="">Copy…</option>'+decks.map((d,i)=>i===deckIdx?'':`<option value="${i}">${esc(deckNames[i]||DECK_DEF_NAMES[i])}</option>`).join('');
@@ -4174,8 +4246,10 @@ function renderDeck(){
   applySharkKit();
   renderDeckTabs();
   renderEmoteGrid();
+  $('modeDeck').innerHTML=['3','5'].map(m=>`<button data-dm="${m}" class="${(m==='5')===MODE5?'on':''}">${m} ON ${m}</button>`).join('');
+  $('slots').classList.toggle('s5',SLOTS===SLOTS5);
   $('slots').innerHTML=SLOTS.map(sl=>{const c=cardById(deck[sl.k]);
-    return c?tileHTML(c,{slot:true}):`<div class="ctile empty"><span class="cpos">${sl.k==='G'?'G':sl.k==='D'?'D':'F'}</span><span class="cn">+</span><span class="cnm">${sl.label}</span><span class="cab">EMPTY</span></div>`}).join('');
+    return (sl.sp?`<div class="slotW"><span class="slotCap">${esc(sl.label)}</span>`:'')+(c?tileHTML(c,{slot:true}):`<div class="ctile empty"><span class="cpos">${sl.sp||(sl.k==='G'?'G':sl.k==='D'?'D':'F')}</span><span class="cn">+</span><span class="cnm">${sl.label}</span><span class="cab">EMPTY</span></div>`)+(sl.sp?'</div>':'')}).join('');
   {const L=CARDS.filter(c=>rarOf(c)==='legend'),U=CARDS.filter(c=>rarOf(c)==='uncommon');
    $('ownCount').textContent='LEGENDS '+L.filter(c=>owned.includes(c.id)).length+'/'+L.length+' \u00b7 UNCOMMON '+U.filter(c=>owned.includes(c.id)).length+'/'+U.length}
   if(selCard&&!owned.includes(selCard))selCard=null;
@@ -4204,11 +4278,11 @@ function toggleCard(id){
   if(c.ultra&&!sharkPos()){openPos();return}
   const k=Object.keys(deck).find(k=>deck[k]===id);
   if(k)deck[k]=null;
-  else{const fits=SLOTS.filter(s=>s.pos===c.pos);const slot=fits.find(s=>!deck[s.k])||fits[0];deck[slot.k]=id}
+  else{const slot=bestSlot(deck,c,SLOTS);if(slot)deck[slot.k]=id}
   saveProgress();renderDeck();renderArenas();
 }
 function setArena(i){
-  arenaIdx=clamp(i,0,unlockedCount()-1);D=arenaD(arenaIdx);saveProgress();renderArenas();
+  arenaIdx=clamp(i,0,unlockedCount()-1);D=cpuD(cpuSkill());saveProgress();renderArenas();
   if(typeof resize==='function'&&iceGrad)resize();
 }
 /* ---------- Puck Pass (free) ----------
@@ -4295,7 +4369,7 @@ const ROAD5=[{at:100,type:'cards',n:8},{at:200,type:'unc'},{at:300,type:'drop',m
   {at:600,type:'unc'},{at:700,type:'cards',n:15},{at:800,type:'gold',n:500},{at:900,type:'drop',min:3},{at:1000,type:'drop',min:4},
   {at:1100,type:'unc'},{at:1200,type:'gems',n:20},{at:1300,type:'drop',min:3},{at:1400,type:'unc'},{at:1500,type:'drop',min:4}];
 let roadView=null; // which road the sheet shows (defaults to the mode you play)
-const rv=()=>roadView==null?MODE5:roadView,ROADof=m=>m?ROAD5:ROAD3,claimedOf=m=>m?roadC5:roadC3,trOf=m=>m?trophies5:trophies;
+const rv=()=>roadView==null?MODE5:roadView,ROADof=m=>m?ROAD5:ROAD3,claimedOf=m=>m?roadC5:roadC3,trOf=m=>m?Math.max(trophies5,trPk5):Math.max(trophies,trPk3);
 const DROP_NAMES=['Card pack','Super Rare+ card pack','Epic+ card pack','Mythic+ card pack','Legendary card pack'];
 let roadClaimed=[];
 function roadLabel(r){
@@ -4315,7 +4389,7 @@ function claimRoad(at){
   else if(r.type==='cards'){const id=pick1(owned);progOf(id).copies+=r.n;tone(660,.2,'triangle',.06,990);toast('+'+r.n+' '+cardById(id).name.split(' ').slice(-1)[0].toUpperCase()+' CARDS','small',1200)}
   else if(r.type==='unc'){ // a new uncommon player joins (if you already have them all: a stack of cards instead)
     const pool=CARDS.filter(c=>rarOf(c)==='uncommon'&&!owned.includes(c.id));
-    if(pool.length){const c=pick1(pool);owned.push(c.id);progOf(c.id);const sl=SLOTS.find(x=>x.pos===c.pos&&!deck[x.k]);if(sl)deck[sl.k]=c.id;saveProgress();renderRoad();renderArenas();openUnlock(c);return}
+    if(pool.length){const c=pick1(pool);owned.push(c.id);progOf(c.id);const sl=bestSlot(deck,c,SLOTS);if(sl&&!deck[sl.k])deck[sl.k]=c.id;saveProgress();renderRoad();renderArenas();openUnlock(c);return}
     const mine=owned.filter(id=>rarOf(cardById(id))==='uncommon');const id=mine.length?pick1(mine):pick1(owned);progOf(id).copies+=25;toast('+25 '+cardById(id).name.split(' ').slice(-1)[0].toUpperCase()+' CARDS','small',1200)}
   else if(r.type==='emote'){
     const pool=EMOTES.filter(e=>!emotes.includes(e.id));
@@ -4410,23 +4484,23 @@ function renderArenas(){
   badge('passBdg',passReady());$('gemCount').textContent=gems;
   badge('questBdg',quests.filter(q=>!q.claimed&&q.prog>=questById(q.id).n).length);
   {const A=ARENAS[arenaIdx],rv=[0,0,1,2,3,3,4,4][arenaIdx];$('modeName').textContent=A.name;
-   $('modeSub').textContent='ARENA '+(arenaIdx+1)+' \u00b7 CPU LV '+CPU_LV[arenaIdx];
+   $('modeSub').textContent='ARENA '+(arenaIdx+1)+' \u00b7 CPU LV '+cpuLvTxt(cpuSkill());
    $('mRink').style.setProperty('--i0',A.ice[0]);$('mRink').style.setProperty('--i1',A.ice[1])}
   renderHero();badge('deckBdg',upgradable());badge('shopBdg',giftReady()?1:0);
   $('whoAv').textContent=(curUser||'?').charAt(0).toUpperCase();
   {const done=lastDropDay===today();$('dstar').classList.toggle('ready',!done);
    $('dropLine').textContent=done?'Daily card pack opened. A new one tomorrow.':'Win a game today to open your daily card pack!'}
   // the arena banner: flip through the arenas you've unlocked
-  const i=arenaIdx,a=ARENAS[i],nx=ARENAS.find(x=>x.need>curTr()),mv=MOVES[i+1];
+  const i=arenaIdx,a=ARENAS[i],nx=ARENAS.find(x=>x.need>curPk()),mv=MOVES[i+1];
   const mx=Object.values(deckMix()),nl=mx.filter(x=>x==='legend').length,nu=mx.filter(x=>x==='uncommon').length;
   const rivTxt='CPU DECK = YOURS: '+(nl||nu?[nl?nl+' LEGEND'+(nl>1?'S':''):'',nu?nu+' UNCOMMON':''].filter(Boolean).join(' + '):'NO LEGENDS')+(i>=2&&nl?' \u00b7 THEY USE SUPERS':'');
   $('arenaList').innerHTML=`<div class="arenaCard" style="--ak:${a.kick};--i0:${a.ice[0]};--i1:${a.ice[1]}">
     <button class="arrow" data-go="-1" aria-label="Previous arena" ${i>0?'':'disabled'}>&lsaquo;</button>
     <div class="aMid"><span class="aNum">ARENA ${i+1}</span><span class="aName">${a.name}</span><span class="aSub">${a.sub}</span>
       <div class="aRink"><b>${a.mark}</b></div>
-      <div class="aTags"><span>CPU LV ${CPU_LV[i]}</span><span class="${nl?'hot':''}">${rivTxt}</span>${mv?`<span class="nmv">MOVE: ${mv.n}</span>`:''}</div></div>
+      <div class="aTags"><span>CPU LV ${cpuLvTxt(cpuSkill())}</span><span class="${nl?'hot':''}">${rivTxt}</span>${mv?`<span class="nmv">MOVE: ${mv.n}</span>`:''}</div></div>
     <button class="arrow" data-go="1" aria-label="Next arena" ${i<unlockedCount()-1?'':'disabled'}>&rsaquo;</button></div>
-    ${nx?`<div class="nextA"><span>${ARENAS.indexOf(nx)+1>i+1?'ARENA '+(ARENAS.indexOf(nx)+1):'NEXT'}</span><span class="bar"><i style="width:${Math.min(100,curTr()/nx.need*100)}%"></i></span><span>${curTr()} / ${nx.need}</span></div>`:'<div class="nextA"><span>ALL ARENAS OPEN</span><span></span><span></span></div>'}`;
+    ${nx?`<div class="nextA"><span>${ARENAS.indexOf(nx)+1>i+1?'ARENA '+(ARENAS.indexOf(nx)+1):'NEXT'}</span><span class="bar"><i style="width:${Math.min(100,curPk()/nx.need*100)}%"></i></span><span>${curTr()} / ${nx.need}</span></div>`:'<div class="nextA"><span>ALL ARENAS OPEN</span><span></span><span></span></div>'}`;
 }
 function badge(id,n){const b=$(id);if(!b)return;b.hidden=!n;if(n)b.textContent=n>9?'9+':n}
 // how many card upgrades you can afford right now (the red badge on the Cards tab)
@@ -4931,7 +5005,7 @@ function primaryAction(){
 }
 // Esc = back out of a menu screen, otherwise pause
 function backAction(){
-  for(const[ov,btn]of[['boxOv','boxDone'],['statsOv','statsDone'],['deckOv','deckDone'],['passOv','passDone'],['roadOv','roadDone'],['shopOv','shopDone'],['helpOv','helpDone'],['questOv','questDone'],['arenaOv','arenaDone'],['superOv','superDone'],['voiceOv','vDone'],['netOv','netCancel'],['xferOv','xferClose'],['authOv','authClose'],['fsOv','fsDone'],['ownerOv','ownerDone'],['musOv','musDone'],['profOv','profClose']])
+  for(const[ov,btn]of[['boxOv','boxDone'],['lbOv','lbDone'],['statsOv','statsDone'],['deckOv','deckDone'],['passOv','passDone'],['roadOv','roadDone'],['shopOv','shopDone'],['helpOv','helpDone'],['questOv','questDone'],['arenaOv','arenaDone'],['superOv','superDone'],['voiceOv','vDone'],['netOv','netCancel'],['xferOv','xferClose'],['authOv','authClose'],['fsOv','fsDone'],['ownerOv','ownerDone'],['musOv','musDone'],['profOv','profClose']])
     if(visible(ov)){if(visible(btn)||SHEETS.some(x=>x[0]===ov))$(btn).click();return}
   togglePause();
 }
@@ -5119,6 +5193,56 @@ $('superDone').addEventListener('click',()=>{$('superOv').hidden=true});
 $('questBtn').addEventListener('click',()=>{renderQuests();$('questOv').hidden=false});
 $('statsBtn').addEventListener('click',()=>{renderStats();$('statsOv').hidden=false});
 $('statsDone').addEventListener('click',()=>{$('statsOv').hidden=true});
+/* ---------- leaderboard ----------
+   Real players only, live: while the board is open it listens to the profiles collection in Firestore
+   (onSnapshot), so a game finished anywhere shows up within a second or two. Every row is a real account's
+   public profile. Overall is worked out here as 3v3 + 5v5 from the top of all three lists, so profiles from
+   older copies of the game (no total field yet) still count. Your own row uses your trophies right now. */
+let lbMode='trT',lbUnsub=[],lbData={},lbAt=0,lbErr='';
+const LB_N=50;
+function lbStop(){lbUnsub.forEach(f=>{try{f()}catch(_){}});lbUnsub=[]}
+function lbListen(m){
+  lbStop();lbData={};lbErr='';lbAt=0;const body=$('lbBody');
+  if(!acct||!fbDb){body.innerHTML=`<p class="lbNote" style="font-size:15px">The leaderboard is made of real players with an account. <b>Sign in</b> to see it and get your name on it.</p><button class="cloudBtn" id="lbSign" style="margin-top:10px">☁️ SIGN IN</button>`;const b=$('lbSign');if(b)b.onclick=()=>{$('lbOv').hidden=true;openAuth('in')};return}
+  body.innerHTML='<p class="lbNote">Loading live rankings...</p>';
+  try{profileUp()}catch(_){}
+  const fields=m==='trT'?['trT','tr','tr5']:[m];
+  for(const f of fields){
+    const q=fbDb.collection('profiles').orderBy(f,'desc').limit(LB_N);
+    const got=snap=>{if(lbMode!==m)return;const part={};snap.docs.forEach(d=>{part[d.id]=Object.assign({uid:d.id},d.data())});lbData[f]=part;lbAt=Date.now();lbErr='';paintLb()};
+    const bad=e=>{console.warn('lb',e);lbErr=fsErr(e);paintLb()};
+    try{if(typeof q.onSnapshot==='function')lbUnsub.push(q.onSnapshot(got,bad));else q.get().then(got,bad)}catch(e){bad(e)}
+  }
+  // safety net: if live updates stall, refresh by hand every 20 s while the board is open
+  const t=setInterval(()=>{if($('lbOv').hidden){lbStop();return}if(Date.now()-lbAt>20000)for(const f of fields)fbDb.collection('profiles').orderBy(f,'desc').limit(LB_N).get().then(s=>{const part={};s.docs.forEach(d=>{part[d.id]=Object.assign({uid:d.id},d.data())});lbData[f]=part;lbAt=Date.now();paintLb()}).catch(()=>{})},5000);
+  lbUnsub.push(()=>clearInterval(t));
+}
+function lbVal(r,m){return m==='trT'?(+r.tr||0)+(+r.tr5||0):(+r[m]||0)}
+function paintLb(){
+  const m=lbMode,me=acct&&acct.uid,body=$('lbBody');if(!body||$('lbOv').hidden)return;
+  if(lbErr&&!Object.keys(lbData).length){body.innerHTML='<p class="lbNote" style="font-size:15px">'+esc(lbErr)+'</p>';return}
+  if(!lbAt){return}
+  const all={};for(const f in lbData)Object.assign(all,lbData[f]);
+  // you, exactly as you are in the game right now
+  if(me){const[t,t5]=acctTrophies(),nm=acctName()||curUser;all[me]=Object.assign({},all[me]||{},{uid:me,name:(all[me]&&all[me].name)||nm,tr:t,tr5:t5,seen:Date.now(),st:inMatch()?'game':'on'})}
+  let rows=Object.values(all).filter(r=>r&&r.name&&lbVal(r,m)>0).sort((a,b)=>lbVal(b,m)-lbVal(a,m)||String(a.name).localeCompare(String(b.name)));
+  const myIdx=rows.findIndex(r=>r.uid===me),top=rows.slice(0,LB_N);
+  const dot=r=>{const[c,txt]=frStatus(r);return`<i class="dot ${c}" title="${esc(txt)}"></i>`};
+  const sub=r=>{const[c,txt]=frStatus(r);return(m==='trT'?`3v3 ${+r.tr||0} · 5v5 ${+r.tr5||0} · `:'')+txt};
+  const row=(r,i)=>`<div class="lbRow${i<3?' top'+(i+1):''}${r.uid===me?' me':''}"><span class="rk">${i+1}</span><span class="nm">${dot(r)}${esc(r.name)}${r.uid===me?' (you)':''}<small>${esc(sub(r))}</small></span><span class="tv">${lbVal(r,m)}</span></div>`;
+  let h=top.length?'<div class="lbList">'+top.map(row).join('')+'</div>':'<p class="lbNote" style="font-size:15px">No one with trophies here yet. Win a game to be first!</p>';
+  if(me&&myIdx>=LB_N)h+=`<div class="lbList">${row(rows[myIdx],myIdx).replace(/<span class="rk">\d+<\/span>/,'<span class="rk">'+LB_N+'+</span>')}</div>`;
+  else if(me&&myIdx<0)h+='<p class="lbNote">Win a game to get on the board.</p>';
+  const tm=new Date(lbAt).toLocaleTimeString([],{hour:'numeric',minute:'2-digit',second:'2-digit'});
+  h+=`<p class="lbNote"><span class="lbLive">● LIVE</span> updated ${esc(tm)} · top ${LB_N} real players with accounts. Wins +30, losses −15, overtime/shootout losses −10.</p>`;
+  body.innerHTML=h;
+}
+function openLb(){audio();$('lbOv').hidden=false;$('lbOv').scrollTop=0;paintLbTog();lbListen(lbMode)}
+function paintLbTog(){for(const b of $('lbTog').querySelectorAll('[data-m]'))b.setAttribute('aria-pressed',String(b.dataset.m===lbMode));$('lbSub').textContent=lbMode==='trT'?'Most trophies · overall':lbMode==='tr'?'Most trophies · 3 on 3':'Most trophies · 5 on 5'}
+$('lbBtn').addEventListener('click',openLb);
+$('lbDone').addEventListener('click',()=>{$('lbOv').hidden=true;lbStop()});
+$('lbTog').addEventListener('click',e=>{const b=e.target.closest('[data-m]');if(!b||b.dataset.m===lbMode)return;lbMode=b.dataset.m;paintLbTog();tone(620,.05,'triangle',.04);lbListen(lbMode)});
+
 $('stTog').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;stMode=b.dataset.m;tone(520,.04,'triangle',.04);renderStats()});
 $('boxBtn').addEventListener('click',()=>{audio();tone(520,.05,'triangle',.04);openBox()});
 $('boxDone').addEventListener('click',()=>{$('boxOv').hidden=true});
@@ -5150,6 +5274,7 @@ $('cardList').addEventListener('click',e=>{
   const f=e.target.closest('[data-filt]');if(f){cardFilt=f.dataset.filt;renderDeck();return}
   pickCard(e)});
 $('slots').addEventListener('click',e=>{pickCard(e)});
+$('modeDeck').addEventListener('click',e=>{const b=e.target.closest('[data-dm]');if(!b)return;const f=b.dataset.dm==='5';if(f===MODE5)return;audio();setMode(f);toast(f?'5 ON 5 DECKS':'3 ON 3 DECKS','small',800)});
 $('deckTabs').addEventListener('click',e=>{const b=e.target.closest('[data-deck]');if(b){audio();switchDeck(+b.dataset.deck)}});
 $('deckName').addEventListener('input',e=>{deckNames[deckIdx]=e.target.value.slice(0,14)||DECK_DEF_NAMES[deckIdx];saveProgress();renderDeckTabs()});
 $('deckName').addEventListener('keydown',e=>{e.stopPropagation();if(e.key==='Enter')e.target.blur()});
@@ -5224,10 +5349,10 @@ function closeNet(){try{netConn&&netConn.close()}catch(_){}try{netPeer&&netPeer.
 function makeCode(){const a='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let c='';for(let i=0;i<5;i++)c+=a[Math.floor(Math.random()*a.length)];return c}
 // what this device brings to a friend game: its own deck with upgrades
 function deckPayload(){
-  const sk=['F1','F2','D'].map(k=>{const c=cardById(deck[k]);if(!c)return null;
+  const d3=deckOf(3),sk=['F1','F2','D'].map(k=>{const c=cardById(d3[k]);if(!c)return null;
     const attr={};for(const a of['spd','shot','acc','hands','def','accel'])attr[a]=(c.boost[a]||1)*(1+PER_LV*lvOf(c.id,a));
     return{id:c.id,name:c.name,num:c.num,attr,kit:c.ultra?c.kit:null}});
-  const gc=cardById(deck.G),g={greact:MY_GOALIE.greact,glat:MY_GOALIE.glat,gctl:MY_GOALIE.gctl};
+  const gc=cardById(d3.G),g={greact:MY_GOALIE.greact,glat:MY_GOALIE.glat,gctl:MY_GOALIE.gctl};
   if(gc){g.greact*=(gc.boost.greact||1)*Math.pow(1-PER_LV,lvOf(gc.id,'greact'));g.glat*=(gc.boost.glat||1)*(1+PER_LV*lvOf(gc.id,'glat'));g.gctl=Math.min(.95,g.gctl*(gc.boost.gctl||1)*(1+PER_LV*lvOf(gc.id,'gctl')))}
   return{sk,g,gname:gc?gc.name:'',gid:gc?gc.id:null,spin:spinUnlocked(),arenas:unlockedCount()};
 }
@@ -5249,7 +5374,7 @@ function setBoard(){
   $('son0').textContent='YOU';$('son1').textContent=on?'FRIEND':'CPU';
   $('son0').className='soName '+(g?'away':'home');$('son1').className='soName '+(g?'home':'away');
 }
-function hideAllOv(){['superOv','shopOv','helpOv','questOv','arenaOv','roadOv','profOv','xferOv','authOv','fsOv','ownerOv','musOv','boxOv','statsOv','menuOv','endOv','interOv','pauseOv','soBar','netOv','deckOv','passOv','voiceOv','dropOv'].forEach(i=>$(i).hidden=true)}
+function hideAllOv(){['superOv','shopOv','helpOv','questOv','arenaOv','roadOv','profOv','xferOv','authOv','fsOv','ownerOv','musOv','boxOv','statsOv','lbOv','menuOv','endOv','interOv','pauseOv','soBar','netOv','deckOv','passOv','voiceOv','dropOv'].forEach(i=>$(i).hidden=true)}
 
 // ----- host -----
 /* Hosting has to survive the host leaving the game to text the code: phones pause background pages,
